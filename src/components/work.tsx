@@ -1,5 +1,7 @@
 import {Header} from "@/components/header";
 import {WorkCard} from "@/components/workCard";
+import trinity from "/public/trinity.png"
+import giggity from "/public/giggity2.png"
 
 export default function Work() {
   return (
@@ -12,14 +14,14 @@ export default function Work() {
 					title={"Trinity Telecomm"}
 					link={"https://trinity.co.za"}
 					tag={"website"}
-					src={"/trinity.png"}
+					src={trinity}
 					alt={"Trinity website cover image"}
 				/>
 				<WorkCard
 					title={"Giggity"}
 					link={"https://giggity.co.za"}
 					tag={"web app"}
-					src={"/giggity2.png"}
+					src={giggity}
 					alt={"Giggity.co.za website cover image"}
 				/>
 			</div>

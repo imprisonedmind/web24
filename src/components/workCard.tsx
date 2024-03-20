@@ -1,12 +1,12 @@
 import {FC} from "react";
-import Image from "next/image";
+import Image, {StaticImageData} from "next/image";
 import Link from "next/link";
 
 interface WorkCardProps {
 	title: string;
 	link: string;
 	tag: string;
-	src: string;
+	src: StaticImageData;
 	alt: string;
 }
 
@@ -21,7 +21,14 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
 				" hover:shadow-md transition duration-150 ease-in-out"
 			}>
 			<div className={"relative h-36 w-full rounded-lg overflow-hidden"}>
-				<Image src={src} alt={alt} fill={true} className={"object-cover h-full w-full"}/>
+				<Image
+					src={src}
+					alt={alt}
+					fill={true}
+					priority={true}
+					placeholder={"blur"}
+					className={"object-cover h-full w-full"}
+				/>
 			</div>
 			<div>
 				<div className={"flex justify-between"}>
