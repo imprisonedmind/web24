@@ -2,11 +2,10 @@ import Image from "next/image";
 import Social from "@/components/social";
 import Employment from "@/components/employment";
 import Education from "@/components/education";
-import {Header} from "@/components/header";
-import {SmallLink} from "@/components/smallLink";
 import Work from "@/components/work";
 import WritingList from "@/components/writingList";
 import Bio from "@/components/bio";
+import Tech from "@/components/tech";
 
 
 export default function Home() {
@@ -28,22 +27,7 @@ export default function Home() {
 			</div>
 			<Work/>
 			<WritingList/>
-
-			<div>
-				<Header title={"tech"}/>
-				<div className={"flex flex-col"}>
-					<SmallLink title={"NextJs"} link={"https://nextjs.org/"}/>
-					<SmallLink title={"Django"} link={"https://www.djangoproject.com/"}/>
-					<SmallLink title={"Supabase"} link={"https://supabase.com"}/>
-					<SmallLink title={"React Native"} link={"https://reactnative.dev/"}/>
-					<SmallLink title={"Flutter"} link={"https://flutter.dev/"}/>
-					<SmallLink title={"Firebase"} link={"https://firebase.google.com/"}/>
-					<SmallLink title={"MongoDB"} link={"https://www.mongodb.com/"}/>
-					<SmallLink title={"Postgres"} link={"https://www.postgresql.org/"}/>
-					<SmallLink title={"Tailwind"} link={"https://tailwindcss.com/"}/>
-					<SmallLink title={"Figma"} link={"https://www.figma.com/"}/>
-				</div>
-			</div>
+			<Tech/>
 		</main>
 	);
 }
