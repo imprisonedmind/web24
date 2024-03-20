@@ -7,7 +7,7 @@ export default function WritingList() {
 			<Header title={"writing"}/>
 			<SmallLink
 				title={"revamping our mobile experience"}
-				link={'/writing/something/0e05c93cd6af475ea91c7abf74f8959d'}
+				link={'/writing/revamping-our-mobile-experience/0e05c93cd6af475ea91c7abf74f8959d'}
 			/>
 		</div>
 	);
