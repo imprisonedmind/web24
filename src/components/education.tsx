@@ -1,4 +1,5 @@
 import {Header} from "@/components/header";
+import {BulletPoint} from "@/components/bulletPoint";
 
 export default function Education() {
   return (
@@ -7,9 +8,8 @@ export default function Education() {
 			<div className={"flex flex-col"}>
 				<p className={"text-sm text-neutral-500"}>
 					BA Visual Communications Degree
-					<br/>
-					<span className={"italic"}>major in multimedia &apos;18-20</span>
 				</p>
+				<BulletPoint title={"major in multimedia"} date={"'18-20"}/>
 			</div>
 		</div>
 	);
