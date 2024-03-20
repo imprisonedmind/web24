@@ -1,5 +1,5 @@
-import {Header} from "@/app/components/header";
-import {SmallLink} from "@/app/components/smallLink";
+import {Header} from "@/components/header";
+import {SmallLink} from "@/components/smallLink";
 
 export default function Social() {
 	return (

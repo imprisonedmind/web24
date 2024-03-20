@@ -1,4 +1,4 @@
-import {Header} from "@/app/components/header";
+import {Header} from "@/components/header";
 
 export default function Education() {
   return (
@@ -8,7 +8,7 @@ export default function Education() {
 				<p className={"text-sm text-neutral-500"}>
 					BA Visual Communications Degree
 					<br/>
-					<span className={"italic"}>Major in Multimedia &apos;18-20</span>
+					<span className={"italic"}>major in multimedia &apos;18-20</span>
 				</p>
 			</div>
 		</div>

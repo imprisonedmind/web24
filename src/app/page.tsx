@@ -1,11 +1,13 @@
 import Image from "next/image";
-import {Header} from "@/app/components/header";
-import {WorkCard} from "@/app/components/workCard";
-import Link from "next/link";
-import {SmallLink} from "@/app/components/smallLink";
-import Social from "@/app/components/social";
-import Employment from "@/app/components/employment";
-import Education from "@/app/components/education";
+import Social from "@/components/social";
+import Employment from "@/components/employment";
+import Education from "@/components/education";
+import {Header} from "@/components/header";
+import {SmallLink} from "@/components/smallLink";
+import Work from "@/components/work";
+import WritingList from "@/components/writingList";
+import Bio from "@/components/bio";
+
 
 export default function Home() {
 	return (
@@ -18,60 +20,28 @@ export default function Home() {
 					height={500}
 				/>
 				<div className={"flex flex-col justify-between"}>
-					<div>
-						<h1 className={"text-xl font-medium"}>luke stephens</h1>
-						<h2 className={"text-neutral-500"}>
-							an individual, type-4 enneagram, passionate, dedicated, resilient.
-						</h2>
-					</div>
+					<Bio/>
 					<Social/>
 					<Employment/>
 					<Education/>
 				</div>
 			</div>
-			<div>
-				<Header title={"work"}/>
-				<div className={
-					"flex flex-nowrap gap-4 w-full pb-1 mt-1"
-				}>
-					<WorkCard
-						title={"Trinity Telecomm"}
-						link={"https://trinity.co.za"}
-						tag={"website"}
-						src={"/trinity.png"}
-						alt={"Trinity website cover image"}
-					/>
-					<WorkCard
-						title={"Giggity"}
-						link={"https://giggity.co.za"}
-						tag={"web app"}
-						src={"/giggity2.png"}
-						alt={"Giggity.co.za website cover image"}
-					/>
-				</div>
-			</div>
-			<div>
-				<Header title={"writing"}/>
-				<Link href={"/"}
-							className={"text-sm text-neutral-500 hover:underline underline-offset-2"}>
-					Hello World!
-				</Link>
-			</div>
-
+			<Work/>
+			<WritingList/>
 
 			<div>
 				<Header title={"tech"}/>
 				<div className={"flex flex-col"}>
-					<SmallLink title={"NextJs"} link={"https://twitter.com/lukey_stephens"}/>
-					<SmallLink title={"Django"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"Supabase"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"React Native"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"Flutter"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"Firebase"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"MongoDB"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"Postgres"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"Tailwind"} link={"https://layers.to/lukey"}/>
-					<SmallLink title={"Figma"} link={"https://layers.to/lukey"}/>
+					<SmallLink title={"NextJs"} link={"https://nextjs.org/"}/>
+					<SmallLink title={"Django"} link={"https://www.djangoproject.com/"}/>
+					<SmallLink title={"Supabase"} link={"https://supabase.com"}/>
+					<SmallLink title={"React Native"} link={"https://reactnative.dev/"}/>
+					<SmallLink title={"Flutter"} link={"https://flutter.dev/"}/>
+					<SmallLink title={"Firebase"} link={"https://firebase.google.com/"}/>
+					<SmallLink title={"MongoDB"} link={"https://www.mongodb.com/"}/>
+					<SmallLink title={"Postgres"} link={"https://www.postgresql.org/"}/>
+					<SmallLink title={"Tailwind"} link={"https://tailwindcss.com/"}/>
+					<SmallLink title={"Figma"} link={"https://www.figma.com/"}/>
 				</div>
 			</div>
 		</main>
