@@ -14,6 +14,7 @@ export default function Tech() {
 				<SmallLink title={"Firebase"} link={"https://firebase.google.com/"}/>
 				<SmallLink title={"MongoDB"} link={"https://www.mongodb.com/"}/>
 				<SmallLink title={"Postgres"} link={"https://www.postgresql.org/"}/>
+				<SmallLink title={"OpenAI APIs"} link={"https://openai.com/"}/>
 				<SmallLink title={"Tailwind"} link={"https://tailwindcss.com/"}/>
 				<SmallLink title={"Figma"} link={"https://www.figma.com/"}/>
 			</div>
