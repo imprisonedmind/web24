@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		site: "@site",
 		creator: "@lukey_stephens",
-		"images": "https://lukestephens.co.za/luke2.jpg"
+		images: "/luke2.jpg"
 	}
 };
 
