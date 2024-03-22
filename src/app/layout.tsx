@@ -35,7 +35,20 @@ export const metadata: Metadata = {
 		title: "Luke Stephens",
 		description: "an individual, type-4 enneagram, passionate, dedicated, resilient.",
 		siteName: "Luke Stephens",
-		images: "https://lukestephens.co.za/luke2.jpg"
+		images: [
+			{
+				url: "/lukeOG.jpg",
+				width: 1024,
+				height: 683,
+				alt: "Luke Stephens, Cape Town, Trinity Iot",
+			},
+			{
+				url: "/luke2.jpg",
+				width: 1200,
+				height: 600,
+				alt: "Luke Stephens, Cape Town, Trinity Iot",
+			},
+		],
 	},
 	twitter: {
 		card: "summary_large_image",
