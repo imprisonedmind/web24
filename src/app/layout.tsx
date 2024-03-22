@@ -15,7 +15,6 @@ const inter = Inter({subsets: ["latin"]});
 export const metadata: Metadata = {
 	title: "Luke Stephens",
 	description: "an individual.",
-	icons: "/faviconX167.svg"
 };
 
 

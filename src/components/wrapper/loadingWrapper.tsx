@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 
 interface LoadingWrapperProps {
-	children: React.ReactNode;
+	children: any;
 }
 
 export const LoadingWrapper: FC<LoadingWrapperProps> = (props) => {
@@ -10,8 +10,8 @@ export const LoadingWrapper: FC<LoadingWrapperProps> = (props) => {
 	return (
 		<div
 			className={`
-        h-[100vh] mx-auto flex w-full max-w-[600px] flex-col items-center justify-center 
-        gap-8 p-4 px-2 py-16 md:px-80
+        mx-auto flex w-full flex-col items-center justify-center 
+        gap-8 p-4 px-2 py-16 max-w-[720px]
     `}
 		>
 			{children}

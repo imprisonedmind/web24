@@ -5,20 +5,20 @@ export default function Loading() {
 		<LoadingWrapper>
 			<div
 				className={
-					"h-10 w-3/5 animate-pulse self-start rounded-sm bg-red-500"
+					"h-10 w-3/5 animate-pulse self-start rounded-sm bg-neutral-200/60"
 				}
 			/>
 			<div
-				className={"h-64 w-full animate-pulse rounded-md bg-red-500"}
+				className={"h-64 w-full animate-pulse rounded-md bg-neutral-200/60"}
 			/>
 			<div
-				className={"h-32 w-full animate-pulse rounded-md bg-red-500"}
+				className={"h-32 w-full animate-pulse rounded-md bg-neutral-200/60"}
 			/>
 			<div
-				className={"h-80 w-full animate-pulse rounded-md bg-red-500"}
+				className={"h-80 w-full animate-pulse rounded-md bg-neutral-200/60"}
 			/>
 			<div
-				className={"h-80 w-full animate-pulse rounded-md bg-red-500"}
+				className={"h-80 w-full animate-pulse rounded-md bg-neutral-200/60"}
 			/>
 		</LoadingWrapper>
 	);
