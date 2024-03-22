@@ -12,11 +12,6 @@ import 'katex/dist/katex.min.css'
 
 const inter = Inter({subsets: ["latin"]});
 
-export const metadata: Metadata = {
-	title: "Luke Stephens",
-	description: "an individual.",
-};
-
 
 export default function RootLayout({children,}: Readonly<{
 	children: React.ReactNode;
@@ -30,3 +25,20 @@ export default function RootLayout({children,}: Readonly<{
 		</html>
 	);
 }
+
+export const metadata: Metadata = {
+	title: "Luke Stephens",
+	description: `an individual, software designer, currently working at Trinity Telecomm (PTY) LTD`,
+	openGraph: {
+		type: "website",
+		url: "https://lukestephens.co.za",
+		title: "Luke Stephens",
+		description: "an individual, type-4 enneagram, passionate, dedicated, resilient.",
+		siteName: "Luke Stephens",
+		images: "/luke2.jpg"
+	}
+};
+
+
+
+
