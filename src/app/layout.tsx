@@ -28,6 +28,7 @@ export default function RootLayout({children,}: Readonly<{
 
 export const metadata: Metadata = {
 	title: "Luke Stephens",
+	metadataBase: new URL("https://www.lukestephens.co.za"),
 	description: `an individual, software designer, currently working at Trinity Telecomm (PTY) LTD`,
 	openGraph: {
 		type: "website",
