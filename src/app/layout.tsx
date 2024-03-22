@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 		title: "Luke Stephens",
 		description: "an individual, type-4 enneagram, passionate, dedicated, resilient.",
 		siteName: "Luke Stephens",
-		images: "/luke2.jpg"
+		images: "https://lukestephens.co.za/luke2.jpg"
 	}
 };
 
