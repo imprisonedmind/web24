@@ -24,7 +24,7 @@ export default function Location() {
 				<div className={"flex justify-between items-center"}>
 					<p className={"text-neutral-800 text-sm"}>Cape Town</p>
 					<div className={
-						"text-[10px] bg-neutral-100 flex w-fit p-2 rounded-full tracking-wide"
+						"flex text-xs p-1 bg-neutral-100 rounded-full px-2"
 					}>
 						<p>-33.93,</p>
 						<p>18.47</p>
