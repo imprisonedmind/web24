@@ -8,6 +8,6 @@ export const Header: FC<HeaderProps> = (props) => {
 	const {title} = props;
 
 	return (
-		<h1 className={"text-lg font-medium"}>{title}</h1>
+		<h1 className={"text-lg font-medium w-fit"}>{title}</h1>
 	);
 };

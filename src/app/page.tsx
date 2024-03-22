@@ -8,6 +8,7 @@ import Bio from "@/components/bio";
 import Tech from "@/components/tech";
 
 import luke from "/public/luke2.jpg"
+import Location from "@/components/location";
 
 
 export default function Home() {
@@ -31,6 +32,7 @@ export default function Home() {
 			</div>
 			<Work/>
 			<WritingList/>
+			<Location/>
 			<Tech/>
 		</main>
 	);

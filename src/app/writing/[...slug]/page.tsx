@@ -9,6 +9,6 @@ export default async function Page({params} : {params: {slug: string[]}}) {
 
 
 	return (
-		<NotionPage recordMap={recordMap}/>
+		<NotionPage recordMap={recordMap} />
 	);
 };

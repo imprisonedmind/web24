@@ -7,9 +7,7 @@ export default function Work() {
   return (
 		<div>
 			<Header title={"work"}/>
-			<div className={
-				"flex flex-nowrap gap-4 w-full pb-1 mt-1"
-			}>
+			<div className={"flex flex-nowrap gap-4 w-fit pb-1 mt-1"}>
 				<WorkCard
 					title={"Trinity Telecomm"}
 					link={"https://trinity.co.za"}
