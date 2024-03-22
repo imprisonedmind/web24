@@ -15,6 +15,7 @@ const inter = Inter({subsets: ["latin"]});
 export const metadata: Metadata = {
 	title: "Luke Stephens",
 	description: "an individual.",
+	icons: "/faviconX167.svg"
 };
 
 
@@ -23,6 +24,9 @@ export default function RootLayout({children,}: Readonly<{
 }>) {
 	return (
 		<html lang="en">
+		<head>
+			<link rel="icon" href="/faviconX167.svg" sizes="any"/>
+		</head>
 		<body className={inter.className}>{children}</body>
 		</html>
 	);
