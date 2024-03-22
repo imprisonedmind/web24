@@ -23,7 +23,20 @@ html {
     }
 }
 
+@keyframes spinAnimation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 /*ANIMATION*/
 .scaleAnimate {
     animation: scaleAnimation 3s linear infinite;
+}
+
+.spinner {
+    animation: spinAnimation 4s linear infinite;
 }

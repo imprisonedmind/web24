@@ -9,7 +9,9 @@ import Tech from "@/components/tech";
 
 import luke from "/public/luke2.jpg"
 import Location from "@/components/location";
+import Music from "@/components/music";
 
+export const revalidate = 0
 
 export default function Home() {
 	return (
@@ -32,6 +34,7 @@ export default function Home() {
 			</div>
 			<Work/>
 			<WritingList/>
+			<Music/>
 			<Location/>
 			<Tech/>
 		</main>
