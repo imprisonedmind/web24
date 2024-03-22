@@ -6,7 +6,7 @@ import Link from "next/link";
 import {songData} from "@/lib/types";
 
 const getSongData = async () => {
-	const res = await fetch("http://localhost:3000/api/currentlyPlaying")
+	const res = await fetch("/api/currentlyPlaying")
 	return await res.json()
 }
 
