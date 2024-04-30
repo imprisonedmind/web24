@@ -118,8 +118,8 @@ export default function Music() {
 						</div>
 
 					</Link>
-					<div className={"flex justify-between text-neutral-800 text-sm items-center"}>
-						<p>{songData.artist}</p>
+					<div className={"flex justify-between text-neutral-800 text-sm items-center "}>
+						<p className={"max-w-[150px] truncate"}>{songData.artist}</p>
 						<p className={
 							"text-xs p-1 bg-neutral-100 rounded-full px-2"
 						}>{songData.title}</p>
