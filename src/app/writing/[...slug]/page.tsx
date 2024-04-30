@@ -9,9 +9,20 @@ export default async function Page({params}: { params: { slug: string[] } }) {
 	const notion = new NotionAPI();
 	const recordMap = await notion.getPage(id);
 
+	const blogData = data.find(obj => obj.id === id) ?? null;
+	const date = blogData?.date
+
 
 	return (
-		<NotionPage recordMap={recordMap}/>
+		<div>
+			<div className={
+				"flex justify-between w-full mx-auto max-w-[720px] px-[calc(min(16px,8vw))]"
+			}>
+				<a href={"/"}>back</a>
+				<p>{date}</p>
+			</div>
+			<NotionPage recordMap={recordMap}/>
+		</div>
 	);
 };
 
