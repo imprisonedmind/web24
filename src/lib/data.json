@@ -1,6 +1,7 @@
 [
   {
     "id": "ebfc2f63277a40a9aeefe50a85fb2ea2",
+    "date": "21 Mar 24",
     "title": "notion as a blog post provider",
     "openGraph": "notion.jpg",
     "openGraphSmall": "notionSmall.jpg",
@@ -8,6 +9,7 @@
   },
   {
     "id": "0e05c93cd6af475ea91c7abf74f8959d",
+    "date": "15 Feb 23",
     "title": "revamping our mobile experience",
     "openGraph": "mobile.jpg",
     "openGraphSmall": "mobileSmall.jpg",
@@ -15,6 +17,7 @@
   },
   {
     "id": "9f7ca94172d546f6a98df201a2ff9042",
+    "date": "31 Oct 22",
     "title": "device management unit interaction page redesign",
     "openGraph": "dashboard.jpg",
     "openGraphSmall": "dashboardSmall.jpg",
