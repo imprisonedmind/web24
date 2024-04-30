@@ -29,7 +29,7 @@ export default function Music() {
 
 	if (songData?.isPlaying) {
 		return (
-			<div className={"w-full flex flex-col gap-1"}>
+			<div className={"w-full flex flex-col gap-1 px-4 md:px-0"}>
 				<Header title={"listening"}/>
 				<div className={"flex flex-col gap-2 bg-white shadow-sm p-2 rounded-xl w-fit"}>
 					<Link href={songData?.songUrl} className={

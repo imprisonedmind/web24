@@ -16,7 +16,7 @@ export const revalidate = 0
 export default function Home() {
 	return (
 		<main className="flex flex-col gap-8 max-w-[600px] mx-auto mb-8">
-			<div className={"flex flex-row justify-between gap-4 mt-8"}>
+			<div className={"flex flex-col md:flex-row justify-between gap-4 mt-8"}>
 				<Image
 					src={luke}
 					alt={"Luke Stephens"}
@@ -24,19 +24,22 @@ export default function Home() {
 					priority={true}
 					width={300}
 					height={500}
+					className={"mx-auto hidden md:flex"}
 				/>
-				<div className={"flex flex-col justify-between"}>
+				<div className={"flex flex-col justify-between px-4 md:px-0 gap-4 md:gap-0"}>
 					<Bio/>
 					<Social/>
 					<Employment/>
 					<Education/>
 				</div>
 			</div>
-			<Work/>
-			<WritingList/>
-			<Music/>
-			<Location/>
-			<Tech/>
+			<div className={"flex flex-col gap-8"}>
+				<Work/>
+				<WritingList/>
+				<Music/>
+				<Location/>
+				<Tech/>
+			</div>
 		</main>
 	);
 }

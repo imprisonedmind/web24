@@ -3,7 +3,7 @@ import {SmallLink} from "@/components/smallLink";
 
 export default function Tech() {
   return (
-		<div>
+		<div className={"px-4 md:px-0"}>
 			<Header title={"tech"}/>
 			<div className={"flex flex-col"}>
 				<SmallLink title={"NextJs"} link={"https://nextjs.org/"}/>

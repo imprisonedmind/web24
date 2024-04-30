@@ -5,7 +5,7 @@ import Image from "next/image";
 import map from "/public/map.png"
 export default function Location() {
   return (
-		<div className={"w-full flex flex-col gap-1"}>
+		<div className={"w-full flex flex-col gap-1 px-4 md:px-0"}>
 			<Header title={"location"}/>
 			<div className={
 				"flex flex-col gap-2 bg-white shadow-sm p-2 w-[416px] rounded-xl"
