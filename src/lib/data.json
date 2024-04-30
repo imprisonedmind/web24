@@ -9,15 +9,15 @@
   {
     "id": "0e05c93cd6af475ea91c7abf74f8959d",
     "title": "revamping our mobile experience",
-    "openGraph": "notion.jpg",
-    "openGraphSmall": "notionSmall.jpg",
+    "openGraph": "mobile.jpg",
+    "openGraphSmall": "mobileSmall.jpg",
     "description": "Revamping mobile app experience by optimizing screen space, reducing redundancy, following design principles like spacing consistency and visual hierarchy. Key changes: streamlined header, consolidated property info, expandable cards for actions, bottom navigation with icons, and better information architecture overall for improved usability."
   },
   {
     "id": "9f7ca94172d546f6a98df201a2ff9042",
     "title": "device management unit interaction page redesign",
-    "openGraph": "notion.jpg",
-    "openGraphSmall": "notionSmall.jpg",
+    "openGraph": "dashboard.jpg",
+    "openGraphSmall": "dashboardSmall.jpg",
     "description": "Redesigning the device management unit interaction page to optimize information architecture and visual hierarchy. Key changes: card/chip layout with heading text, icons, and descriptions to convey state quickly. Modular design for future expansions. Careful consideration of spacing, colors, editing UX. Ultimately, moving important info to the right for easy scanning, and separating main components side-by-side for reduced cognitive load following natural reading patterns. User testing validating initial design decisions after implementation."
   }
 ]
