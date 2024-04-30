@@ -1,7 +1,7 @@
 [
   {
     "id": "ebfc2f63277a40a9aeefe50a85fb2ea2",
-    "title": "notion for blog post creation and hosting",
+    "title": "notion as a blog post provider",
     "openGraph": "notion.jpg",
     "openGraphSmall": "notionSmall.jpg",
     "description": "Notion is used as a blog post creator/provider, leveraging react-notion-x for seamless integration with NextJS, offering real-time updates, auth handling, and efficient data storage in Supabase for optimal SEO with server-rendered metadata."
