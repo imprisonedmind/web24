@@ -8,7 +8,7 @@ export default function Location() {
 		<div className={"w-full flex flex-col gap-1 px-4 md:px-0"}>
 			<Header title={"location"}/>
 			<div className={
-				"flex flex-col gap-2 bg-white shadow-sm p-2 w-[416px] rounded-xl"
+				"flex flex-col gap-2 bg-white shadow-sm p-2 xs:w-[416px] rounded-xl"
 			}>
 				<div className={"relative w-full h-72 overflow-hidden rounded-lg"}>
 					<BlueDot/>

@@ -31,17 +31,18 @@ export default function Music() {
 		return (
 			<div className={"w-full flex flex-col gap-1 px-4 md:px-0"}>
 				<Header title={"listening"}/>
-				<div className={"flex flex-col gap-2 bg-white shadow-sm p-2 rounded-xl w-fit"}>
+				<div className={
+					"flex flex-col gap-2 bg-white shadow-sm p-2 rounded-xl w-full xs:w-fit"
+				}>
 					<Link href={songData?.songUrl} className={
-						"relative flex justify-center items-center h-72 w-[300px] p-4 " +
-						" rounded-lg bg-gradient-to-t from-gray-400 to-gray-200 overflow-hidden" +
-						" cursor-pointer"
+						"relative flex  h-72 w-full p-4 rounded-lg bg-gradient-to-t from-gray-400 " +
+						"to-gray-200 overflow-hidden cursor-pointer"
 					}>
 						{/*ARM THINGY*/}
 						<div className={
-							"h-36 w-3 absolute z-10 right-[42px] -rotate-[12deg] -top-[60px]" +
-							" drop-shadow-md bg-neutral-800 p-2 rounded-full hover:-rotate-[18deg]" +
-							" transition duration-150 ease-in-out"
+							"h-36 w-3 absolute z-10 left-1/2 translate-x-[91px] -rotate-[12deg]" +
+							" -top-[60px] drop-shadow-md bg-neutral-800 p-2 rounded-full" +
+							" hover:-rotate-[18deg] transition duration-150 ease-in-out"
 						}>
 							<div className={
 								"absolute left-1/2 bottom-1/2 bg-neutral-600 w-1 h-3/4 -translate-x-[50%]" +
@@ -60,14 +61,13 @@ export default function Music() {
 									"h-1 w-6 absolute z-20 bottom-1/2 translate-y-[50%] right-1/2" +
 									" translate-x-[50%] rounded-full bg-neutral-600 mr-[4px]"}/>
 							</div>
-
 						</div>
 
+						{/*Circles*/}
 						<div className={
 							"relative w-auto h-full bg-neutral-800 rounded-full aspect-square spinner" +
-							" group"
+							" group mx-auto"
 						}>
-							{/*Circles*/}
 							<div className={
 								"absolute h-60 w-60 border border-neutral-900 rounded-full z-10 top-1/2" +
 								" left-1/2 -translate-x-[50%] -translate-y-[50%] bg-neutral-700" +
@@ -115,8 +115,6 @@ export default function Music() {
 								"absolute h-8 w-8 border border-neutral-300 rounded-full z-10 top-1/2" +
 								" left-1/2 -translate-x-[50%] -translate-y-[50%]"
 							}/>
-
-
 						</div>
 
 					</Link>
