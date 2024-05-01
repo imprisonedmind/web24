@@ -10,7 +10,8 @@ export default function Work() {
 				<Header title={"work"} seeAll={true} link={"work"}/>
 			</div>
 			<div className={
-				"px-4 md:px-0 flex flex-nowrap gap-2 md:gap-4 w-full mt-1 overflow-x-scroll pb-4"
+				"flex flex-row pb-4 px-4 md:grid grid-cols-3 gap-2 md:gap-4 md:px-0" +
+				" overflow-x-auto"
 			}>
 				{workData().slice(0,3).map((item: WorkCardData, index: number) => {
 					return (

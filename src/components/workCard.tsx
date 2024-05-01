@@ -17,7 +17,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
 		<Link
 			href={link}
 			className={
-				"flex flex-col gap-2 bg-white p-2 shadow-sm rounded-xl min-w-[200px]" +
+				"flex flex-col gap-2 bg-white p-2 shadow-sm rounded-xl min-w-[185px]" +
 				" hover:shadow-md transition duration-150 ease-in-out"
 			}>
 			<div className={"relative h-36 w-full rounded-lg overflow-hidden"}>
