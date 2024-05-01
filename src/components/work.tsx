@@ -6,7 +6,7 @@ import giggity from "/public/giggity2.png"
 export default function Work() {
 	return (
 		<div className={"pl-4 md:pl-0"}>
-			<Header title={"work"}/>
+			<Header title={"work"} seeAll={true} link={"work"} />
 			<div className={
 				"flex flex-nowrap gap-2 md:gap-4 w-full pb-1 mt-1 overflow-x-scroll"
 			}>

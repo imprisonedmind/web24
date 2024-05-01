@@ -6,7 +6,7 @@ interface WorkCardProps {
 	title: string;
 	link: string;
 	tag: string;
-	src: StaticImageData;
+	src: StaticImageData | string;
 	alt: string;
 }
 
@@ -26,7 +26,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
 					alt={alt}
 					fill={true}
 					priority={true}
-					placeholder={"blur"}
+					placeholder={ "blur"}
 					className={"object-cover h-full w-full"}
 				/>
 			</div>

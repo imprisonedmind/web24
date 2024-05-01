@@ -2,6 +2,7 @@ import {NotionAPI} from "notion-client";
 import {NotionPage} from "@/components/wrapper/notionPage";
 import data from "@/lib/data.json"
 import {spaceToHyphen} from "@/lib/util";
+import GoBack from "@/components/goBack";
 
 export default async function Page({params}: { params: { slug: string[] } }) {
 	const id = params.slug[1]
@@ -18,7 +19,7 @@ export default async function Page({params}: { params: { slug: string[] } }) {
 			<div className={
 				"flex justify-between w-full mx-auto max-w-[720px] px-[calc(min(16px,8vw))]"
 			}>
-				<a href={"/"}>back</a>
+				<GoBack/>
 				<p>{date}</p>
 			</div>
 			<NotionPage recordMap={recordMap}/>

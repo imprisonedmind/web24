@@ -5,8 +5,8 @@ import {spaceToHyphen} from "@/lib/util";
 
 export default function WritingList() {
 	return (
-		<div className={"w-fit px-4 md:px-0"}>
-			<Header title={"writing"}/>
+		<div className={"w-full px-4 md:px-0"}>
+			<Header title={"writing"} seeAll={true} link={"writing"}/>
 			{data.map((item, index) =>
 				<SmallLink
 					key={index}

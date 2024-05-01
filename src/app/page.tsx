@@ -11,9 +11,8 @@ import luke from "/public/luke2.jpg"
 import Location from "@/components/location";
 import Music from "@/components/music";
 
-export const revalidate = 0
-
 export default function Home() {
+
 	return (
 		<main className="flex flex-col gap-8 max-w-[600px] mx-auto mb-8">
 			<div className={"flex flex-col md:flex-row justify-between gap-4 mt-8"}>
