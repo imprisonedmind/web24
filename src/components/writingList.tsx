@@ -1,6 +1,6 @@
 import {Header} from "@/components/header";
 import {SmallLink} from "@/components/smallLink";
-import data from "@/lib/data.json"
+import data from "@/lib/blogData.json"
 import {spaceToHyphen} from "@/lib/util";
 
 export default function WritingList() {
