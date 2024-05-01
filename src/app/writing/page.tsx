@@ -11,9 +11,7 @@ export default function Page() {
 			"flex py-4 flex-col max-w-[720px] mx-auto px-[calc(min(16px,8vw))] gap-4"
 		}>
 			<GoBack/>
-			<div className={`
-			grid grid-cols-1 gap-4 cursor-pointer
-		`}>
+			<div className={`grid grid-cols-1 gap-4 cursor-pointer`}>
 				{data.map((blog, index) => {
 					return (
 						<Link
