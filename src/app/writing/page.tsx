@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {spaceToHyphen} from "@/lib/util";
 import GoBack from "@/components/goBack";
+import Breadcrumbs from "@/components/breadcrumbs";
 
 export default function Page() {
 
@@ -10,7 +11,7 @@ export default function Page() {
 		<div className={
 			"flex py-4 flex-col max-w-[720px] mx-auto px-[calc(min(16px,8vw))] gap-4"
 		}>
-			<GoBack/>
+			<Breadcrumbs/>
 			<div className={`grid grid-cols-1 gap-4 cursor-pointer`}>
 				{data.map((blog, index) => {
 					return (
