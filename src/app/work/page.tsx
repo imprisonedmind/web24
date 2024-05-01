@@ -5,10 +5,10 @@ import {WorkCard} from "@/components/workCard";
 export default function Page() {
 	return (
 		<div className={
-			"flex py-4 flex-col max-w-[720px] mx-auto px-[calc(min(16px,8vw))] gap-8"
+			"flex py-4 flex-col max-w-[720px] mx-auto px-[calc(min(16px,8vw))] gap-4"
 		}>
 			<GoBack/>
-			<div className={"grid grid-cols-3 gap-4 w-full"}>
+			<div className={"grid grid-cols-1 md:grid-cols-3 gap-4 w-full"}>
 				{workData().map((item: WorkCardData, index: number) => {
 					return (
 						<WorkCard

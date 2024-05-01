@@ -6,7 +6,7 @@ import {WorkCardData, workData} from "@/lib/workData";
 export default function Work() {
 	return (
 		<div className={""}>
-			<div className={"pl-4 md:pl-0"}>
+			<div className={"px-4 md:px-0"}>
 				<Header title={"work"} seeAll={true} link={"work"}/>
 			</div>
 			<div className={

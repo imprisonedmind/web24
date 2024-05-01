@@ -8,7 +8,7 @@ export default function Page() {
 
 	return (
 		<div className={
-			"flex py-4 flex-col max-w-[720px] mx-auto px-[calc(min(16px,8vw))] gap-8"
+			"flex py-4 flex-col max-w-[720px] mx-auto px-[calc(min(16px,8vw))] gap-4"
 		}>
 			<GoBack/>
 			<div className={`
