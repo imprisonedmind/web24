@@ -1,4 +1,4 @@
-import data from "@/lib/data.json"
+import data from "@/lib/blogData.json"
 import Image from "next/image";
 import Link from "next/link";
 import {spaceToHyphen} from "@/lib/util";

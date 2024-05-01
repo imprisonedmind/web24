@@ -1,6 +1,6 @@
 import {NotionAPI} from "notion-client";
 import {NotionPage} from "@/components/wrapper/notionPage";
-import data from "@/lib/data.json"
+import data from "@/lib/blogData.json"
 import {spaceToHyphen} from "@/lib/util";
 import GoBack from "@/components/goBack";
 
