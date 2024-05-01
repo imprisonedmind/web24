@@ -11,7 +11,7 @@ export default function Work() {
 			</div>
 			<div className={
 				"flex flex-row pb-4 px-4 md:grid md:pb-0 grid-cols-3 gap-2 md:gap-4 md:px-0" +
-				" overflow-x-auto"
+				" overflow-x-auto md:overflow-visible"
 			}>
 				{workData().slice(0,3).map((item: WorkCardData, index: number) => {
 					return (
