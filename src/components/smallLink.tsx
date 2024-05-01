@@ -13,7 +13,7 @@ export const SmallLink: FC<SmallLinkProps> = (props) => {
 		<Link
 			href={link}
 			className={
-				"w-full flex text-sm text-neutral-500 hover:underline underline-offset-2"
+				"w-max flex text-sm text-neutral-500 hover:underline underline-offset-2"
 			}>
 			{title}
 		</Link>
