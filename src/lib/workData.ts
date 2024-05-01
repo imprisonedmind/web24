@@ -17,7 +17,7 @@ export interface WorkCardData {
 
 export const workData = (): WorkCardData[] => [
 	{
-		title: "Trinity ",
+		title: "Trinity",
 		link: "https://trinity.co.za",
 		tag: "website",
 		src: trinity,
