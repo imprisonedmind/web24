@@ -1,36 +1,36 @@
-import {Header} from "@/components/header";
+import { Header } from "@/components/header";
 import BlueDot from "@/components/blueDot";
 import Image from "next/image";
 
-import map from "/public/map.png"
+import map from "/public/map.png";
 export default function Location() {
   return (
-		<div className={"w-full flex flex-col gap-1 px-4 md:px-0"}>
-			<Header title={"location"}/>
-			<div className={
-				"flex flex-col gap-2 bg-white shadow-sm p-2 xs:w-[416px] rounded-xl"
-			}>
-				<div className={"relative w-full h-72 overflow-hidden rounded-lg"}>
-					<BlueDot/>
-					<Image
-						src={map}
-						alt={"test"}
-						fill={true}
-						priority={true}
-						placeholder={"blur"}
-						className={"object-cover scale-[1.2]"}
-					/>
-				</div>
-				<div className={"flex justify-between items-center"}>
-					<p className={"text-neutral-800 text-sm"}>Cape Town</p>
-					<div className={
-						"flex text-xs p-1 bg-neutral-100 rounded-full px-2"
-					}>
-						<p>-33.93,</p>
-						<p>18.47</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-};
+    <div className={"flex w-full flex-col gap-1"}>
+      <Header title={"location"} />
+      <div
+        className={
+          "flex flex-col gap-2 rounded-xl bg-white p-2 shadow-sm xs:w-[300px]"
+        }
+      >
+        <div className={"relative h-72 w-full overflow-hidden rounded-lg"}>
+          <BlueDot />
+          <Image
+            src={map}
+            alt={"test"}
+            fill={true}
+            priority={true}
+            placeholder={"blur"}
+            className={"scale-[1.2] object-cover"}
+          />
+        </div>
+        <div className={"flex items-center justify-between"}>
+          <p className={"text-sm text-neutral-800"}>Cape Town</p>
+          <div className={"flex rounded-full bg-neutral-100 p-1 px-2 text-xs"}>
+            <p>-33.93,</p>
+            <p>18.47</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

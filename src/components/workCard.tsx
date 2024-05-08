@@ -1,41 +1,45 @@
-import {FC} from "react";
-import Image, {StaticImageData} from "next/image";
+import { FC } from "react";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
 interface WorkCardProps {
-	title: string;
-	link: string;
-	tag: string;
-	src: StaticImageData | string;
-	alt: string;
+  title: string;
+  link: string;
+  tag: string;
+  src: StaticImageData | string;
+  alt: string;
 }
 
 export const WorkCard: FC<WorkCardProps> = (props) => {
-	const {title, link, tag, src, alt} = props;
+  const { title, link, tag, src, alt } = props;
 
-	return (
-		<Link
-			href={link}
-			className={
-				"flex flex-col gap-2 bg-white p-2 shadow-sm rounded-xl min-w-[185px]" +
-				" hover:shadow-md transition duration-150 ease-in-out"
-			}>
-			<div className={"relative h-36 w-full rounded-lg overflow-hidden"}>
-				<Image
-					src={src}
-					alt={alt}
-					fill={true}
-					priority={true}
-					placeholder={ "blur"}
-					className={"object-cover w-full"}
-				/>
-			</div>
-			<div>
-				<div className={"flex justify-between"}>
-					<p className={"text-sm w-max"}>{title}</p>
-					<p className={"text-xs p-1 bg-neutral-100 rounded-full px-2"}>{tag}</p>
-				</div>
-			</div>
-		</Link>
-	);
+  return (
+    <Link
+      prefetch={true}
+      href={link}
+      className={
+        "flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm" +
+        " transition duration-150 ease-in-out hover:shadow-md"
+      }
+    >
+      <div className={"relative h-36 w-full overflow-hidden rounded-lg"}>
+        <Image
+          src={src}
+          alt={alt}
+          fill={true}
+          priority={true}
+          placeholder={"blur"}
+          className={"w-full object-cover"}
+        />
+      </div>
+      <div>
+        <div className={"flex justify-between"}>
+          <p className={"w-max text-sm"}>{title}</p>
+          <p className={"rounded-full bg-neutral-100 p-1 px-2 text-xs"}>
+            {tag}
+          </p>
+        </div>
+      </div>
+    </Link>
+  );
 };
