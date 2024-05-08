@@ -9,7 +9,7 @@ import Tech from "@/components/tech";
 
 import luke from "/public/luke2.jpg";
 import Location from "@/components/location";
-import Music from "@/components/music";
+import Music from "@/components/music/music";
 
 export default function Home() {
   return (

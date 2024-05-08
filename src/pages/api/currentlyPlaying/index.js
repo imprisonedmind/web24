@@ -1,5 +1,5 @@
 // /pages/api/spotify.js
-import querystring from 'querystring';
+import querystring from "querystring";
 
 const {
   NEXT_PUBLIC_SPOTIFY_CLIENT_ID: client_id,
@@ -7,20 +7,20 @@ const {
   NEXT_PUBLIC_SPOTIFY_REFRESH_TOKEN: refresh_token,
 } = process.env;
 
-const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
+const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
 const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
-const TOP_TRACKS_ENDPOINT = `	https://api.spotify.com/v1/me/top/{type}`
+const TOP_TRACKS_ENDPOINT = `	https://api.spotify.com/v1/me/top/{type}`;
 const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
 
 const getAccessToken = async () => {
   const response = await fetch(TOKEN_ENDPOINT, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     body: querystring.stringify({
-      grant_type: 'refresh_token',
+      grant_type: "refresh_token",
       refresh_token,
     }),
   });
@@ -48,7 +48,7 @@ const Index = async (_, res) => {
   const song = await response.json();
   const isPlaying = song.is_playing;
   const title = song.item.name;
-  const artist = song.item.artists.map((_artist) => _artist.name).join(', ');
+  const artist = song.item.artists.map((_artist) => _artist.name).join(", ");
   const album = song.item.album.name;
   const albumImageUrl = song.item.album.images[0].url;
   const songUrl = song.item.external_urls.spotify;
@@ -63,4 +63,4 @@ const Index = async (_, res) => {
   });
 };
 
-export default Index
+export default Index;
