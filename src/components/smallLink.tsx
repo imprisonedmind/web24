@@ -1,21 +1,23 @@
-import {FC} from "react";
+import { FC } from "react";
 import Link from "next/link";
 
 interface SmallLinkProps {
-	title: string;
-	link: string;
+  title: string;
+  link: string;
 }
 
 export const SmallLink: FC<SmallLinkProps> = (props) => {
-	const {title, link} = props;
+  const { title, link } = props;
 
-	return (
-		<Link
-			href={link}
-			className={
-				"w-max flex text-sm text-neutral-500 hover:underline underline-offset-2"
-			}>
-			{title}
-		</Link>
-	);
+  return (
+    <Link
+      prefetch={true}
+      href={link}
+      className={
+        "flex w-max text-sm text-neutral-500 underline-offset-2 hover:underline"
+      }
+    >
+      {title}
+    </Link>
+  );
 };
