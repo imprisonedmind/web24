@@ -4,7 +4,13 @@ import { Header } from "@/components/header";
 import Link from "next/link";
 import Image from "next/image";
 import { songData } from "@/lib/types";
-import { getSongData } from "@/components/music/music";
+
+const getSongData = async () => {
+  const res = await fetch("/api/currentlyPlaying", {
+    cache: "no-cache",
+  });
+  return await res.json();
+};
 
 interface MusicClientProps {
   initialSongData: songData;
@@ -19,7 +25,7 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
   };
 
   useEffect(() => {
-    fetchSongData(); // Initial fetch
+    // fetchSongData(); // Initial fetch
     const interval = setInterval(() => {
       fetchSongData();
     }, 30000); // Fetch every 30 seconds
