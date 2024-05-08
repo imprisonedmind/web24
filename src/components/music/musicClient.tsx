@@ -11,7 +11,7 @@ interface MusicClientProps {
 }
 
 export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
-  const [songData, setSongData] = useState<songData>(initialSongData);
+  const [songData, setSongData] = useState<songData | null>(initialSongData);
 
   const fetchSongData = async () => {
     const data = await getSongData();
@@ -26,6 +26,8 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
+
+  if (!songData?.isPlaying) return null;
 
   return (
     <div className={"flex w-full flex-col gap-1"}>

@@ -1,14 +1,14 @@
 import { MusicClient } from "@/components/music/musicClient";
 
 export const getSongData = async () => {
-  const res = await fetch("http://localhost:3000/api/currentlyPlaying");
+  const res = await fetch("https://lukestephens.co.za/api/currentlyPlaying", {
+    cache: "no-cache",
+  });
   return await res.json();
 };
 
 export default async function Music() {
   const songData = await getSongData();
 
-  if (songData?.isPlaying) {
-    return <MusicClient initialSongData={songData} />;
-  }
+  return <MusicClient initialSongData={songData} />;
 }
