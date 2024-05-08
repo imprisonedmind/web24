@@ -36,6 +36,7 @@ export const getNowPlaying = async () => {
   const { access_token } = await getAccessToken();
 
   return fetch(NOW_PLAYING_ENDPOINT, {
+    cache: "no-cache",
     headers: {
       Authorization: `Bearer ${access_token}`,
     },
