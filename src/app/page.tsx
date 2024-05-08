@@ -38,7 +38,7 @@ export default function Home() {
         <Work />
         <WritingList />
         <div
-          className={"flex flex-col gap-2 px-4 xs:flex-row xs:gap-4 md:px-0"}
+          className={"flex flex-col gap-8 px-4 xs:flex-row xs:gap-4 md:px-0"}
         >
           <Location />
           <Music />
