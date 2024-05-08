@@ -1,5 +1,7 @@
 import { MusicClient } from "@/components/music/musicClient";
 
+const revalidate = "force-no-store";
+
 export const getSongData = async () => {
   const res = await fetch("__REMOVED_SITE_URL__/api/currentlyPlaying", {
     cache: "no-cache",
