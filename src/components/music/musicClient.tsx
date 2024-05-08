@@ -11,7 +11,7 @@ interface MusicClientProps {
 }
 
 export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
-  const [songData, setSongData] = useState<songData | null>(initialSongData);
+  const [songData, setSongData] = useState<songData>(initialSongData);
 
   const fetchSongData = async () => {
     const data = await getSongData();
@@ -36,7 +36,7 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
         }
       >
         <Link
-          href={songData?.songUrl}
+          href={songData.songUrl}
           className={
             "relative flex h-72 w-full rounded-lg bg-gradient-to-t from-gray-400 p-4 " +
             "cursor-pointer overflow-hidden to-gray-200"
@@ -128,7 +128,7 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
               }
             >
               <Image
-                src={songData?.albumImageUrl}
+                src={songData.albumImageUrl}
                 alt={"bolt"}
                 fill={true}
                 className={"object-cover opacity-[0.8] mix-blend-multiply"}
