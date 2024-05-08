@@ -4,7 +4,11 @@ import { Header } from "@/components/header";
 import Link from "next/link";
 import Image from "next/image";
 import { songData } from "@/lib/types";
-import { returnSongData } from "@/lib/util";
+
+const getSongData = async () => {
+  const res = await fetch("/api/currentlyPlaying");
+  return await res.json();
+};
 
 interface MusicClientProps {
   initialSongData: songData;
@@ -14,8 +18,7 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
   const [songData, setSongData] = useState<songData | null>(initialSongData);
 
   const fetchSongData = async () => {
-    const data = await returnSongData();
-    // @ts-ignore
+    const data = await getSongData();
     setSongData(data);
   };
 
