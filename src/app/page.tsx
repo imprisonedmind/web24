@@ -21,7 +21,7 @@ export default function Home() {
           placeholder={"blur"}
           priority={true}
           sizes={"80vw"}
-          className={"mx-auto hidden max-w-[300px] md:flex"}
+          className={"mx-auto hidden max-h-[400px] max-w-[300px] md:flex"}
         />
         <div
           className={
@@ -40,8 +40,8 @@ export default function Home() {
         <div
           className={"flex flex-col gap-2 px-4 xs:flex-row xs:gap-4 md:px-0"}
         >
-          <Music />
           <Location />
+          <Music />
         </div>
         <Tech />
       </div>
