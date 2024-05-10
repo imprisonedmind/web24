@@ -136,6 +136,8 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
                 src={songData.albumImageUrl}
                 alt={"bolt"}
                 fill={true}
+                priority={true}
+                sizes={"20vw"}
                 className={"object-cover opacity-[0.8] mix-blend-multiply"}
               />
             </div>
