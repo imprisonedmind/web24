@@ -28,7 +28,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
           alt={alt}
           fill={true}
           priority={true}
-          sizes={"20vw"}
+          sizes={"50vw"}
           placeholder={"blur"}
           className={"w-full object-cover"}
         />
