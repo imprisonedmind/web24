@@ -19,6 +19,7 @@ export default function Location() {
             alt={"test"}
             fill={true}
             priority={true}
+            sizes={"50vw"}
             placeholder={"blur"}
             className={"scale-[1.2] object-cover"}
           />

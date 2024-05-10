@@ -23,12 +23,11 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
   };
 
   useEffect(() => {
-    // fetchSongData(); // Initial fetch
     const interval = setInterval(() => {
       fetchSongData();
-    }, 30000); // Fetch every 30 seconds
+    }, 30000);
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   if (!songData?.isPlaying) return null;
