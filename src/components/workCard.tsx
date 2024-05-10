@@ -17,10 +17,10 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
     <Link
       prefetch={true}
       href={link}
-      className={
-        "flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm" +
-        " transition duration-150 ease-in-out hover:shadow-md"
-      }
+      className={`
+        flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm 
+        transition duration-150 ease-in-out hover:shadow-md
+      `}
     >
       <div className={"relative h-36 w-full overflow-hidden rounded-lg"}>
         <Image
@@ -28,6 +28,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
           alt={alt}
           fill={true}
           priority={true}
+          sizes={"20vw"}
           placeholder={"blur"}
           className={"w-full object-cover"}
         />
