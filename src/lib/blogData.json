@@ -3,8 +3,8 @@
     "id": "490b99e822bc41c88cdb02a370023821",
     "date": "15 May 24",
     "title": "next.js app server improvements",
-    "openGraph": "notion.jpg",
-    "openGraphSmall": "notionSmall.jpg",
+    "openGraph": "speedLarge.jpg",
+    "openGraphSmall": "speedSmall.jpg",
     "description": "This post discusses significant improvements made to the Trinity website by changing how data fetching for blog posts and filtering of the data based on tags is done. Previously, data fetching was done inside a React Server Component (rsc) using URL slugs, which was slow. Now, data fetching is done in page.tsx, and data is passed as props, resulting in improvements. The changes involve calling getStoryData() once in page.tsx and using cached server data for subsequent calls, minimizing data fetching. Additional optimizations include prefetching and prioritizing certain links and images, reducing load time by roughly 75%. More investigation is needed, as Lighthouse scores do not reflect the improvements."
   },
   {
@@ -27,8 +27,8 @@
     "id": "9f7ca94172d546f6a98df201a2ff9042",
     "date": "31 Oct 22",
     "title": "device management unit interaction page redesign",
-    "openGraph": "speedLarge.jpg",
-    "openGraphSmall": "speedSmall.jpg",
+    "openGraph": "notion.jpg",
+    "openGraphSmall": "notionSmall.jpg",
     "description": "Redesigning the device management unit interaction page to optimize information architecture and visual hierarchy. Key changes: card/chip layout with heading text, icons, and descriptions to convey state quickly. Modular design for future expansions. Careful consideration of spacing, colors, editing UX. Ultimately, moving important info to the right for easy scanning, and separating main components side-by-side for reduced cognitive load following natural reading patterns. User testing validating initial design decisions after implementation."
   }
 ]
