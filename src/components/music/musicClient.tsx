@@ -37,58 +37,59 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
       <Header title={"listening"} />
       <div
         className={
-          "flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm xs:w-[300px]"
+          "flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm"
         }
       >
         <Link
           href={songData.songUrl}
-          className={
-            "relative flex h-72 w-full rounded-lg bg-gradient-to-t from-gray-400 p-4 " +
-            "cursor-pointer overflow-hidden to-gray-200"
-          }
+          className="
+            relative flex h-72 w-full cursor-pointer overflow-hidden rounded-lg 
+            bg-gradient-to-t from-gray-400 to-gray-200 p-4
+          "
         >
           {/*ARM THINGY*/}
           <div
-            className={
-              "absolute left-1/2 z-10 h-36 w-3 translate-x-[91px] -rotate-[12deg]" +
-              " -top-[60px] rounded-full bg-neutral-800 p-2 drop-shadow-md" +
-              " transition duration-150 ease-in-out hover:-rotate-[18deg]"
-            }
+            className="
+              absolute -top-[60px] left-1/2 z-10 h-36 w-3 translate-x-[91px]
+              -rotate-[12deg] rounded-full bg-neutral-800 p-2 drop-shadow-md
+              transition duration-150 ease-in-out hover:-rotate-[18deg]
+            "
           >
             <div
-              className={
-                "absolute bottom-1/2 left-1/2 h-3/4 w-1 -translate-x-[50%] bg-neutral-600" +
-                " translate-y-[50%] rounded-full"
-              }
+              className="
+                absolute bottom-1/2 left-1/2 h-3/4 w-1 -translate-x-[50%] 
+                translate-y-[50%] rounded-full bg-neutral-600
+              "
             />
 
             <div
-              className={
-                "absolute -bottom-[6px] -right-[2px] z-20 h-4 w-8 bg-neutral-800" +
-                " -rotate-45 rounded-r-full"
-              }
+              className="
+                absolute -bottom-[6px] -right-[2px] z-20 h-4 w-8 -rotate-45
+                rounded-r-full bg-neutral-800
+              "
             >
               <div
-                className={
-                  "absolute -left-[6px] top-1/2 z-0 h-3 w-3 rotate-45 bg-neutral-800" +
-                  " -translate-y-[50%] rounded-sm"
-                }
+                className="
+                  absolute -left-[6px] top-1/2 z-0 h-3 w-3 -translate-y-[50%] 
+                  rotate-45 rounded-sm bg-neutral-800
+                "
               />
               <div
-                className={
-                  "absolute bottom-1/2 right-1/2 z-20 h-1 w-6 translate-y-[50%]" +
-                  " mr-[4px] translate-x-[50%] rounded-full bg-neutral-600"
-                }
+                className="
+                  absolute bottom-1/2 right-1/2 z-20 mr-[4px] h-1 w-6
+                  translate-x-[50%] translate-y-[50%] rounded-full
+                  bg-neutral-600
+               "
               />
             </div>
           </div>
 
           {/*Circles*/}
           <div
-            className={
-              "spinner relative aspect-square h-full w-auto rounded-full bg-neutral-800" +
-              " group mx-auto"
-            }
+            className="
+              spinner group relative mx-auto aspect-square h-full 
+              w-auto rounded-full bg-neutral-800
+           "
           >
             <div
               className={

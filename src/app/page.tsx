@@ -10,6 +10,7 @@ import Tech from "@/components/tech";
 import luke from "/public/luke2.jpg";
 import Location from "@/components/location";
 import Music from "@/components/music/music";
+import Coding from "@/components/coding";
 
 export default function Home() {
   return (
@@ -37,12 +38,11 @@ export default function Home() {
       <div className={"flex flex-col gap-8"}>
         <Work />
         <WritingList />
-        <div
-          className={"flex flex-col gap-8 px-4 xs:flex-row xs:gap-4 md:px-0"}
-        >
+        <div className={"grid grid-cols-1 gap-8 px-4 sm:grid-cols-2 md:p-0"}>
           <Location />
           <Music />
         </div>
+        <Coding />
         <Tech />
       </div>
     </main>
