@@ -7,11 +7,7 @@ export default function Location() {
   return (
     <div className={"flex w-full flex-col gap-1"}>
       <Header title={"location"} />
-      <div
-        className={
-          "flex flex-col gap-2 rounded-xl bg-white p-2 shadow-sm xs:w-[300px]"
-        }
-      >
+      <div className={"flex flex-col gap-2 rounded-xl bg-white p-2 shadow-sm"}>
         <div className={"relative h-72 w-full overflow-hidden rounded-lg"}>
           <BlueDot />
           <Image
