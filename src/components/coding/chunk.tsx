@@ -5,8 +5,6 @@ interface ChunkProps {
 }
 
 export const Chunk: FC<ChunkProps> = ({ chunk }) => {
-  console.log(chunk);
-
   return (
     <div className={"flex flex-col gap-[3px] p-[2px]"}>
       {chunk.map((chunkItem, index) => {
