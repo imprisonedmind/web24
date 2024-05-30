@@ -39,11 +39,6 @@ export default async function Coding() {
           })}
         </div>
       </div>
-      {/*<div className="rounded-lg bg-white p-4 pl-3 shadow-sm">*/}
-      {/*  <figure className={"flex w-full justify-end overflow-clip"}>*/}
-      {/*    <embed src="https://wakatime.com/share/@018c620c-4d0b-4835-a919-aefff3d87af2/f2b48019-3e6d-4fc5-82dd-84d819b68684.svg"></embed>*/}
-      {/*  </figure>*/}
-      {/*</div>*/}
     </section>
   );
 }
