@@ -18,7 +18,7 @@ export default function NotFound() {
         className={"h-50 w-72 object-cover"}
       />
       <Link href={"/"} className="underline underline-offset-4">
-        you're lost, go home.
+        you&apos;re lost, go home.
       </Link>
     </div>
   );

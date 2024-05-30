@@ -1,7 +1,7 @@
 import querystring from "querystring";
 
 export function spaceToHyphen(str) {
-  return str.replace(/\s+/g, "-").toLowerCase();
+  return str?.replace(/\s+/g, "-").toLowerCase();
 }
 
 //SPOTIFY DATA FETCHING
