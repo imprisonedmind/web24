@@ -5,7 +5,7 @@
     "title": "watchQuery to save the day",
     "openGraph": "smallWatchQuery.jpg",
     "openGraphSmall": "largeWatchQuery.jpg",
-    "description": "This post discusses significant improvements made to the Trinity website by changing how data fetching for blog posts and filtering of the data based on tags is done. Previously, data fetching was done inside a React Server Component (rsc) using URL slugs, which was slow. Now, data fetching is done in page.tsx, and data is passed as props, resulting in improvements. The changes involve calling getStoryData() once in page.tsx and using cached server data for subsequent calls, minimizing data fetching. Additional optimizations include prefetching and prioritizing certain links and images, reducing load time by roughly 75%. More investigation is needed, as Lighthouse scores do not reflect the improvements."
+    "description": "In this blog post, the author delves into the implementation of Apollo GraphQL's `watchQuery()` to overcome skeleton loading across route navigation in a device management portal. They compare the currently implemented `useQuery()` method, which lacks caching and incurs loading delays, with the experimental `watchQuery()` approach that subscribes to cached data for faster interaction. The post outlines the pros and cons of `watchQuery()` implementation, discusses challenges like managing dependencies in `useEffect()`, and shares insights on stabilizing data sorting to reduce layout shifts in the user interface."
   },
   {
     "id": "490b99e822bc41c88cdb02a370023821",
