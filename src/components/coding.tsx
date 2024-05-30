@@ -17,7 +17,7 @@ const getCodingData = async () => {
 export default async function Coding() {
   const data = await getCodingData();
 
-  function chunkArray(array, chunkSize) {
+  function chunkArray(array: any, chunkSize: number) {
     const chunks = [];
     for (let i = 0; i < array.length; i += chunkSize) {
       chunks.push(array.slice(i, i + chunkSize));
