@@ -70,3 +70,25 @@ export const returnSongData = async () => {
     title,
   };
 };
+
+export function formatDate(dateString) {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const [year, month, day] = dateString.split("-");
+  const formattedMonth = months[parseInt(month) - 1];
+
+  return `${day} ${formattedMonth} ${year.slice(2)}`;
+}

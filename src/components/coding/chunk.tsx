@@ -1,4 +1,7 @@
 import { FC } from "react";
+import is from "@sindresorhus/is";
+import date = is.date;
+import { formatDate } from "@/lib/util";
 
 interface ChunkProps {
   chunk: any[];
@@ -25,8 +28,7 @@ export const Chunk: FC<ChunkProps> = ({ chunk }) => {
           maxColor[2] +
           Math.round((minColor[2] - maxColor[2]) * (1 - percentage));
 
-        const colorClasses =
-          Math.round(time) < 1 ? null : `rgba(${r}, ${g}, ${b}, 1)`;
+        const colorClasses = !!time && `rgba(${r}, ${g}, ${b}, 1)`;
 
         return (
           <div key={index} className={"group relative cursor-pointer"}>
@@ -36,9 +38,13 @@ export const Chunk: FC<ChunkProps> = ({ chunk }) => {
                 rounded-sm bg-white p-1 shadow-lg group-hover:flex
               "
             >
-              <p className={" text-xs"}>{chunkItem.date}</p>
+              <p className={" text-xs"}>{formatDate(chunkItem.date)}</p>
               <p className={"text-xs text-gray-500"}>
-                {Math.round(time)} Hours
+                {time > 0
+                  ? time >= 1
+                    ? `${Math.floor(time)} Hours`
+                    : `${Math.round(chunkItem.total / 60)} Minutes`
+                  : "no time"}
               </p>
             </div>
             <div
