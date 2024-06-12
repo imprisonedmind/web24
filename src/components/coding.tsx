@@ -31,7 +31,7 @@ export default async function Coding() {
       <div className={"rounded-lg bg-white pl-1 shadow-sm"}>
         <div
           className="
-            flex w-full flex-nowrap justify-end overflow-x-clip p-2
+            clip-me flex w-full flex-nowrap justify-end overflow-x-clip p-2
           "
         >
           {chunkArray(data.days, 7).map((chunk, index) => {
