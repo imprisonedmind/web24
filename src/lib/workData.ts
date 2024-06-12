@@ -6,6 +6,7 @@ import luke from "/public/luke.png";
 import experiment from "/public/experiment.png";
 import blog from "/public/blog.png";
 import tmw from "/public/tmw.png";
+import postz from "/public/postz.jpg";
 import showreel from "/public/showreel.jpg";
 import acidMage from "/public/acidMage.png";
 
@@ -31,6 +32,13 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     src: giggity,
     alt: "Giggity.co.za website cover image",
+  },
+  {
+    title: "Postz",
+    link: "https://metaversal-take-home.vercel.app/",
+    tag: "web app",
+    src: postz,
+    alt: "Postz website blog cover image",
   },
   {
     title: "PitchPlatform",
