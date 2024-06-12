@@ -1,5 +1,5 @@
 "use client";
-import React, { FC, Fragment, useState } from "react";
+import React, { FC, Fragment, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChunkHover } from "@/components/coding/chunkHover";
 
@@ -8,7 +8,14 @@ interface ChunkProps {
 }
 
 export const Chunk: FC<ChunkProps> = ({ chunk }) => {
-  const modal = document.getElementById("modal");
+  const [modal, setModal] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const modal = document.getElementById("modal");
+      setModal(modal);
+    }
+  }, []);
 
   const maxHours = 10;
   const minColor = [240, 255, 237]; // Very light green

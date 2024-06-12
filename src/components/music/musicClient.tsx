@@ -87,8 +87,8 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
           {/*Circles*/}
           <div
             className="
-              spinner group relative mx-auto aspect-square h-full 
-              w-auto rounded-full bg-neutral-800
+              spinner group relative aspect-square h-full w-auto rounded-full
+              bg-neutral-800
            "
           >
             <div
