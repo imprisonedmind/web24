@@ -17,6 +17,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
     <Link
       prefetch={true}
       href={link}
+      target={"_blank"}
       className={`
         flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm 
         transition duration-150 ease-in-out hover:shadow-md
