@@ -5,8 +5,8 @@ import { formatDate } from "@/lib/util";
 interface ChunkHoverProps {
   chunkItem: any;
   time: any;
-  yPos: string | null;
-  xPos: string | null;
+  yPos: number;
+  xPos: number;
 }
 
 export const ChunkHover: FC<ChunkHoverProps> = ({
@@ -15,8 +15,6 @@ export const ChunkHover: FC<ChunkHoverProps> = ({
   yPos,
   xPos,
 }) => {
-  console.log(chunkItem);
-
   return (
     <div
       className="
