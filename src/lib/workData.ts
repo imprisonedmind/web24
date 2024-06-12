@@ -7,6 +7,7 @@ import experiment from "/public/experiment.png";
 import blog from "/public/blog.png";
 import tmw from "/public/tmw.png";
 import postz from "/public/postz.jpg";
+import notionNextBlog from "/public/notion-next-blog.jpg";
 import showreel from "/public/showreel.jpg";
 import acidMage from "/public/acidMage.png";
 
@@ -39,6 +40,13 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     src: postz,
     alt: "Postz website blog cover image",
+  },
+  {
+    title: "notion-next-blog",
+    link: "https://notion-next-blog-black.vercel.app/",
+    tag: "web app",
+    src: notionNextBlog,
+    alt: "Notion-next-blog website blog cover image",
   },
   {
     title: "PitchPlatform",
