@@ -1,22 +1,21 @@
 "use client";
-import { FC, Fragment, useState } from "react";
+import React, { FC, Fragment, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChunkHover } from "@/components/coding/chunkHover";
 
 interface ChunkProps {
   chunk: any[];
-  chunkIndex: number;
 }
 
-export const Chunk: FC<ChunkProps> = ({ chunk, chunkIndex }) => {
+export const Chunk: FC<ChunkProps> = ({ chunk }) => {
   const modal = document.getElementById("modal");
 
   const maxHours = 10;
   const minColor = [240, 255, 237]; // Very light green
   const maxColor = [27, 150, 0]; // Dark green
 
-  const [xPos, setXpos] = useState(null);
-  const [yPos, setYpos] = useState(null);
+  const [xPos, setXpos] = useState<number>(0);
+  const [yPos, setYpos] = useState<number>(0);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const handleMouseEnter = (e: React.MouseEvent, index: number) => {
