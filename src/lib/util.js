@@ -92,3 +92,64 @@ export function formatDate(dateString) {
 
   return `${day} ${formattedMonth} ${year.slice(2)}`;
 }
+
+export function chunkArray(array, chunkSize) {
+  const chunks = [];
+  let currentChunk = [];
+
+  // Helper function to format date as YYYY-MM-DD
+  const formatDate = (date) => date.toISOString().split("T")[0];
+
+  // Fill the first chunk with placeholders if the first date does not start on a Sunday
+  const startDate = new Date(array[0].date);
+  const startDayOfWeek = startDate.getDay();
+  if (startDayOfWeek !== 0) {
+    const placeholders = startDayOfWeek;
+    for (let i = 0; i < placeholders; i++) {
+      const previousDate = new Date(startDate);
+      previousDate.setDate(startDate.getDate() - (startDayOfWeek - i));
+      currentChunk.push({
+        date: formatDate(previousDate),
+        total: 0,
+      });
+    }
+  }
+
+  // Add the actual data to the current chunk
+  array.forEach((day) => {
+    currentChunk.push(day);
+    if (currentChunk.length === chunkSize) {
+      chunks.push(currentChunk);
+      currentChunk = [];
+    }
+  });
+
+  // Add placeholders to the last chunk if necessary
+  if (currentChunk.length > 0) {
+    const lastDate = new Date(currentChunk[currentChunk.length - 1].date);
+    while (currentChunk.length < chunkSize) {
+      lastDate.setDate(lastDate.getDate() + 1);
+      currentChunk.push({
+        date: formatDate(lastDate),
+        total: 0,
+      });
+    }
+    chunks.push(currentChunk);
+  }
+
+  // Ensure each chunk follows [s, m, t, w, t, f, s] pattern
+  return chunks.map((chunk) => {
+    const sortedChunk = [];
+    const daysOfWeek = ["0", "1", "2", "3", "4", "5", "6"]; // Sunday to Saturday
+
+    daysOfWeek.forEach((day) => {
+      chunk.forEach((entry) => {
+        if (new Date(entry.date).getDay().toString() === day) {
+          sortedChunk.push(entry);
+        }
+      });
+    });
+
+    return sortedChunk;
+  });
+}
