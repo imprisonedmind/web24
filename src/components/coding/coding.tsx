@@ -1,5 +1,13 @@
 import { Header } from "@/components/header";
 import { Chunk } from "@/components/coding/chunk";
+import HeatMapDates from "@/components/coding/heatMapDates";
+import { chunkArray } from "@/lib/util";
+import { IoIosInformationCircleOutline } from "react-icons/io";
+import { Modal } from "react-notion-x/build/third-party/modal";
+import { createPortal } from "react-dom";
+import { ChunkHover } from "@/components/coding/chunkHover";
+import React from "react";
+import CodingHeader from "@/components/coding/codingHeader";
 
 const getCodingData = async () => {
   const data = await fetch(
@@ -17,21 +25,15 @@ const getCodingData = async () => {
 export default async function Coding() {
   const data = await getCodingData();
 
-  function chunkArray(array: any, chunkSize: number) {
-    const chunks = [];
-    for (let i = 0; i < array.length; i += chunkSize) {
-      chunks.push(array.slice(i, i + chunkSize));
-    }
-    return chunks;
-  }
-
   return (
-    <section className={"flex flex-col gap-1 px-4 sm:p-0"}>
-      <Header title={"coding"} />
-      <div className={"rounded-lg bg-white pl-1 shadow-sm"}>
+    <section className="flex flex-col gap-1 px-4 sm:p-0">
+      <CodingHeader />
+      <div className="flex flex-row rounded-lg bg-white p-2 pl-1 shadow-sm">
+        <HeatMapDates />
         <div
           className="
-            clip-me flex w-full flex-nowrap justify-end overflow-x-clip p-2
+            flex w-full flex-nowrap justify-end overflow-x-clip pr-[16px]
+            sm:pr-[14px]
           "
         >
           {chunkArray(data.days, 7).map((chunk, index) => {
