@@ -1,27 +1,25 @@
-import {WorkCardData, workData} from "@/lib/workData";
-import {WorkCard} from "@/components/workCard";
+import { workData } from "@/lib/workData";
 import Breadcrumbs from "@/components/breadcrumbs";
+import React from "react";
+import { WorkArea } from "@/components/work/workArea";
 
 export default function Page() {
-	return (
-		<div className={
-			"flex py-4 flex-col max-w-[720px] mx-auto px-[calc(min(16px,8vw))] gap-4"
-		}>
-			<Breadcrumbs/>
-			<div className={"grid grid-cols-1 md:grid-cols-3 gap-4 w-full"}>
-				{workData().map((item: WorkCardData, index: number) => {
-					return (
-						<WorkCard
-							key={index}
-							title={item.title}
-							link={item.link}
-							tag={item.tag}
-							src={item.src}
-							alt={item.alt}
-						/>
-					)
-				})}
-			</div>
-		</div>
-	);
-};
+  const specificData = (value: string) => {
+    return workData().filter((item) => item.type === value);
+  };
+
+  return (
+    <div
+      className="
+        mx-auto flex max-w-[720px] flex-col gap-8 px-[calc(min(16px,8vw))]
+        py-4
+      "
+    >
+      <Breadcrumbs />
+
+      <WorkArea header={"professional"} data={specificData("professional")} />
+      <WorkArea header={"personal"} data={specificData("personal")} />
+      <WorkArea header={"college"} data={specificData("college")} />
+    </div>
+  );
+}

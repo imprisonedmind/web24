@@ -42,7 +42,10 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
           "flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm"
         }
       >
-        <SongLinkWrapper songUrl={songData.songUrl}>
+        <SongLinkWrapper
+          songUrl={songData.songUrl}
+          imgUrl={songData.albumImageUrl}
+        >
           <ArmThingy />
           <VinylCircles albumImageUrl={songData.albumImageUrl} />
         </SongLinkWrapper>

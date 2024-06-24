@@ -1,13 +1,16 @@
 import React, { FC, ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface SongLinkWrapperProps {
   songUrl: string;
+  imgUrl: string;
   children: ReactNode;
 }
 
 export const SongLinkWrapper: FC<SongLinkWrapperProps> = ({
   songUrl,
+  imgUrl,
   children,
 }) => {
   return (
@@ -19,6 +22,7 @@ export const SongLinkWrapper: FC<SongLinkWrapperProps> = ({
         p-4
       "
     >
+      <Image src={imgUrl} alt={"test"} fill={true} className={"opacity-20"} />
       {children}
     </Link>
   );
