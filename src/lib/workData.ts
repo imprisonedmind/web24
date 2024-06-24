@@ -15,6 +15,7 @@ export interface WorkCardData {
   title: string;
   link: string;
   tag: string;
+  type: string;
   src: StaticImageData;
   alt: string;
 }
@@ -24,6 +25,7 @@ export const workData = (): WorkCardData[] => [
     title: "Trinity",
     link: "https://trinity.co.za",
     tag: "website",
+    type: "professional",
     src: trinity,
     alt: "Trinity website cover image",
   },
@@ -31,6 +33,7 @@ export const workData = (): WorkCardData[] => [
     title: "Giggity",
     link: "https://giggity.co.za",
     tag: "web app",
+    type: "personal",
     src: giggity,
     alt: "Giggity.co.za website cover image",
   },
@@ -38,6 +41,7 @@ export const workData = (): WorkCardData[] => [
     title: "Postz",
     link: "https://metaversal-take-home.vercel.app/",
     tag: "web app",
+    type: "personal",
     src: postz,
     alt: "Postz website blog cover image",
   },
@@ -45,6 +49,7 @@ export const workData = (): WorkCardData[] => [
     title: "notion-next-blog",
     link: "https://notion-next-blog-black.vercel.app/",
     tag: "web app",
+    type: "personal",
     src: notionNextBlog,
     alt: "Notion-next-blog website blog cover image",
   },
@@ -52,6 +57,7 @@ export const workData = (): WorkCardData[] => [
     title: "PitchPlatform",
     link: "https://takemyword-34623.web.app/",
     tag: "website",
+    type: "professional",
     src: tmw,
     alt: "TakeMyWord website blog cover image",
   },
@@ -59,6 +65,7 @@ export const workData = (): WorkCardData[] => [
     title: "Specno",
     link: "https://specno-54db0.web.app",
     tag: "wesbite",
+    type: "professional",
     src: specno,
     alt: "Specno.com website cover image",
   },
@@ -66,6 +73,7 @@ export const workData = (): WorkCardData[] => [
     title: "portfolio",
     link: "https://luke-portfolio-64b54.web.app/",
     tag: "2020",
+    type: "college",
     src: luke,
     alt: "Luke Stephens website cover image",
   },
@@ -73,6 +81,7 @@ export const workData = (): WorkCardData[] => [
     title: "show-reel",
     link: "https://youtu.be/VRtpQDCGSvU",
     tag: "2020",
+    type: "college",
     src: showreel,
     alt: "Luke Stephens 2020 show reel cover image",
   },
@@ -80,6 +89,7 @@ export const workData = (): WorkCardData[] => [
     title: "experiment",
     link: "https://experimental-website-96c14.web.app/",
     tag: "website",
+    type: "college",
     src: experiment,
     alt: "Luke Stephens experimental website cover image",
   },
@@ -87,6 +97,7 @@ export const workData = (): WorkCardData[] => [
     title: "blog",
     link: "https://lukestephens-2f9c9.web.app/home",
     tag: "2020",
+    type: "college",
     src: blog,
     alt: "Luke Stephens 2020 blog cover image",
   },
@@ -94,6 +105,7 @@ export const workData = (): WorkCardData[] => [
     title: "game trailer",
     link: "https://youtu.be/NR02OtOpixo",
     tag: "2020",
+    type: "college",
     src: acidMage,
     alt: "Luke Stephens 2020 blog cover image",
   },

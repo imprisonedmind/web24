@@ -9,8 +9,8 @@ export const VinylCircles: FC<VinylCirclesProps> = ({ albumImageUrl }) => {
   return (
     <div
       className="
-        spinner group relative aspect-square h-full w-auto rounded-full
-        bg-neutral-800
+        spinner group relative aspect-square h-full w-auto transform-gpu
+        rounded-full bg-neutral-800
       "
     >
       <div
@@ -63,7 +63,9 @@ export const VinylCircles: FC<VinylCirclesProps> = ({ albumImageUrl }) => {
           fill={true}
           priority={true}
           sizes={"20vw"}
-          className={"object-cover opacity-[0.8] mix-blend-multiply"}
+          className={
+            "bg-neutral-800 object-cover opacity-[0.8] mix-blend-multiply"
+          }
         />
       </div>
       {/*Numb*/}
