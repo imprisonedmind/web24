@@ -9,7 +9,7 @@ export const HeatMapDate: FC<HeatMapDateProps> = ({ title }) => {
     <li
       className={`
         m-auto flex h-[10px] w-[10px] items-center justify-center rounded-sm 
-        border-[0.5px] border-gray-200 bg-white text-[5px] shadow-sm 
+        border-[0.5px] border-gray-200 bg-white text-[7px] font-medium shadow-sm
     `}
     >
       {title}
