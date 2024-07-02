@@ -7,9 +7,9 @@ import experiment from "/public/experiment.png";
 import blog from "/public/blog.png";
 import tmw from "/public/tmw.png";
 import postz from "/public/postz.jpg";
-import notionNextBlog from "/public/notion-next-blog.jpg";
 import showreel from "/public/showreel.jpg";
 import acidMage from "/public/acidMage.png";
+import bloggin from "/public/bloggin.png";
 
 export interface WorkCardData {
   title: string;
@@ -38,20 +38,20 @@ export const workData = (): WorkCardData[] => [
     alt: "Giggity.co.za website cover image",
   },
   {
+    title: "bloggin",
+    link: "https://notion-nextjs-bloggin.vercel.app/home",
+    tag: "web app",
+    type: "personal",
+    src: bloggin,
+    alt: "bloggin website blog cover",
+  },
+  {
     title: "Postz",
     link: "https://metaversal-take-home.vercel.app/",
     tag: "web app",
     type: "personal",
     src: postz,
     alt: "Postz website blog cover image",
-  },
-  {
-    title: "notion-next-blog",
-    link: "https://notion-next-blog-black.vercel.app/",
-    tag: "web app",
-    type: "personal",
-    src: notionNextBlog,
-    alt: "Notion-next-blog website blog cover image",
   },
   {
     title: "PitchPlatform",
