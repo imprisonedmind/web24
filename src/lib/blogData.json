@@ -1,10 +1,18 @@
 [
   {
+    "id": "c406c93858294ee2988bb757a978c18b",
+    "date": "04 Jul 24",
+    "title": "a love letter to raycast",
+    "openGraph": "raycastLarge.jpg",
+    "openGraphSmall": "raycastSmall.jpg",
+    "description": "Discover why Raycast is a must-have tool for efficient command management on your Mac. From window handling to Spotify controls and custom snippets, learn how Raycast transforms productivity. Explore key commands, window management tricks, and the power of personalized scripts. A must-read for those seeking seamless Mac navigation and advanced tool integration."
+  },
+  {
     "id": "44b611cc9aba42aa838b6d7f7524ac18",
     "date": "27 May 24",
     "title": "watchQuery to save the day",
-    "openGraph": "smallWatchQuery.jpg",
-    "openGraphSmall": "largeWatchQuery.jpg",
+    "openGraph": "largeWatchQuery.jpg",
+    "openGraphSmall": "smallWatchQuery.jpg",
     "description": "In this blog post, the author delves into the implementation of Apollo GraphQL's `watchQuery()` to overcome skeleton loading across route navigation in a device management portal. They compare the currently implemented `useQuery()` method, which lacks caching and incurs loading delays, with the experimental `watchQuery()` approach that subscribes to cached data for faster interaction. The post outlines the pros and cons of `watchQuery()` implementation, discusses challenges like managing dependencies in `useEffect()`, and shares insights on stabilizing data sorting to reduce layout shifts in the user interface."
   },
   {
