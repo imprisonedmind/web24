@@ -31,7 +31,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
           priority={true}
           sizes={"50vw"}
           placeholder={"blur"}
-          className={"w-full object-cover"}
+          className={"w-full bg-gray-200 object-cover"}
         />
       </div>
       <div>

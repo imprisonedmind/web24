@@ -26,6 +26,7 @@ export const NotionPage: FC<NotionPageProps> = (props) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const videos = document.querySelectorAll("video");
+
       videos.forEach((video) => {
         video.autoplay = true;
         video.muted = true;
@@ -39,6 +40,7 @@ export const NotionPage: FC<NotionPageProps> = (props) => {
 
   return (
     <NotionRenderer
+      className={"[v"}
       recordMap={recordMap}
       darkMode={false}
       fullPage={false}
