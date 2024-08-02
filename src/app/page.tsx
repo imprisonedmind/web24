@@ -22,7 +22,9 @@ export default function Home() {
           placeholder={"blur"}
           priority={true}
           sizes={"80vw"}
-          className={"mx-auto hidden max-h-[400px] max-w-[300px] md:flex"}
+          className={`
+            mx-auto hidden max-h-[400px] max-w-[300px] rounded-2xl md:flex
+          `}
         />
         <div
           className={

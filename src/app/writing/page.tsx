@@ -12,7 +12,7 @@ export default function Page() {
       }
     >
       <Breadcrumbs />
-      <div className={`grid cursor-pointer grid-cols-1 gap-4`}>
+      <div className={`grid cursor-pointer grid-cols-1 gap-4 sm:grid-cols-2`}>
         {data.map((blog, index) => {
           return (
             <Link
@@ -29,14 +29,16 @@ export default function Page() {
                 alt={blog.title}
                 width={300}
                 height={300}
-                className={"max-h-[400px] w-full rounded-lg object-cover"}
+                className={`
+                  max-h-[160px] w-full rounded-lg bg-gray-200 object-cover
+                `}
               />
               <div className={"flex flex-col gap-1"}>
                 <div className={"flex flex-row items-center justify-between"}>
-                  <p className={"font-medium"}>{blog.title}</p>
-                  <p className={"text-xs"}>{blog.date}</p>
+                  <p className={"line-clamp-1 font-medium"}>{blog.title}</p>
+                  <p className={"flex-shrink-0 text-xs"}>{blog.date}</p>
                 </div>
-                <p className={"truncate text-sm"}>{blog.description}</p>
+                <p className={"line-clamp-3 text-sm"}>{blog.description}</p>
               </div>
             </Link>
           );

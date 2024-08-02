@@ -1,5 +1,13 @@
 [
   {
+    "id": "d9d9ff0975444fa191bd2a5a2e102c91",
+    "date": "02 Aug 24",
+    "title": "fix external camera flicker on mac",
+    "openGraph": "flicker.jpg",
+    "openGraphSmall": "flickerSmall.jpg",
+    "description": "Learn how to fix external webcam flicker on Mac caused by fluorescent lighting. Discover an efficient solution using CameraController to adjust refresh rates without bloatware. Easy steps to improve your video quality."
+  },
+  {
     "id": "c406c93858294ee2988bb757a978c18b",
     "date": "04 Jul 24",
     "title": "a love letter to raycast",
