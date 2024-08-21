@@ -10,7 +10,6 @@ import Location from "@/components/location";
 import Music from "@/components/music/music";
 import Coding from "@/components/coding/coding";
 import WritingList from "@/components/writing/writingList";
-import ReviewList from "@/components/writing/reviewList";
 
 export default function Home() {
   return (
@@ -45,7 +44,6 @@ export default function Home() {
           <Music />
         </div>
         <Coding />
-        {/*<ReviewList />*/}
         <Tech />
       </div>
     </main>
