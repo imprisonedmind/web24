@@ -33,8 +33,6 @@ export const NotionPage: FC<NotionPageProps> = (props) => {
         video.loop = true;
         video.play();
       });
-
-      console.log(videos);
     }
   }, []);
 

@@ -1,16 +1,16 @@
+import luke from "/public/luke2.jpg";
 import Image from "next/image";
 import Social from "@/components/social";
 import Employment from "@/components/employment";
 import Education from "@/components/education";
 import Work from "@/components/work";
-import WritingList from "@/components/writingList";
 import Bio from "@/components/bio";
 import Tech from "@/components/tech";
-
-import luke from "/public/luke2.jpg";
 import Location from "@/components/location";
 import Music from "@/components/music/music";
 import Coding from "@/components/coding/coding";
+import WritingList from "@/components/writing/writingList";
+import ReviewList from "@/components/writing/reviewList";
 
 export default function Home() {
   return (
@@ -44,6 +44,7 @@ export default function Home() {
           <Location />
           <Music />
         </div>
+        <ReviewList />
         <Coding />
         <Tech />
       </div>
