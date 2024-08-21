@@ -1,8 +1,11 @@
 import { NotionAPI } from "notion-client";
 import { NotionPage } from "@/components/wrapper/notionPage";
-import data from "@/lib/blogData.json";
+import blogData from "@/lib/blogData.json";
+import reviewData from "@/lib/reviewData.json";
 import { spaceToHyphen } from "@/lib/util";
 import Breadcrumbs from "@/components/breadcrumbs";
+import { ReviewScore } from "@/components/writing/reviewScore";
+import { Post } from "@/lib/types";
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const id = params.slug[1];
@@ -10,8 +13,10 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
   const notion = new NotionAPI();
   const recordMap = await notion.getPage(id);
 
-  const blogData = data.find((obj) => obj.id === id) ?? null;
-  const date = blogData?.date;
+  const data: Post[] = [...blogData, ...reviewData];
+  const item = data.find((obj) => obj.id === id) ?? null;
+  const date = item?.date;
+  const score = item?.score;
 
   return (
     <div>
@@ -21,6 +26,7 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
         }
       >
         <Breadcrumbs />
+        {score !== null && <ReviewScore score={score!} />}
         <p className={"flex w-max flex-shrink-0"}>{date}</p>
       </div>
       <NotionPage recordMap={recordMap} />
@@ -34,11 +40,12 @@ export async function generateMetadata({
   params: { slug: string[] };
 }) {
   const id = params.slug[1];
-  const blogData = data.find((obj) => obj.id === id) ?? null;
+  const data: Post[] = [...blogData, ...reviewData];
+  const item = data.find((obj) => obj.id === id) ?? null;
 
-  const title = blogData?.title;
-  const description = blogData?.description;
-  const imgUrl = blogData?.openGraph;
+  const title = item?.title;
+  const description = item?.description;
+  const imgUrl = item?.openGraph;
 
   return {
     title: title,
@@ -51,7 +58,7 @@ export async function generateMetadata({
       siteName: "Luke Stephens",
       images: [
         {
-          url: `/${blogData?.openGraphSmall}`,
+          url: `/${item?.openGraphSmall}`,
           width: 1024,
           height: 683,
           alt: title,
