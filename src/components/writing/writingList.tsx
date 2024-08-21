@@ -17,7 +17,7 @@ export default function WritingList() {
         <span key={index} className="flex items-center justify-between">
           <SmallLink
             title={item.title}
-            link={`/reviews/${spaceToHyphen(item.title)}/${item.id}`}
+            link={`/writing/${spaceToHyphen(item.title)}/${item.id}`}
           />
           {item.score !== undefined && <ReviewScore score={item.score} />}
         </span>
