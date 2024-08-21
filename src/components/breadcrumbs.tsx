@@ -8,7 +8,7 @@ export default function Breadcrumbs() {
   const pathSegments = pathname?.split("/").filter((segment) => segment !== "");
 
   return (
-    <div className={`flex w-full flex-row gap-2 truncate`}>
+    <div className={`flex w-fit flex-row gap-2 truncate`}>
       <Link href={"/"}>home</Link>
       {pathSegments && <p>/</p>}
       {pathSegments && (
