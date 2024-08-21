@@ -161,3 +161,13 @@ export function chunkArray(array, chunkSize) {
     return sortedChunk;
   });
 }
+
+export function getTopThreePosts(posts) {
+  // Sort the posts by date in descending order
+  const sortedPosts = posts.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+
+  // Get the top 4 most recent posts
+  return sortedPosts.slice(0, 3);
+}

@@ -6,18 +6,16 @@ interface SmallLinkProps {
   link: string;
 }
 
-export const SmallLink: FC<SmallLinkProps> = (props) => {
-  const { title, link } = props;
-
+export const SmallLink: FC<SmallLinkProps> = ({ title, link }) => {
   return (
     <Link
       prefetch={true}
       href={link}
-      className={
-        "flex w-max text-sm text-neutral-500 underline-offset-2 hover:underline"
-      }
+      className="
+        flex w-max text-sm text-neutral-500 underline-offset-4 hover:underline
+      "
     >
-      {title}
+      <p>{title}</p>
     </Link>
   );
 };

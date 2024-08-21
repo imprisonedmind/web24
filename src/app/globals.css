@@ -12,7 +12,11 @@ html {
     }
 }
 
-.notion-asset-wrapper img  {
+.notion-asset-wrapper-full img {
+    @apply rounded-none bg-neutral-100 !important
+}
+
+.medium-zoom-image {
     @apply rounded-2xl !important
 }
 
