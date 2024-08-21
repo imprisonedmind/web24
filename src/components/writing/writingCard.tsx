@@ -29,18 +29,22 @@ export const WritingCard: FC<WritingCardProps> = ({ item, isReview }) => {
           max-h-[160px] w-full rounded-lg bg-gray-200 object-cover
         "
       />
+
       <div className={"flex flex-col gap-1"}>
         <div className={"flex flex-row items-center justify-between"}>
           <p className={"line-clamp-1 font-medium"}>{item.title}</p>
 
           <p className={"flex-shrink-0 text-xs"}>{item.date}</p>
         </div>
-        {isReview ? (
-          <ReviewScore score={item.score!} />
-        ) : (
-          <p className={"line-clamp-3 text-sm text-neutral-500"}>
-            {item.description}
-          </p>
+
+        <p className={"line-clamp-3 text-sm text-neutral-500"}>
+          {item.description}
+        </p>
+
+        {item.score !== undefined && (
+          <span className="mt-1">
+            <ReviewScore score={item.score!} />
+          </span>
         )}
       </div>
     </Link>

@@ -44,8 +44,8 @@ export default function Home() {
           <Location />
           <Music />
         </div>
-        <ReviewList />
         <Coding />
+        {/*<ReviewList />*/}
         <Tech />
       </div>
     </main>
