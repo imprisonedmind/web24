@@ -1,11 +1,6 @@
-import { Header } from "@/components/header";
 import { Chunk } from "@/components/coding/chunk";
 import HeatMapDates from "@/components/coding/heatMapDates";
 import { chunkArray } from "@/lib/util";
-import { IoIosInformationCircleOutline } from "react-icons/io";
-import { Modal } from "react-notion-x/build/third-party/modal";
-import { createPortal } from "react-dom";
-import { ChunkHover } from "@/components/coding/chunkHover";
 import React from "react";
 import CodingHeader from "@/components/coding/codingHeader";
 
@@ -19,11 +14,14 @@ const getCodingData = async () => {
       },
     },
   );
+
   return await data.json();
 };
 
 export default async function Coding() {
   const data = await getCodingData();
+
+  // console.log(data);
 
   return (
     <section className="flex flex-col gap-1 px-4 sm:p-0">

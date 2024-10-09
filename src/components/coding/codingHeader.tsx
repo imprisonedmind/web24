@@ -18,7 +18,7 @@ export default function CodingHeader() {
           modalTing.current,
         )}
       <span className={"flex flex-row items-center justify-between"}>
-        <Header title={"coding"} />
+        <Header title={"activity"} />
 
         <span
           ref={modalTing}
