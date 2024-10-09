@@ -26,7 +26,7 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
         }
       >
         <Breadcrumbs />
-        {score !== null && <ReviewScore score={score!} />}
+        {score !== undefined && <ReviewScore score={score!} />}
         <p className={"flex w-max flex-shrink-0"}>{date}</p>
       </div>
       <NotionPage recordMap={recordMap} />
