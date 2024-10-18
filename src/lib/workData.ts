@@ -47,7 +47,7 @@ export const workData = (): WorkCardData[] => [
   },
   {
     title: "Postz",
-    link: "https://metaversal-take-home.vercel.app/",
+    link: "https://metaversal-posts.vercel.app/",
     tag: "web app",
     type: "personal",
     src: postz,
