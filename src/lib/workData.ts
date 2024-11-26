@@ -1,5 +1,5 @@
 import { StaticImageData } from "next/image";
-import trinity from "/public/trinity.png";
+import trinity from "/public/trinity.jpg";
 import giggity from "/public/giggity2.png";
 import specno from "/public/Spec.png";
 import luke from "/public/luke.png";
@@ -10,6 +10,7 @@ import postz from "/public/postz.jpg";
 import showreel from "/public/showreel.jpg";
 import acidMage from "/public/acidMage.png";
 import bloggin from "/public/bloggin.png";
+import olarm from "/public/olarmHero.jpg";
 
 export interface WorkCardData {
   title: string;
@@ -27,7 +28,7 @@ export const workData = (): WorkCardData[] => [
     tag: "website",
     type: "professional",
     src: trinity,
-    alt: "Trinity website cover image",
+    alt: "Trinity website cover image"
   },
   {
     title: "Giggity",
@@ -35,7 +36,15 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     type: "personal",
     src: giggity,
-    alt: "Giggity.co.za website cover image",
+    alt: "Giggity.co.za website cover image"
+  },
+  {
+    title: "olarm-ws",
+    link: "https://github.com/imprisonedmind/homebridge-ws-olarm-plugin",
+    tag: "plugin",
+    type: "personal",
+    src: olarm,
+    alt: "bloggin website blog cover"
   },
   {
     title: "bloggin",
@@ -43,7 +52,7 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     type: "personal",
     src: bloggin,
-    alt: "bloggin website blog cover",
+    alt: "bloggin website blog cover"
   },
   {
     title: "Postz",
@@ -51,7 +60,7 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     type: "personal",
     src: postz,
-    alt: "Postz website blog cover image",
+    alt: "Postz website blog cover image"
   },
   {
     title: "PitchPlatform",
@@ -59,7 +68,7 @@ export const workData = (): WorkCardData[] => [
     tag: "website",
     type: "professional",
     src: tmw,
-    alt: "TakeMyWord website blog cover image",
+    alt: "TakeMyWord website blog cover image"
   },
   {
     title: "Specno",
@@ -67,7 +76,7 @@ export const workData = (): WorkCardData[] => [
     tag: "wesbite",
     type: "professional",
     src: specno,
-    alt: "Specno.com website cover image",
+    alt: "Specno.com website cover image"
   },
   {
     title: "portfolio",
@@ -75,7 +84,7 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: luke,
-    alt: "Luke Stephens website cover image",
+    alt: "Luke Stephens website cover image"
   },
   {
     title: "show-reel",
@@ -83,7 +92,7 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: showreel,
-    alt: "Luke Stephens 2020 show reel cover image",
+    alt: "Luke Stephens 2020 show reel cover image"
   },
   {
     title: "experiment",
@@ -91,7 +100,7 @@ export const workData = (): WorkCardData[] => [
     tag: "website",
     type: "college",
     src: experiment,
-    alt: "Luke Stephens experimental website cover image",
+    alt: "Luke Stephens experimental website cover image"
   },
   {
     title: "blog",
@@ -99,7 +108,7 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: blog,
-    alt: "Luke Stephens 2020 blog cover image",
+    alt: "Luke Stephens 2020 blog cover image"
   },
   {
     title: "game trailer",
@@ -107,6 +116,6 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: acidMage,
-    alt: "Luke Stephens 2020 blog cover image",
-  },
+    alt: "Luke Stephens 2020 blog cover image"
+  }
 ];

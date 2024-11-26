@@ -1,5 +1,13 @@
 [
   {
+    "id": "14af90ec476b80d5b34deec12c0d0dc3",
+    "date": "26 Nov 24",
+    "title": "get olarm working with homekit & g-home",
+    "openGraph": "olarm.jpg",
+    "openGraphSmall": "olarmSmall.jpg",
+    "description": "Learn how to connect your Olarm communicator with HomeKit and Google Home using Homebridge. This step-by-step guide covers installation, plugin setup, and configuration to seamlessly integrate your Olarm alarm system with iOS and Android platforms."
+  },
+  {
     "id": "d9d9ff0975444fa191bd2a5a2e102c91",
     "date": "02 Aug 24",
     "title": "fix external camera flicker on mac",

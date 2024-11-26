@@ -169,5 +169,5 @@ export function getTopThreePosts(posts) {
   );
 
   // Get the top 4 most recent posts
-  return sortedPosts.slice(0, 3).reverse();
+  return sortedPosts.slice(0, 3);
 }
