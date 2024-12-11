@@ -8,16 +8,17 @@ interface WorkCardProps {
   tag: string;
   src: StaticImageData | string;
   alt: string;
+  internal?: boolean;
 }
 
 export const WorkCard: FC<WorkCardProps> = (props) => {
-  const { title, link, tag, src, alt } = props;
+  const { title, link, tag, src, alt, internal } = props;
 
   return (
     <Link
       prefetch={true}
       href={link}
-      target={"_blank"}
+      target={internal ? "_self" : "_blank"}
       className={`
         flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm 
         transition duration-150 ease-in-out hover:shadow-md
