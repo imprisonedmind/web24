@@ -25,6 +25,7 @@ export default function Work() {
                 tag={item.tag}
                 src={item.src}
                 alt={item.alt}
+                internal={item.internal}
               />
             );
           })}

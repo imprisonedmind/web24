@@ -22,6 +22,7 @@ export const WorkArea: FC<WorkAreaProps> = ({ header, data }) => {
               tag={item.tag}
               src={item.src}
               alt={item.alt}
+              internal={item.internal}
             />
           );
         })}

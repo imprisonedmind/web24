@@ -1,5 +1,6 @@
 import { StaticImageData } from "next/image";
 import trinity from "/public/trinity.jpg";
+import portal from "/public/projects/portal.png";
 import giggity from "/public/giggity2.png";
 import specno from "/public/Spec.png";
 import luke from "/public/luke.png";
@@ -19,6 +20,7 @@ export interface WorkCardData {
   type: string;
   src: StaticImageData;
   alt: string;
+  internal?: boolean
 }
 
 export const workData = (): WorkCardData[] => [
@@ -31,20 +33,29 @@ export const workData = (): WorkCardData[] => [
     alt: "Trinity website cover image"
   },
   {
-    title: "Giggity",
-    link: "https://giggity.co.za",
-    tag: "web app",
-    type: "personal",
-    src: giggity,
-    alt: "Giggity.co.za website cover image"
-  },
-  {
     title: "olarm-ws",
     link: "https://github.com/imprisonedmind/homebridge-ws-olarm-plugin",
     tag: "plugin",
     type: "personal",
     src: olarm,
     alt: "bloggin website blog cover"
+  },
+  {
+    title: "Portal",
+    link: "/writing/device-management-portal/159f90ec476b8039a452c4675a6f24c6",
+    tag: "web app",
+    type: "professional",
+    src: portal,
+    alt: "A device management portal",
+    internal: true
+  },
+  {
+    title: "Giggity",
+    link: "https://giggity.co.za",
+    tag: "web app",
+    type: "personal",
+    src: giggity,
+    alt: "Giggity.co.za website cover image"
   },
   {
     title: "bloggin",
