@@ -10,7 +10,7 @@ export default function Employment() {
           Trinity Telecomms (PTY) LTD
         </p>
         <BulletPoint title={"design and research lead"} date={"'23-current"} />
-        <BulletPoint title={"software designer"} date={"'21-23"} />
+        <BulletPoint title={"software designer"} date={"'21-current"} />
       </div>
       <div className={"flex flex-col"}>
         <p className={"text-sm text-neutral-500"}>Specno</p>
