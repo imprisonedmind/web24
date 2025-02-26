@@ -12,6 +12,7 @@ import showreel from "/public/showreel.jpg";
 import acidMage from "/public/acidMage.png";
 import bloggin from "/public/bloggin.png";
 import olarm from "/public/olarmHero.jpg";
+import pttt from "/public/pttt.jpg";
 
 export interface WorkCardData {
   title: string;
@@ -20,7 +21,7 @@ export interface WorkCardData {
   type: string;
   src: StaticImageData;
   alt: string;
-  internal?: boolean
+  internal?: boolean;
 }
 
 export const workData = (): WorkCardData[] => [
@@ -48,6 +49,14 @@ export const workData = (): WorkCardData[] => [
     src: portal,
     alt: "A device management portal",
     internal: true
+  },
+  {
+    title: "PTTT",
+    link: "https://parentingtheteentribe.com/",
+    tag: "website / backend",
+    type: "professional",
+    src: pttt,
+    alt: "A device management portal"
   },
   {
     title: "Giggity",
