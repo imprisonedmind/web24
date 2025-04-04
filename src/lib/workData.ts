@@ -14,6 +14,7 @@ import bloggin from "/public/bloggin.png";
 import olarm from "/public/olarmHero.jpg";
 import pttt from "/public/pttt.jpg";
 import susWatch from "/public/sus_watch.jpg";
+import ootify from "/public/ootify.jpg";
 
 export interface WorkCardData {
   title: string;
@@ -35,21 +36,29 @@ export const workData = (): WorkCardData[] => [
     alt: "Trinity website cover image"
   },
   {
-    title: "olarm-ws",
-    link: "https://github.com/imprisonedmind/homebridge-ws-olarm-plugin",
-    tag: "plugin",
-    type: "personal",
-    src: olarm,
-    alt: "bloggin website blog cover"
-  },
-  {
     title: "sus.watch",
     link: "https://sus.watch",
     tag: "web app",
     type: "personal",
     src: susWatch,
     alt: "A device management portal",
+  },
+  {
+    title: "ootify.me",
+    link: "https://ootify.me",
+    tag: "web app",
+    type: "personal",
+    src: ootify,
+    alt: "A device management portal",
     internal: true
+  },
+  {
+    title: "olarm-ws",
+    link: "https://github.com/imprisonedmind/homebridge-ws-olarm-plugin",
+    tag: "plugin",
+    type: "personal",
+    src: olarm,
+    alt: "bloggin website blog cover"
   },
   {
     title: "Portal",
