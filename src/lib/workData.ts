@@ -15,6 +15,7 @@ import olarm from "/public/olarmHero.jpg";
 import pttt from "/public/pttt.jpg";
 import susWatch from "/public/sus_watch.jpg";
 import ootify from "/public/ootify.jpg";
+import hyyp from "/public/hyyp.jpg";
 
 export interface WorkCardData {
   title: string;
@@ -36,14 +37,6 @@ export const workData = (): WorkCardData[] => [
     alt: "Trinity website cover image"
   },
   {
-    title: "sus.watch",
-    link: "https://sus.watch",
-    tag: "web app",
-    type: "personal",
-    src: susWatch,
-    alt: "A device management portal",
-  },
-  {
     title: "ootify.me",
     link: "https://ootify.me",
     tag: "web app",
@@ -51,6 +44,22 @@ export const workData = (): WorkCardData[] => [
     src: ootify,
     alt: "A device management portal",
     internal: true
+  },
+  {
+    title: "hyyp+",
+    link: "https://play.google.com/store/apps/details?id=za.trinity.com.chrysalisv2",
+    tag: "mobile app",
+    type: "professional",
+    src: hyyp,
+    alt: "Home security system mobile app",
+  },
+  {
+    title: "sus.watch",
+    link: "https://sus.watch",
+    tag: "web app",
+    type: "personal",
+    src: susWatch,
+    alt: "A device management portal",
   },
   {
     title: "olarm-ws",
