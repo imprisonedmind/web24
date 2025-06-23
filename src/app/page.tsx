@@ -11,6 +11,7 @@ import Music from "@/components/music/music";
 import Coding from "@/components/coding/coding";
 import WritingList from "@/components/writing/writingList";
 import { Analytics } from "@vercel/analytics/next";
+import CombinedActivity from "@/components/activity/combinedActivity";
 
 export default function Home() {
   return (
@@ -40,12 +41,13 @@ export default function Home() {
       </div>
       <div className={"flex flex-col gap-8"}>
         <Work />
+        {/*<Coding />*/}
+        <CombinedActivity/>
         <WritingList />
         <div className={"grid grid-cols-1 gap-8 px-4 sm:grid-cols-2 md:p-0"}>
           <Location />
           <Music />
         </div>
-        <Coding />
         <Tech />
       </div>
     </main>

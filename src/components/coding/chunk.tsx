@@ -26,9 +26,11 @@ export const Chunk: FC<ChunkProps> = ({ chunk }) => {
   const categoryColors: CategoryColors = {
     Coding: "#20b958", // Green
     Designing: "#a855f7", // Purple
-    Meeting: "#ef4444", // Red
-    "Writing Docs": "#eab308", // Yellow
+    Meeting: "#de44ef", // Red
+    "Writing Docs": "#08eac1", // Yellow
     "Browsing": "#086aea", // Blue
+    "Movie": "#ea4408", // Blue
+    "Episode": "#ea7908", // Blue
   };
   const defaultColor = "#f3f4f6"; // Light gray for items without categories
   const defaultBorderColor = "#e5e7eb";
