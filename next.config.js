@@ -15,7 +15,12 @@ const nextConfig = {
         hostname: "media0.giphy.com",
         port: "",
         pathname: "/**",
-      },
+      }, {
+        protocol: "https",
+        hostname: "image.tmdb.org",
+        port: "",
+        pathname: "/**"
+      }
     ],
   },
 };

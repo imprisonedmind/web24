@@ -15,28 +15,28 @@ export const VinylCircles: FC<VinylCirclesProps> = ({ albumImageUrl }) => {
     >
       <div
         className="
-          absolute left-1/2 top-1/2 z-10 h-60 w-60 -translate-x-[50%] 
+          absolute left-1/2 top-1/2 z-10 h-32 w-32 -translate-x-[50%]
           -translate-y-[50%] rounded-full border border-neutral-900 
           bg-neutral-700
         "
       />
       <div
         className="
-          absolute left-1/2 top-1/2 z-10 h-52 w-52 -translate-x-[50%] 
+          absolute left-1/2 top-1/2 z-10 h-32 w-32 -translate-x-[50%]
           -translate-y-[50%] rounded-full border border-neutral-900 
           bg-neutral-700
         "
       />
       <div
         className="
-          absolute left-1/2 top-1/2 z-10 h-44 w-44 -translate-x-[50%] 
+          absolute left-1/2 top-1/2 z-10 h-26 w-26 -translate-x-[50%]
           -translate-y-[50%] rounded-full border border-neutral-900 
           bg-neutral-700
         "
       />
       <div
         className="
-          absolute left-1/2 top-1/2 z-10 h-36 w-36 -translate-x-[50%] 
+          absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-[50%]
           -translate-y-[50%] rounded-full border border-neutral-900 
           bg-neutral-900
         "
@@ -52,7 +52,7 @@ export const VinylCircles: FC<VinylCirclesProps> = ({ albumImageUrl }) => {
       {/*Inner Circle*/}
       <div
         className="
-          absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-[50%] 
+          absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-[50%]
           -translate-y-[50%] overflow-hidden rounded-full bg-white transition 
           duration-150 ease-in-out group-hover:scale-[1.5]
         "
@@ -79,7 +79,7 @@ export const VinylCircles: FC<VinylCirclesProps> = ({ albumImageUrl }) => {
       {/*Numb Circle*/}
       <div
         className="
-          absolute left-1/2 top-1/2 z-10 h-8 w-8 -translate-x-[50%]
+          absolute left-1/2 top-1/2 z-10 h-4 w-4 -translate-x-[50%]
           -translate-y-[50%] rounded-full border border-neutral-300
         "
       />

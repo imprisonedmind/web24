@@ -8,14 +8,14 @@ import Bio from "@/components/bio";
 import Tech from "@/components/tech";
 import Location from "@/components/location";
 import Music from "@/components/music/music";
-import Coding from "@/components/coding/coding";
 import WritingList from "@/components/writing/writingList";
 import { Analytics } from "@vercel/analytics/next";
 import CombinedActivity from "@/components/activity/combinedActivity";
+import TvWidget from "@/components/tv/tvWidget";
 
 export default function Home() {
   return (
-    <main className="mx-auto mb-8 flex max-w-[600px] flex-col gap-8">
+    <main className="mx-auto mb-8 flex max-w-[640px] flex-col gap-8">
       <Analytics />
       <div className={"mt-8 flex flex-col justify-between gap-4 md:flex-row"}>
         <Image
@@ -42,10 +42,11 @@ export default function Home() {
       <div className={"flex flex-col gap-8"}>
         <Work />
         {/*<Coding />*/}
-        <CombinedActivity/>
+        <CombinedActivity />
         <WritingList />
-        <div className={"grid grid-cols-1 gap-8 px-4 sm:grid-cols-2 md:p-0"}>
+        <div className={"grid grid-cols-1 gap-4 px-4 sm:grid-cols-3 md:p-0"}>
           <Location />
+          <TvWidget />
           <Music />
         </div>
         <Tech />

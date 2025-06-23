@@ -17,8 +17,8 @@ export const SongLinkWrapper: FC<SongLinkWrapperProps> = ({
     <Link
       href={songUrl}
       className="
-        relative flex h-72 w-full cursor-pointer items-center justify-center 
-        overflow-hidden rounded-lg bg-gradient-to-t from-gray-400 to-gray-200
+        relative flex h-full w-full cursor-pointer items-center justify-center
+        overflow-hidden bg-gradient-to-t from-gray-400 to-gray-200
         p-4
       "
     >
