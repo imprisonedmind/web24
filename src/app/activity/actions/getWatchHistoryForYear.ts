@@ -1,14 +1,14 @@
-'use server';
+"use server";
 
-import { eachDayOfInterval, formatISO, parseISO, subDays } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
+import { eachDayOfInterval, formatISO, subDays } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
-const ID    = process.env.TRAKT_CLIENT_ID!;
+const ID = process.env.TRAKT_CLIENT_ID!;
 const TOKEN = process.env.TRAKT_ACCESS_TOKEN!;
-const TZ    = 'Africa/Johannesburg';
+const TZ = "Africa/Johannesburg";
 
 const SINCE = subDays(new Date(), 364);                       // ← 365-day window
-const SINCE_ISO = `${SINCE.toISOString().split('T')[0]}T00:00:00Z`; // midnight
+const SINCE_ISO = `${SINCE.toISOString().split("T")[0]}T00:00:00Z`; // midnight
 
 async function* historyPagesLastYear() {
   for (let page = 1; ; page++) {
@@ -18,12 +18,11 @@ async function* historyPagesLastYear() {
 
     const res = await fetch(url, {
       headers: {
-        Authorization:       `Bearer ${TOKEN}`,
-        'trakt-api-key':     ID,
-        'trakt-api-version': '2'
+        Authorization: `Bearer ${TOKEN}`,
+        "trakt-api-key": ID,
+        "trakt-api-version": "2"
       },
-      cache: 'force-cache',
-      next:  { revalidate: 3600 }
+      next: { revalidate: 3600 }
     });
 
     if (!res.ok) throw new Error(`Trakt ${res.status}`);
@@ -37,7 +36,11 @@ async function* historyPagesLastYear() {
 export async function getWatchDaysLastYear() {
   const map: Record<
     string,
-    { date: string; total: number; categories: { name: string; total: number }[] }
+    {
+      date: string;
+      total: number;
+      categories: { name: string; total: number }[]
+    }
   > = {};
 
   /* -------- build the map -------- */
@@ -47,23 +50,26 @@ export async function getWatchDaysLastYear() {
       if (local < SINCE) return;                               // older than 365 d
 
       const day = local.toISOString().slice(0, 10);            // YYYY-MM-DD
-      const minutes = it.type === 'movie' ? it.movie?.runtime : it.episode?.runtime;
+      const minutes = it.type === "movie" ? it.movie?.runtime : it.episode?.runtime;
       const seconds = (minutes || 0) * 60;
 
       if (!map[day]) map[day] = { date: day, total: 0, categories: [] };
 
       map[day].total += seconds;
 
-      const key = it.type === 'movie' ? 'Movie' : 'Episode';
+      const key = it.type === "movie" ? "Movie" : "Episode";
       const cat = map[day].categories.find(c => c.name === key);
-      cat ? (cat.total += seconds) : map[day].categories.push({ name: key, total: seconds });
+      cat ? (cat.total += seconds) : map[day].categories.push({
+        name: key,
+        total: seconds
+      });
     }
   }
 
   /* -------- fill gaps so every day exists -------- */
   const fullSpan = eachDayOfInterval({ start: SINCE, end: new Date() });
   for (const d of fullSpan) {
-    const iso = formatISO(d, { representation: 'date' });
+    const iso = formatISO(d, { representation: "date" });
     if (!map[iso]) map[iso] = { date: iso, total: 0, categories: [] };
   }
 
