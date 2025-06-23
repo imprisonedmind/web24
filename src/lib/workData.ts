@@ -29,12 +29,12 @@ export interface WorkCardData {
 
 export const workData = (): WorkCardData[] => [
   {
-    title: "Trinity",
-    link: "https://trinity.co.za",
-    tag: "website",
+    title: "hyyp+",
+    link: "https://play.google.com/store/apps/details?id=za.trinity.com.chrysalisv2",
+    tag: "mobile app",
     type: "professional",
-    src: trinity,
-    alt: "Trinity website cover image"
+    src: hyyp,
+    alt: "Home security system mobile app",
   },
   {
     title: "ootify.me",
@@ -46,12 +46,12 @@ export const workData = (): WorkCardData[] => [
     internal: true
   },
   {
-    title: "hyyp+",
-    link: "https://play.google.com/store/apps/details?id=za.trinity.com.chrysalisv2",
-    tag: "mobile app",
+    title: "Trinity",
+    link: "https://trinity.co.za",
+    tag: "website",
     type: "professional",
-    src: hyyp,
-    alt: "Home security system mobile app",
+    src: trinity,
+    alt: "Trinity website cover image"
   },
   {
     title: "sus.watch",

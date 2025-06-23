@@ -18,12 +18,12 @@ export default function CodingHeader() {
           modalTing.current,
         )}
       <span className={"flex flex-row items-center justify-between"}>
-        <Header title={"activity"} />
+        <Header title={"work"}  />
 
         <span
           ref={modalTing}
           onClick={() => setActive(!active)}
-          className={"relative h-fit w-fit"}
+          className={"relative h-fit w-fit ml-4"}
         >
           <IoIosInformationCircleOutline
             className={"cursor-pointer text-neutral-300"}
