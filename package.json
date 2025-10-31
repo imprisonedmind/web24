@@ -7,7 +7,8 @@
     "prod": "next build",
     "start": "next start",
     "lint": "next lint",
-    "trakt:login": "bun run scripts/trakt-auth.ts login"
+    "trakt:login": "bun run scripts/trakt-auth.ts login",
+    "spotify:login": "bun run scripts/spotify-auth.ts login"
   },
   "dependencies": {
     "@vercel/analytics": "^1.4.1",
