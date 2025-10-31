@@ -3,15 +3,16 @@ import Image from "next/image";
 
 interface VinylCirclesProps {
   albumImageUrl: string;
+  isPlaying?: boolean;
 }
 
-export const VinylCircles: FC<VinylCirclesProps> = ({ albumImageUrl }) => {
+export const VinylCircles: FC<VinylCirclesProps> = ({ albumImageUrl, isPlaying = true }) => {
   return (
     <div
-      className="
-        spinner group relative aspect-square h-full w-auto transform-gpu
-        rounded-full bg-neutral-800
-      "
+      className={`
+        group relative aspect-square h-full w-auto transform-gpu
+        rounded-full bg-neutral-800 ${isPlaying ? "spinner" : "animate-none"}
+      `}
     >
       <div
         className="

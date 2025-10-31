@@ -1,11 +1,17 @@
-export default function ArmThingy() {
+interface ArmThingyProps {
+  isPlaying?: boolean;
+}
+
+export default function ArmThingy({ isPlaying = true }: ArmThingyProps) {
+  const rotation = isPlaying ? "-rotate-[12deg]" : "-rotate-[2deg]";
+
   return (
     <div
-      className="
+      className={`
         absolute -top-[60px] left-1/2 z-10 h-36 w-3 translate-x-[91px]
-        -rotate-[12deg] rounded-full bg-neutral-800 p-2 drop-shadow-md
+        ${rotation} rounded-full bg-neutral-800 p-2 drop-shadow-md
         transition duration-150 ease-in-out hover:-rotate-[18deg]
-      "
+      `}
     >
       <div
         className="
