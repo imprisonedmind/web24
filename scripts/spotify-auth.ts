@@ -199,9 +199,7 @@ async function login() {
 
   const updates: Record<string, string | undefined> = {
     SPOTIFY_REFRESH_TOKEN: tokenResponse.refresh_token,
-    spotify_refresh_token: tokenResponse.refresh_token,
     SPOTIFY_ACCESS_TOKEN: tokenResponse.access_token,
-    spotify_access_token: tokenResponse.access_token,
     SPOTIFY_TOKEN_SCOPE: tokenResponse.scope,
     SPOTIFY_TOKEN_TYPE: tokenResponse.token_type,
     SPOTIFY_TOKEN_CREATED_AT: String(createdAt),
@@ -231,4 +229,3 @@ main().catch(error => {
   console.error(error);
   process.exit(1);
 });
-

@@ -97,13 +97,24 @@ export async function writeEnvEntries(
   await writeFile(envPath, content, "utf8");
 }
 
+const DUPLICATE_KEYS = new Set([
+  "trakt_access_token",
+  "trakt_refresh_token",
+  "spotify_access_token",
+  "spotify_refresh_token"
+]);
+
 export async function updateEnvFile(
   updates: Record<string, string | undefined>,
   envPath: string = DEFAULT_ENV_PATH
 ): Promise<Record<string, string>> {
   const entries = await readEnvEntries(envPath);
   const merged = applyEnvUpdates(entries, updates);
-  await writeEnvEntries(merged, envPath);
-  return envEntriesToObject(merged);
+  const sanitized = merged.filter(entry => {
+    if (entry.type !== "pair") return true;
+    if (DUPLICATE_KEYS.has(entry.key)) return false;
+    return true;
+  });
+  await writeEnvEntries(sanitized, envPath);
+  return envEntriesToObject(sanitized);
 }
-

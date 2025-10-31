@@ -62,9 +62,7 @@ async function persistToken(data: TokenResponse): Promise<string> {
 
   const updates: Record<string, string | undefined> = {
     TRAKT_ACCESS_TOKEN: data.access_token,
-    trakt_access_token: data.access_token,
     TRAKT_REFRESH_TOKEN: data.refresh_token,
-    trakt_refresh_token: data.refresh_token,
     TRAKT_TOKEN_CREATED_AT: String(createdAt),
     TRAKT_TOKEN_EXPIRES_IN:
       data.expires_in !== undefined ? String(data.expires_in) : undefined,
