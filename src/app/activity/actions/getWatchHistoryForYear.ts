@@ -2,9 +2,9 @@
 
 import { eachDayOfInterval, formatISO, subDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { getTraktAccessToken } from "@/lib/traktAuth";
 
 const ID = process.env.TRAKT_CLIENT_ID!;
-const TOKEN = process.env.TRAKT_ACCESS_TOKEN!;
 const TZ = "Africa/Johannesburg";
 
 const SINCE = subDays(new Date(), 364);                       // ← 365-day window
@@ -12,13 +12,14 @@ const SINCE_ISO = `${SINCE.toISOString().split("T")[0]}T00:00:00Z`; // midnight
 
 async function* historyPagesLastYear() {
   for (let page = 1; ; page++) {
+    const token = await getTraktAccessToken();
     const url =
       `https://api.trakt.tv/sync/history` +
       `?type=all&page=${page}&limit=100&extended=full&start_at=${encodeURIComponent(SINCE_ISO)}`;
 
     const res = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${TOKEN}`,
+        Authorization: `Bearer ${token}`,
         "trakt-api-key": ID,
         "trakt-api-version": "2"
       },
