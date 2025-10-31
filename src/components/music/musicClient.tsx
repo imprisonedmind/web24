@@ -1,5 +1,5 @@
 "use client";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState, useCallback } from "react";
 import { Header } from "@/components/header";
 import { type songData } from "@/lib/types";
 import { IPodContainer } from "@/components/music/ipodContainer";
@@ -17,14 +17,14 @@ interface MusicClientProps {
 
 export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
   const [songData, setSongData] = useState<songData | null>(
-    initialSongData ?? null
+    initialSongData ?? null,
   );
   const [relativePlayed, setRelativePlayed] = useState<string | null>(null);
   const [recentRelative, setRecentRelative] = useState<string[]>([]);
 
-  const fetchSongData = async () => {
+const fetchSongData = useCallback(async () => {
     const data = await getSongData();
-    setSongData(prev => {
+    setSongData((prev) => {
       if (data?.title) {
         return data;
       }
@@ -38,20 +38,50 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
       }
       return data ?? prev ?? null;
     });
-  };
+  }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchSongData();
-    }, 30000);
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
-    return () => clearInterval(interval);
-  }, []);
+    const schedule = () => {
+      if (!songData?.title) {
+        timer = setTimeout(fetchSongData, 30_000);
+        return;
+      }
+
+      if (
+        songData.isPlaying &&
+        typeof songData.durationMs === "number" &&
+        typeof songData.progressMs === "number"
+      ) {
+        const remaining = Math.max(songData.durationMs - songData.progressMs, 1_000);
+        const delay = Math.min(Math.max(remaining + 2_000, 10_000), 10 * 60_000);
+        timer = setTimeout(fetchSongData, delay);
+        return;
+      }
+
+      timer = setTimeout(fetchSongData, 45_000);
+    };
+
+    schedule();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [fetchSongData, songData?.title, songData?.isPlaying, songData?.durationMs, songData?.progressMs]);
 
   const hasTrack = Boolean(songData?.title);
   const isPlaying = Boolean(songData?.isPlaying);
   const headerTitle = isPlaying ? "listening" : "listened";
   const playbackStatus = isPlaying ? "playing" : "paused";
+
+  const latestRecent = songData?.recentlyPlayed?.[0];
+  const displayTitle = isPlaying
+    ? (songData?.title ?? "")
+    : (latestRecent?.title ?? songData?.title ?? "");
+  const displayAlbum = isPlaying
+    ? (songData?.album ?? "")
+    : (latestRecent?.album ?? songData?.album ?? "");
 
   const playedAt = songData?.playedAt ?? null;
 
@@ -78,11 +108,11 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
 
     const compute = () => {
       setRecentRelative(
-        songData.recentlyPlayed!.map(item =>
+        songData.recentlyPlayed!.map((item) =>
           item.playedAt
             ? `${formatDistanceToNowStrict(new Date(item.playedAt))} ago`
-            : ""
-        )
+            : "",
+        ),
       );
     };
 
@@ -96,7 +126,6 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
   return (
     <div className={"flex w-full flex-col gap-1"}>
       <Header title={headerTitle} />
-
 
       <div
         className={
@@ -112,6 +141,13 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
             recentRelative={recentRelative}
           />
         </IPodContainer>
+
+        <div className="flex items-center justify-between text-sm text-neutral-800">
+          <p className="max-w-[180px] truncate lowercase">{displayTitle}</p>
+          <span className="max-w-[140px] truncate rounded-full bg-neutral-100 px-2 py-1 text-xs lowercase text-neutral-600">
+            {displayAlbum}
+          </span>
+        </div>
       </div>
     </div>
   );

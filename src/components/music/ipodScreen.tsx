@@ -7,7 +7,14 @@ import { memo, useEffect, useState } from "react";
 
 type TrackSummary = Pick<
   songData,
-  "title" | "artist" | "album" | "albumImageUrl" | "songUrl" | "playedAt"
+  | "title"
+  | "artist"
+  | "album"
+  | "albumImageUrl"
+  | "songUrl"
+  | "playedAt"
+  | "progressMs"
+  | "durationMs"
 >;
 
 interface IpodScreenProps {
