@@ -6,6 +6,19 @@ export interface songData {
   albumImageUrl: string;
   songUrl: string;
   playedAt?: string;
+  recentlyPlayed?: RecentlyPlayedTrack[];
+  durationMs?: number;
+  progressMs?: number;
+}
+
+export interface RecentlyPlayedTrack {
+  title: string;
+  artist: string;
+  album: string;
+  albumImageUrl: string;
+  songUrl: string;
+  playedAt?: string;
+  durationMs?: number;
 }
 
 export interface Post {

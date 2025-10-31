@@ -13,7 +13,8 @@ const {
 
 const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
 const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
-const RECENTLY_PLAYED_ENDPOINT = `https://api.spotify.com/v1/me/player/recently-played?limit=1`;
+const recentlyPlayedEndpoint = (limit = 6) =>
+  `https://api.spotify.com/v1/me/player/recently-played?limit=${limit}`;
 const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
 
 const getAccessToken = async () => {
@@ -44,10 +45,10 @@ export const getNowPlaying = async () => {
   });
 };
 
-const getRecentlyPlayed = async () => {
+const getRecentlyPlayed = async (limit = 6) => {
   const { access_token } = await getAccessToken();
 
-  return fetch(RECENTLY_PLAYED_ENDPOINT, {
+  return fetch(recentlyPlayedEndpoint(limit), {
     cache: "no-cache",
     headers: {
       Authorization: `Bearer ${access_token}`,
@@ -59,41 +60,52 @@ const mapTrackResponse = (track, extras = {}) => {
   if (!track) return null;
 
   const title = track.name || "unknown";
-  const artist = track.artists?.map((_artist) => _artist.name).join(", ") || "unknown";
+  const artist =
+    track.artists?.map((_artist) => _artist.name).join(", ") || "unknown";
   const album = track.album?.name || "";
   const albumImageUrl = track.album?.images?.[0]?.url || "";
   const songUrl = track.external_urls?.spotify || "#";
+  const durationMs = track.duration_ms;
 
   return {
     album,
     albumImageUrl,
     artist,
-    isPlaying: false,
     songUrl,
     title,
     ...extras,
+    isPlaying: Boolean(extras.isPlaying),
+    durationMs,
   };
 };
 
 export const returnSongData = async (requireTrack = false) => {
-  let recentTrack = null;
+  let recentTracks = [];
 
   try {
-    const recentRes = await getRecentlyPlayed();
+    const recentRes = await getRecentlyPlayed(6);
     if (!recentRes.ok) {
-      console.warn(`[spotify] recently played request failed (${recentRes.status})`);
+      console.warn(
+        `[spotify] recently played request failed (${recentRes.status})`,
+      );
     } else {
       const recent = await recentRes.json();
-      const item = recent?.items?.[0];
-      recentTrack = mapTrackResponse(item?.track, {
-        isPlaying: false,
-        playedAt: item?.played_at,
-        source: "recently_played",
-      });
-      if (recentTrack?.title) {
-        console.log(`[spotify] fetched recently played track: ${recentTrack.title}`);
+      recentTracks = (recent?.items ?? [])
+        .map((item) =>
+          mapTrackResponse(item?.track, {
+            playedAt: item?.played_at,
+            source: "recently_played",
+          }),
+        )
+        .filter(Boolean);
+      if (recentTracks.length) {
+        console.log(
+          `[spotify] fetched ${recentTracks.length} recently played tracks`,
+        );
       } else {
-        console.warn("[spotify] recently played payload missing track information");
+        console.warn(
+          "[spotify] recently played payload missing track information",
+        );
       }
     }
   } catch (error) {
@@ -105,31 +117,48 @@ export const returnSongData = async (requireTrack = false) => {
     if (response.status === 200) {
       const song = await response.json();
 
-      if (song?.is_playing && song?.currently_playing_type === "track" && song?.item) {
+      if (
+        song?.is_playing &&
+        song?.currently_playing_type === "track" &&
+        song?.item
+      ) {
         const playing = mapTrackResponse(song.item, {
           isPlaying: true,
           source: "currently_playing",
+          progressMs: song.progress_ms ?? 0,
         });
         if (playing?.title) {
           console.log(`[spotify] currently playing track: ${playing.title}`);
-          return playing;
+          return {
+            ...playing,
+            recentlyPlayed: recentTracks,
+          };
         }
       } else {
-        console.log("[spotify] no active track returned from currently playing endpoint");
+        console.log(
+          "[spotify] no active track returned from currently playing endpoint",
+        );
       }
     } else if (response.status !== 204) {
-      console.warn(`[spotify] currently playing request failed (${response.status})`);
+      console.warn(
+        `[spotify] currently playing request failed (${response.status})`,
+      );
     }
   } catch (error) {
     console.error("[spotify] error fetching currently playing track", error);
   }
 
-  if (recentTrack?.title) {
-    return recentTrack;
+  if (recentTracks.length) {
+    const [latest, ...rest] = recentTracks;
+    return {
+      ...latest,
+      isPlaying: false,
+      recentlyPlayed: [latest, ...rest],
+    };
   }
 
   if (!requireTrack) {
-    return { isPlaying: false };
+    return { isPlaying: false, recentlyPlayed: recentTracks };
   }
 
   console.warn("[spotify] no track data available from Spotify");

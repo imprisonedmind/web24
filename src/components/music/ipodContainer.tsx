@@ -1,67 +1,66 @@
-import type { FC, ReactNode } from "react"
-import { SkipBack, SkipForward, Play, Pause } from "lucide-react"
+import type { FC, ReactNode } from "react";
+import { SkipBack, SkipForward, Play, Pause } from "lucide-react";
 
 interface IPodContainerProps {
-  children: ReactNode
-  status?: "playing" | "paused"
+  children: ReactNode;
+  status?: "playing" | "paused";
 }
 
-export const IPodContainer: FC<IPodContainerProps> = ({ children, status = "playing" }) => {
-  const isPaused = status === "paused"
+export const IPodContainer: FC<IPodContainerProps> = ({
+  children,
+  status = "playing",
+}) => {
+  const isPaused = status === "paused";
 
   return (
     <div className="relative rounded-lg">
       {/* iPod Body */}
-      <div className="w-auto h-72 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-500 shadow-2xl rounded-lg border border-gray-400 relative overflow-hidden">
+      <div className="relative h-72 w-auto overflow-hidden rounded-xl border border-gray-400 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-500 shadow-2xl">
         {/* Subtle highlight on top edge */}
-        <div className="absolute top-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
+        <div className="absolute left-4 right-4 top-0 h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
 
         {/* Screen Area */}
-        <div className="absolute top-2 left-2 right-2 h-32 bg-black rounded-lg border-2 border-gray-700 overflow-hidden shadow-inner">
-          {/* Screen bezel */}
-          <div className="absolute inset-1 bg-gradient-to-b from-gray-900 to-black rounded-md">
-            {/* Screen content area */}
-            <div className="w-full h-full relative">{children}</div>
-          </div>
+        <div className="absolute left-2 right-2 top-2 h-36 overflow-hidden rounded-lg border-2 border-gray-700 bg-neutral-300">
+          <div className="relative h-full w-full">{children}</div>
         </div>
 
         {/* Click Wheel */}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 scale-[0.8]">
-          <div className="w-36 h-36 bg-gradient-to-b from-white via-gray-50 to-gray-200 rounded-full shadow-lg border border-gray-300 relative">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 scale-[0.8] transform">
+          <div className="relative h-36 w-36 rounded-full border border-gray-300 bg-gradient-to-b from-white via-gray-50 to-gray-200 shadow-lg">
             {/* Outer touch ring */}
-            <div className="absolute inset-1 border border-gray-300 rounded-full bg-gradient-to-b from-gray-50 to-gray-100">
+            <div className="absolute inset-1 rounded-full border border-gray-300 bg-gradient-to-b from-gray-50 to-gray-100">
               {/* Menu text */}
-              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-gray-600 tracking-wide">
+              <div className="absolute left-1/2 top-3 -translate-x-1/2 transform text-[10px] font-medium tracking-wide text-gray-600">
                 MENU
               </div>
 
               {/* Control buttons */}
-              <div className="absolute top-1/2 left-3 transform -translate-y-1/2">
-                <SkipBack className="w-3 h-3 text-gray-600" />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 transform">
+                <SkipBack className="h-3 w-3 text-gray-600" />
               </div>
-              <div className="absolute top-1/2 right-3 transform -translate-y-1/2">
-                <SkipForward className="w-3 h-3 text-gray-600" />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 transform">
+                <SkipForward className="h-3 w-3 text-gray-600" />
               </div>
-              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 transform">
                 {isPaused ? (
-                  <Play className="w-4 h-4 text-gray-600" />
+                  <Play className="h-4 w-4 text-gray-600" />
                 ) : (
-                  <Pause className="w-4 h-4 text-gray-600" />
+                  <Pause className="h-4 w-4 text-gray-600" />
                 )}
               </div>
             </div>
 
             {/* Center button */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-gradient-to-b from-gray-100 via-gray-200 to-gray-300 rounded-full border border-gray-300 shadow-inner"></div>
+            <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 transform rounded-full border border-gray-300 bg-gradient-to-b from-gray-100 via-gray-200 to-gray-300 shadow-inner"></div>
           </div>
         </div>
 
         {/* Bottom highlight */}
-        <div className="absolute bottom-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-black/20 to-transparent rounded-full"></div>
+        <div className="absolute bottom-0 left-4 right-4 h-1 rounded-full bg-gradient-to-r from-transparent via-black/20 to-transparent"></div>
       </div>
 
       {/* Reflection effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent rounded-lg to-transparent pointer-events-none"></div>
+      <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-white/30 via-transparent to-transparent"></div>
     </div>
-  )
-}
+  );
+};
