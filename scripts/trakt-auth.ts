@@ -108,18 +108,16 @@ async function login() {
       const expiresAt =
         data.expires_in !== undefined ? createdAt + data.expires_in : undefined;
 
-      const updates: Record<string, string | undefined> = {
-        TRAKT_ACCESS_TOKEN: data.access_token,
-        trakt_access_token: data.access_token,
-        TRAKT_REFRESH_TOKEN: data.refresh_token,
-        trakt_refresh_token: data.refresh_token,
-        TRAKT_TOKEN_CREATED_AT: String(createdAt),
-        TRAKT_TOKEN_EXPIRES_IN:
-          data.expires_in !== undefined ? String(data.expires_in) : undefined,
-        TRAKT_TOKEN_EXPIRES_AT: expiresAt ? String(expiresAt) : undefined,
-        TRAKT_TOKEN_SCOPE: data.scope,
-        TRAKT_TOKEN_TYPE: data.token_type
-      };
+  const updates: Record<string, string | undefined> = {
+    TRAKT_ACCESS_TOKEN: data.access_token,
+    TRAKT_REFRESH_TOKEN: data.refresh_token,
+    TRAKT_TOKEN_CREATED_AT: String(createdAt),
+    TRAKT_TOKEN_EXPIRES_IN:
+      data.expires_in !== undefined ? String(data.expires_in) : undefined,
+    TRAKT_TOKEN_EXPIRES_AT: expiresAt ? String(expiresAt) : undefined,
+    TRAKT_TOKEN_SCOPE: data.scope,
+    TRAKT_TOKEN_TYPE: data.token_type
+  };
 
       const updatedEnv = await updateEnvFile(updates, ENV_PATH);
 
