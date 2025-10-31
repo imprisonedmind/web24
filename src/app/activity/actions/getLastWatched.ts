@@ -3,6 +3,7 @@
 
 import "server-only";
 import { cookies } from "next/headers";
+import { getTraktAccessToken } from "@/lib/traktAuth";
 
 type LastWatched = {
   title: string;
@@ -13,9 +14,8 @@ type LastWatched = {
 
 export async function getLastWatched(): Promise<LastWatched | null> {
   const TRAKT_ID = process.env.TRAKT_CLIENT_ID!;
-  const ACCESS =
-    cookies().get("trakt_access_token")?.value ??
-    process.env.TRAKT_ACCESS_TOKEN!;
+  const cookieToken = cookies().get("trakt_access_token")?.value;
+  const ACCESS = cookieToken ?? (await getTraktAccessToken());
 
   const headers = {
     "trakt-api-version": "2",

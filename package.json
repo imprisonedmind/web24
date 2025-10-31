@@ -6,7 +6,8 @@
     "dev": "next dev",
     "prod": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "trakt:login": "bun run scripts/trakt-auth.ts login"
   },
   "dependencies": {
     "@vercel/analytics": "^1.4.1",
