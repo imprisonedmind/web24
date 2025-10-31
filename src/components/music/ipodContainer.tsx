@@ -1,11 +1,14 @@
 import type { FC, ReactNode } from "react"
-import { SkipBack, SkipForward, Play } from "lucide-react"
+import { SkipBack, SkipForward, Play, Pause } from "lucide-react"
 
 interface IPodContainerProps {
   children: ReactNode
+  status?: "playing" | "paused"
 }
 
-export const IPodContainer: FC<IPodContainerProps> = ({ children }) => {
+export const IPodContainer: FC<IPodContainerProps> = ({ children, status = "playing" }) => {
+  const isPaused = status === "paused"
+
   return (
     <div className="relative rounded-lg">
       {/* iPod Body */}
@@ -40,11 +43,11 @@ export const IPodContainer: FC<IPodContainerProps> = ({ children }) => {
                 <SkipForward className="w-3 h-3 text-gray-600" />
               </div>
               <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
-                <div className="flex items-center gap-0.5">
-                  <Play className="w-2.5 h-2.5 text-gray-600 fill-current" />
-                  <div className="w-0.5 h-2.5 bg-gray-600 rounded-full"></div>
-                  <div className="w-0.5 h-2.5 bg-gray-600 rounded-full"></div>
-                </div>
+                {isPaused ? (
+                  <Play className="w-4 h-4 text-gray-600" />
+                ) : (
+                  <Pause className="w-4 h-4 text-gray-600" />
+                )}
               </div>
             </div>
 

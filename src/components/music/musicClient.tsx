@@ -7,6 +7,7 @@ import { VinylCircles } from "@/components/music/vinylCircles";
 import { SongDescription } from "@/components/music/songDescription";
 import { IPodContainer } from "@/components/music/ipodContainer";
 import { SongLinkWrapper } from "@/components/music/songLinkWrapper";
+import { formatDistanceToNowStrict } from "date-fns";
 
 const getSongData = async () => {
   const res = await fetch("/api/currentlyPlaying");
@@ -18,11 +19,27 @@ interface MusicClientProps {
 }
 
 export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
-  const [songData, setSongData] = useState<songData | null>(initialSongData);
+  const [songData, setSongData] = useState<songData | null>(
+    initialSongData ?? null
+  );
+  const [relativePlayed, setRelativePlayed] = useState<string | null>(null);
 
   const fetchSongData = async () => {
     const data = await getSongData();
-    setSongData(data);
+    setSongData(prev => {
+      if (data?.title) {
+        return data;
+      }
+      if (prev?.title) {
+        const updated = {
+          ...prev,
+          isPlaying: false,
+          playedAt: data?.playedAt ?? prev.playedAt,
+        };
+        return updated;
+      }
+      return data ?? prev ?? null;
+    });
   };
 
   useEffect(() => {
@@ -33,11 +50,34 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
     return () => clearInterval(interval);
   }, []);
 
-  if (!songData?.isPlaying) return null;
+  const hasTrack = Boolean(songData?.title);
+  const isPlaying = Boolean(songData?.isPlaying);
+  const headerTitle = isPlaying ? "listening" : "listened";
+  const playbackStatus = isPlaying ? "playing" : "paused";
+
+  const songUrl = songData?.songUrl || "#";
+  const playedAt = songData?.playedAt ?? null;
+
+  useEffect(() => {
+    if (!hasTrack || !playedAt || isPlaying) {
+      setRelativePlayed(null);
+      return;
+    }
+
+    const compute = () => {
+      setRelativePlayed(`${formatDistanceToNowStrict(new Date(playedAt))} ago`);
+    };
+
+    compute();
+    const timer = setInterval(compute, 60_000);
+    return () => clearInterval(timer);
+  }, [hasTrack, isPlaying, playedAt]);
+
+  if (!hasTrack) return null;
 
   return (
     <div className={"flex w-full flex-col gap-1"}>
-      <Header title={"listening"} />
+      <Header title={headerTitle} />
 
 
       <div
@@ -45,17 +85,25 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
           "flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm"
         }
       >
-        <IPodContainer>
+        <IPodContainer status={playbackStatus}>
           <SongLinkWrapper
-            songUrl={songData.songUrl}
+            songUrl={songUrl}
             imgUrl={songData.albumImageUrl}
           >
-            <ArmThingy />
-            <VinylCircles albumImageUrl={songData.albumImageUrl} />
+            <ArmThingy isPlaying={isPlaying} />
+            <VinylCircles
+              albumImageUrl={songData.albumImageUrl}
+              isPlaying={isPlaying}
+            />
           </SongLinkWrapper>
         </IPodContainer>
 
-        <SongDescription artist={songData.artist} title={songData.title} />
+        <SongDescription
+          artist={songData.artist}
+          album={songData.album}
+          title={songData.title}
+          listenedAgo={relativePlayed}
+        />
       </div>
     </div>
   );

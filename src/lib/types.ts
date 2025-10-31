@@ -5,6 +5,7 @@ export interface songData {
   album: string;
   albumImageUrl: string;
   songUrl: string;
+  playedAt?: string;
 }
 
 export interface Post {
