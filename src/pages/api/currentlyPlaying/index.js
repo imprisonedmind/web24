@@ -7,6 +7,9 @@ export default async function Index(_, res) {
     isPlaying: Boolean(response?.isPlaying),
     source: response?.source ?? "unknown",
     playedAt: response?.playedAt ?? null,
+    recentlyPlayed: Array.isArray(response?.recentlyPlayed)
+      ? response.recentlyPlayed.length
+      : 0,
   });
 
   if (response) {

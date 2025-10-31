@@ -1,13 +1,10 @@
 "use client";
 import { FC, useEffect, useState } from "react";
 import { Header } from "@/components/header";
-import { songData } from "@/lib/types";
-import ArmThingy from "@/components/music/armThingy";
-import { VinylCircles } from "@/components/music/vinylCircles";
-import { SongDescription } from "@/components/music/songDescription";
+import { type songData } from "@/lib/types";
 import { IPodContainer } from "@/components/music/ipodContainer";
-import { SongLinkWrapper } from "@/components/music/songLinkWrapper";
 import { formatDistanceToNowStrict } from "date-fns";
+import IpodScreen from "@/components/music/ipodScreen";
 
 const getSongData = async () => {
   const res = await fetch("/api/currentlyPlaying");
@@ -23,6 +20,7 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
     initialSongData ?? null
   );
   const [relativePlayed, setRelativePlayed] = useState<string | null>(null);
+  const [recentRelative, setRecentRelative] = useState<string[]>([]);
 
   const fetchSongData = async () => {
     const data = await getSongData();
@@ -55,7 +53,6 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
   const headerTitle = isPlaying ? "listening" : "listened";
   const playbackStatus = isPlaying ? "playing" : "paused";
 
-  const songUrl = songData?.songUrl || "#";
   const playedAt = songData?.playedAt ?? null;
 
   useEffect(() => {
@@ -73,6 +70,27 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
     return () => clearInterval(timer);
   }, [hasTrack, isPlaying, playedAt]);
 
+  useEffect(() => {
+    if (!songData?.recentlyPlayed?.length) {
+      setRecentRelative([]);
+      return;
+    }
+
+    const compute = () => {
+      setRecentRelative(
+        songData.recentlyPlayed!.map(item =>
+          item.playedAt
+            ? `${formatDistanceToNowStrict(new Date(item.playedAt))} ago`
+            : ""
+        )
+      );
+    };
+
+    compute();
+    const timer = setInterval(compute, 60_000);
+    return () => clearInterval(timer);
+  }, [songData?.recentlyPlayed]);
+
   if (!hasTrack) return null;
 
   return (
@@ -86,24 +104,14 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
         }
       >
         <IPodContainer status={playbackStatus}>
-          <SongLinkWrapper
-            songUrl={songUrl}
-            imgUrl={songData.albumImageUrl}
-          >
-            <ArmThingy isPlaying={isPlaying} />
-            <VinylCircles
-              albumImageUrl={songData.albumImageUrl}
-              isPlaying={isPlaying}
-            />
-          </SongLinkWrapper>
+          <IpodScreen
+            track={songData}
+            isPlaying={isPlaying}
+            relativePlayed={relativePlayed}
+            recentlyPlayed={songData.recentlyPlayed}
+            recentRelative={recentRelative}
+          />
         </IPodContainer>
-
-        <SongDescription
-          artist={songData.artist}
-          album={songData.album}
-          title={songData.title}
-          listenedAgo={relativePlayed}
-        />
       </div>
     </div>
   );
