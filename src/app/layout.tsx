@@ -9,6 +9,7 @@ import "prismjs/themes/prism-tomorrow.css";
 
 // used for rendering equations (optional)
 import "katex/dist/katex.min.css";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,8 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/faviconX167.svg" sizes="any" />
       </head>
-      <body className={inter.className}>
+
+      <body className={cn(inter.className, "bg-neutral-50")}>
         <div id={"modal"} />
         {children}
       </body>
