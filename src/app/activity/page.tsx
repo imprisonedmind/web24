@@ -1,18 +1,16 @@
+
 // app/activity/page.tsx
-import {
-  getWatchDaysLastYear
-} from "@/app/activity/actions/getWatchHistoryForYear";
+import { Suspense } from "react";
+
+import { getWatchDaysLastYear } from "@/app/activity/actions/getWatchHistoryForYear";
 import { ActivitySection } from "@/components/activity/activitySection";
 import TelevisionHeader from "@/components/activity/televisionHeader";
 import { getCodingData } from "@/components/coding/coding";
-import React from "react";
 import Breadcrumbs from "@/components/breadcrumbs";
+import { getSpotifyRecentDays } from "@/lib/util";
+import { ActivitySkeleton } from "@/components/activity/activitySkeleton";
+import { Header } from "@/components/header";
 
-type ActivityDay = {
-  date: string;
-  total: number;
-  categories?: { name: string; total: number }[];
-};
 
 const CATEGORY_LABELS: Record<string, string> = {
   Coding: "coding",
@@ -20,6 +18,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   Designing: "designing",
   Meeting: "meeting",
   Browsing: "browsing"
+};
+
+type ActivityDay = {
+  date: string;
+  total: number;
+  categories?: { name: string; total: number }[];
 };
 
 function mapDaysToCategory(days: ActivityDay[], category: string) {
@@ -38,38 +42,87 @@ function sumTotals(days: { total: number }[]) {
   return days.reduce((acc, curr) => acc + (curr.total ?? 0), 0);
 }
 
-export default async function Activity() {
-  const [televisionDays, codingData] = await Promise.all([
-    getWatchDaysLastYear(),
-    getCodingData()
-  ]);
+async function TelevisionActivity() {
+  const televisionDays = await getWatchDaysLastYear();
+  return (
+    <ActivitySection
+      title="television"
+      days={televisionDays}
+      header={<TelevisionHeader />}
+    />
+  );
+}
 
+async function ListeningActivity() {
+  const listeningDays = await getSpotifyRecentDays(365);
+  return (
+    <ActivitySection
+      title="listening"
+      days={listeningDays}
+      header={<Header title="listening" />}
+      emptyMessage="No recent listening activity tracked yet."
+    />
+  );
+}
+
+async function WorkActivity() {
+  const codingData = await getCodingData();
   const wakaDays: ActivityDay[] = codingData?.days ?? [];
 
-  const categorySections = Object.entries(CATEGORY_LABELS)
+  const sections = Object.entries(CATEGORY_LABELS)
     .map(([sourceName, label]) => {
       const days = mapDaysToCategory(wakaDays, sourceName);
       return { label, days, total: sumTotals(days) };
     })
     .filter(section => section.total > 0);
 
+  if (!sections.length) return null;
+
   return (
-    <div className="mx-auto mb-8 flex max-w-[600px] flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
-      <Breadcrumbs />
-
-      <ActivitySection
-        title="television"
-        days={televisionDays}
-        header={<TelevisionHeader />}
-      />
-
-      {categorySections.map(section => (
+    <>
+      {sections.map(section => (
         <ActivitySection
           key={section.label}
           title={section.label}
           days={section.days}
         />
       ))}
+    </>
+  );
+}
+
+const WORK_SKELETON_TITLES = [
+  "coding",
+  "writing",
+  "designing",
+  "meeting",
+  "browsing"
+];
+
+export default function Activity() {
+  return (
+    <div className="mx-auto mb-8 flex max-w-[600px] flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
+      <Breadcrumbs />
+
+      <Suspense fallback={<ActivitySkeleton title="television" />}>
+        <TelevisionActivity />
+      </Suspense>
+
+      <Suspense fallback={<ActivitySkeleton title="listening" />}>
+        <ListeningActivity />
+      </Suspense>
+
+      <Suspense
+        fallback={
+          <>
+            {WORK_SKELETON_TITLES.map(title => (
+              <ActivitySkeleton key={title} title={title} />
+            ))}
+          </>
+        }
+      >
+        <WorkActivity />
+      </Suspense>
     </div>
   );
 }

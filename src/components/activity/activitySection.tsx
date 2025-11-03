@@ -7,17 +7,29 @@ import React from "react";
 type ActivityDay = {
   date: string;
   total: number;
-  categories: { name: string; total: number }[];
+  categories?: { name: string; total: number }[];
 };
 
 interface ActivitySectionProps {
   title: string;
   days: ActivityDay[];
   header?: React.ReactNode;
+  emptyMessage?: string;
 }
 
-export function ActivitySection({ title, days, header }: ActivitySectionProps) {
-  if (!days?.length) return null;
+export function ActivitySection({ title, days, header, emptyMessage }: ActivitySectionProps) {
+  if (!days?.length) {
+    return emptyMessage
+      ? (
+        <section className="flex flex-col gap-1 px-4 sm:p-0">
+          {header ?? <CodingHeader title={title} />}
+          <div className="rounded-lg bg-white p-4 text-sm text-neutral-500 shadow-sm">
+            {emptyMessage}
+          </div>
+        </section>
+      )
+      : null;
+  }
 
   return (
     <section className="flex flex-col gap-1 px-4 sm:p-0">
