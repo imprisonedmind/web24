@@ -96,7 +96,7 @@ function IpodScreenComponent({
           className="flex flex-1 flex-col items-center justify-between gap-3 p-2 pb-1"
         >
           <div className={"flex-start flex w-full grow gap-2"}>
-            <div className="relative aspect-square h-full w-auto overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
+            <div className="relative aspect-square h-full w-auto flex-shrink-0 overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
               <Image
                 src={track.albumImageUrl || FALLBACK_ART}
                 alt={track.title}
@@ -113,8 +113,12 @@ function IpodScreenComponent({
               </p>
 
               <div>
-                <p className="text-[9px] text-neutral-600">{track.artist}</p>
-                <p className="text-[8px] text-neutral-500">{track.album}</p>
+                <p className="overflow-ellipsis text-[9px] text-neutral-600">
+                  {track.artist}
+                </p>
+                <p className="overflow-ellipsis text-[8px] text-neutral-500">
+                  {track.album}
+                </p>
               </div>
             </div>
           </div>

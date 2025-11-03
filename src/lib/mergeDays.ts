@@ -35,7 +35,10 @@ export function mergeDays(
   }
 
   // 3️⃣  back-fill missing calendar days (shows grey squares)
-  const start = parseISO(Object.keys(map).sort()[0]);
+  const sortedKeys = Object.keys(map).sort();
+  if (!sortedKeys.length) return [];
+
+  const start = parseISO(sortedKeys[0]);
   const end   = new Date();                                     // today
   for (const day of eachDayOfInterval({ start, end })) {
     const iso = formatISO(day, { representation: 'date' });
