@@ -1,10 +1,13 @@
 // app/(widgets)/TvWidget.tsx
-import { Header } from '@/components/header';
-import Image from 'next/image';
-import { formatDistanceToNowStrict } from 'date-fns';
-import { getLastWatched } from '@/app/activity/actions/getLastWatched';
+import Image from "next/image";
+import { formatDistanceToNowStrict } from "date-fns";
 
-function renderTitle(data: Awaited<ReturnType<typeof getLastWatched>>) {
+import { getLastWatched } from "@/app/activity/actions/getLastWatched";
+import { Header } from "@/components/header";
+
+export function formatLastWatchedTitle(
+  data: Awaited<ReturnType<typeof getLastWatched>>
+) {
   if (!data) return "Nothing watched yet";
   if (data.type === "episode") {
     const parts = [];
@@ -19,21 +22,20 @@ function renderTitle(data: Awaited<ReturnType<typeof getLastWatched>>) {
 
 export default async function TvWidget() {
   const data = await getLastWatched();
-  const displayTitle = renderTitle(data);
+  const displayTitle = formatLastWatchedTitle(data);
 
   return (
     <div className="flex w-full flex-col gap-1">
-      <Header title="watched" />
+      <Header title="watched" seeAll link="/watched" />
 
       <div className="flex flex-col gap-2 rounded-xl bg-white p-2 shadow-sm">
-        {/* Clickable poster */}
         <div className="relative h-72 w-full overflow-hidden rounded-lg">
-          {data && (
+          {data ? (
             <a
               href={data.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="block h-full w-full"   // keeps Image clickable
+              className="block h-full w-full"
             >
               <Image
                 src={data.posterUrl}
@@ -44,10 +46,13 @@ export default async function TvWidget() {
                 className="object-cover"
               />
             </a>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-sm text-neutral-500">
+              Nothing watched yet
+            </div>
           )}
         </div>
 
-        {/* Meta row */}
         <div className="flex items-center justify-between">
           {data ? (
             <>
