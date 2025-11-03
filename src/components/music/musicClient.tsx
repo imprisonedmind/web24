@@ -12,7 +12,7 @@ const getSongData = async () => {
 };
 
 interface MusicClientProps {
-  initialSongData: songData;
+  initialSongData: songData | null;
 }
 
 export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
@@ -121,6 +121,7 @@ const fetchSongData = useCallback(async () => {
     return () => clearInterval(timer);
   }, [songData?.recentlyPlayed]);
 
+  if (!songData) return null;
   if (!hasTrack) return null;
 
   return (
