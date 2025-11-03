@@ -75,9 +75,9 @@ export function applyEnvUpdates(
     return { ...entry, value };
   });
 
-  for (const [key, value] of remaining) {
+  remaining.forEach((value, key) => {
     next.push({ type: "pair", key, value: value! });
-  }
+  });
 
   return next;
 }
