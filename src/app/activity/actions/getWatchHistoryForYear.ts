@@ -45,10 +45,10 @@ export async function getWatchDaysLastYear() {
   > = {};
 
   /* -------- build the map -------- */
-  for await (const page of historyPagesLastYear()) {
+  outer: for await (const page of historyPagesLastYear()) {
     for (const it of page) {
       const local = toZonedTime(new Date(it.watched_at), TZ);
-      if (local < SINCE) return;                               // older than 365 d
+      if (local < SINCE) break outer;                          // window reached
 
       const day = local.toISOString().slice(0, 10);            // YYYY-MM-DD
       const minutes = it.type === "movie" ? it.movie?.runtime : it.episode?.runtime;
