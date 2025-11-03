@@ -1,19 +1,19 @@
-import {FC} from "react";
-import {SmallLink} from "@/components/smallLink";
+import { FC } from "react";
+import { SmallLink } from "@/components/smallLink";
 
 interface HeaderProps {
-	title: string;
-	seeAll?: boolean;
-	link?: string;
+  title: string;
+  seeAll?: boolean;
+  link?: string;
 }
 
 export const Header: FC<HeaderProps> = (props) => {
-	const {title, seeAll, link} = props;
+  const { title, seeAll, link } = props;
 
-	return (
-		<div className={"w-full justify-between flex items-center"}>
-			<h1 className={"text-lg font-medium w-fit"}>{title}</h1>
-			{seeAll && link && <SmallLink link={link} title={"see all"}/>}
-		</div>
-	);
+  return (
+    <div className={"flex w-full items-center justify-between pr-3"}>
+      <h1 className={"w-fit text-lg font-medium"}>{title}</h1>
+      {seeAll && link && <SmallLink link={link} title={"more"} />}
+    </div>
+  );
 };
