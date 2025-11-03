@@ -7,10 +7,7 @@ import { ActivitySection } from "@/components/activity/activitySection";
 import TelevisionHeader from "@/components/activity/televisionHeader";
 import { getCodingData } from "@/components/coding/coding";
 import Breadcrumbs from "@/components/breadcrumbs";
-import { getSpotifyRecentDays } from "@/lib/util";
 import { ActivitySkeleton } from "@/components/activity/activitySkeleton";
-import { Header } from "@/components/header";
-
 
 const CATEGORY_LABELS: Record<string, string> = {
   Coding: "coding",
@@ -49,18 +46,6 @@ async function TelevisionActivity() {
       title="television"
       days={televisionDays}
       header={<TelevisionHeader />}
-    />
-  );
-}
-
-async function ListeningActivity() {
-  const listeningDays = await getSpotifyRecentDays(365);
-  return (
-    <ActivitySection
-      title="listening"
-      days={listeningDays}
-      header={<Header title="listening" />}
-      emptyMessage="No recent listening activity tracked yet."
     />
   );
 }
@@ -106,10 +91,6 @@ export default function Activity() {
 
       <Suspense fallback={<ActivitySkeleton title="television" />}>
         <TelevisionActivity />
-      </Suspense>
-
-      <Suspense fallback={<ActivitySkeleton title="listening" />}>
-        <ListeningActivity />
       </Suspense>
 
       <Suspense

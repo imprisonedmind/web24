@@ -1,10 +1,8 @@
 import { Chunk } from "@/components/coding/chunk";
 import HeatMapDates from "@/components/coding/heatMapDates";
-import { chunkArray, getSpotifyRecentDays } from "@/lib/util";
+import { chunkArray } from "@/lib/util";
 import React from "react";
-import {
-  getWatchDaysLastYear
-} from "@/app/activity/actions/getWatchHistoryForYear";
+import { getWatchDaysLastYear } from "@/app/activity/actions/getWatchHistoryForYear";
 import { mergeDays } from "@/lib/mergeDays";
 import ActivityHeader from "@/components/activity/activityHeader";
 
@@ -24,32 +22,14 @@ export const getCodingData = async () => {
 };
 
 export default async function CombinedActivity() {
-  const watchDaysPromise = getWatchDaysLastYear(); // Trakt (runtime-accurate, cached)
-  const codingPromise = getCodingData();           // WakaTime
-
-  const watchDays = await watchDaysPromise;
-  const hasWatchRange = Array.isArray(watchDays) && watchDays.length > 0;
-  const rangeStart = hasWatchRange ? watchDays[0]?.date : null;
-  const rangeEnd = hasWatchRange
-    ? watchDays[watchDays.length - 1]?.date
-    : null;
-
-  const spotifyPromise =
-    rangeStart && rangeEnd
-      ? getSpotifyRecentDays({
-          startDate: rangeStart,
-          endDate: rangeEnd,
-          maxDays: watchDays.length,
-        })
-      : getSpotifyRecentDays(365);
-
-  const [codeDays, listenDays] = await Promise.all([
-    codingPromise,
-    spotifyPromise,
+  const [codeDays, watchDays] = await Promise.all([
+    getCodingData(),
+    getWatchDaysLastYear(),
   ]);
 
-  const combined = mergeDays(codeDays ?? [], watchDays ?? []);
-  const days = mergeDays(combined, listenDays ?? []);  // unified array
+  const days = mergeDays(codeDays ?? [], watchDays ?? []);
+
+  if (!days.length) return null;
 
   return (
     <section className="flex flex-col gap-1 px-4 sm:p-0">
