@@ -21,7 +21,7 @@ export default function Location() {
           />
         </div>
         <div className={"flex items-center justify-between"}>
-          <p className={"text-sm text-neutral-800"}>Cape Town</p>
+          <p className={"text-sm lowercase text-neutral-800"}>Cape Town</p>
           <div className={"flex rounded-full bg-neutral-100 p-1 px-2 text-xs"}>
             <p>-33.93,</p>
             <p>18.47</p>

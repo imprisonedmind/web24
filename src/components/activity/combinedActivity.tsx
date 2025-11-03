@@ -2,9 +2,7 @@ import { Chunk } from "@/components/coding/chunk";
 import HeatMapDates from "@/components/coding/heatMapDates";
 import { chunkArray } from "@/lib/util";
 import React from "react";
-import {
-  getWatchDaysLastYear
-} from "@/app/activity/actions/getWatchHistoryForYear";
+import { getWatchDaysLastYear } from "@/app/activity/actions/getWatchHistoryForYear";
 import { mergeDays } from "@/lib/mergeDays";
 import ActivityHeader from "@/components/activity/activityHeader";
 
@@ -24,12 +22,14 @@ export const getCodingData = async () => {
 };
 
 export default async function CombinedActivity() {
-  const [watchDays, codeDays] = await Promise.all([
-    getWatchDaysLastYear(),           // Trakt (runtime-accurate, cached)
-    getCodingData()                  // WakaTime
+  const [codeDays, watchDays] = await Promise.all([
+    getCodingData(),
+    getWatchDaysLastYear(),
   ]);
 
-  const days = mergeDays(codeDays, watchDays);  // unified array
+  const days = mergeDays(codeDays ?? [], watchDays ?? []);
+
+  if (!days.length) return null;
 
   return (
     <section className="flex flex-col gap-1 px-4 sm:p-0">

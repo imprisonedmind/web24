@@ -1,13 +1,17 @@
+import { eachDayOfInterval, formatISO, parseISO } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
+import { getTraktAccessToken } from "@/lib/traktAuth";
+
 const ID = process.env.TRAKT_CLIENT_ID!;
-const TOKEN = process.env.TRAKT_ACCESS_TOKEN!;
 
 async function* historyPages() {
   for (let page = 1; ; page++) {
+    const token = await getTraktAccessToken();
     const res = await fetch(
       `https://api.trakt.tv/sync/history?type=all&page=${page}&limit=100&extended=full`,
       {
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
           "trakt-api-key": ID,
           "trakt-api-version": "2"
         },
@@ -20,10 +24,6 @@ async function* historyPages() {
     yield arr;
   }
 }
-
-
-import { eachDayOfInterval, formatISO, parseISO } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 
 export async function getWatchDays() {
   const dayMap: Record<
