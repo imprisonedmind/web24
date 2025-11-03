@@ -2,9 +2,9 @@
 
 import { eachDayOfInterval, formatISO, subDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { getTraktAccessToken } from "@/lib/traktAuth";
 
 const ID = process.env.TRAKT_CLIENT_ID!;
-const TOKEN = process.env.TRAKT_ACCESS_TOKEN!;
 const TZ = "Africa/Johannesburg";
 
 const SINCE = subDays(new Date(), 364);                       // ← 365-day window
@@ -12,13 +12,14 @@ const SINCE_ISO = `${SINCE.toISOString().split("T")[0]}T00:00:00Z`; // midnight
 
 async function* historyPagesLastYear() {
   for (let page = 1; ; page++) {
+    const token = await getTraktAccessToken();
     const url =
       `https://api.trakt.tv/sync/history` +
       `?type=all&page=${page}&limit=100&extended=full&start_at=${encodeURIComponent(SINCE_ISO)}`;
 
     const res = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${TOKEN}`,
+        Authorization: `Bearer ${token}`,
         "trakt-api-key": ID,
         "trakt-api-version": "2"
       },
@@ -44,10 +45,10 @@ export async function getWatchDaysLastYear() {
   > = {};
 
   /* -------- build the map -------- */
-  for await (const page of historyPagesLastYear()) {
+  outer: for await (const page of historyPagesLastYear()) {
     for (const it of page) {
       const local = toZonedTime(new Date(it.watched_at), TZ);
-      if (local < SINCE) return;                               // older than 365 d
+      if (local < SINCE) break outer;                          // window reached
 
       const day = local.toISOString().slice(0, 10);            // YYYY-MM-DD
       const minutes = it.type === "movie" ? it.movie?.runtime : it.episode?.runtime;

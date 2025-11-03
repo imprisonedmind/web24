@@ -9,8 +9,8 @@ export const CodingModal: FC<CodingModalProps> = ({ callBack }) => {
   const dialog = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleOutsideClick = (event: { target: any }) => {
-      if (dialog.current && !dialog.current.contains(event.target)) {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (dialog.current && !dialog.current.contains(event.target as Node)) {
         callBack();
       }
     };
@@ -20,7 +20,7 @@ export const CodingModal: FC<CodingModalProps> = ({ callBack }) => {
     return () => {
       document.removeEventListener("click", handleOutsideClick, true);
     };
-  }, []);
+  }, [callBack]);
 
   return (
     <div

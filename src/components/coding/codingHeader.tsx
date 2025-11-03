@@ -5,9 +5,13 @@ import { IoIosInformationCircleOutline } from "react-icons/io";
 import React, { useRef, useState } from "react";
 import { CodingModal } from "@/components/coding/codingModal";
 
-export default function CodingHeader() {
+interface CodingHeaderProps {
+  title?: string;
+}
+
+export default function CodingHeader({ title = "work" }: CodingHeaderProps) {
   const [active, setActive] = useState(false);
-  const modalTing = useRef(null);
+  const modalTing = useRef<HTMLSpanElement | null>(null);
 
   return (
     <div className={"relative"}>
@@ -18,7 +22,7 @@ export default function CodingHeader() {
           modalTing.current,
         )}
       <span className={"flex flex-row items-center justify-between"}>
-        <Header title={"work"}  />
+        <Header title={title} />
 
         <span
           ref={modalTing}

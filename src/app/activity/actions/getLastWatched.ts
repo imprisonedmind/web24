@@ -3,9 +3,15 @@
 
 import "server-only";
 import { cookies } from "next/headers";
+import { getTraktAccessToken } from "@/lib/traktAuth";
 
 type LastWatched = {
+  type: string;
   title: string;
+  showTitle?: string;
+  episodeTitle?: string;
+  season?: number;
+  episode?: number;
   posterUrl: string;
   watchedAt: string;   // ISO 8601
   url: string;         // Trakt deep-link
@@ -13,9 +19,8 @@ type LastWatched = {
 
 export async function getLastWatched(): Promise<LastWatched | null> {
   const TRAKT_ID = process.env.TRAKT_CLIENT_ID!;
-  const ACCESS =
-    cookies().get("trakt_access_token")?.value ??
-    process.env.TRAKT_ACCESS_TOKEN!;
+  const cookieToken = cookies().get("trakt_access_token")?.value;
+  const ACCESS = cookieToken ?? (await getTraktAccessToken());
 
   const headers = {
     "trakt-api-version": "2",
@@ -30,6 +35,12 @@ export async function getLastWatched(): Promise<LastWatched | null> {
   );
   if (!res.ok) return null;
   const [item] = (await res.json()) as any[];
+
+  const type = item?.type ?? (item?.episode ? "episode" : item?.movie ? "movie" : "show");
+  const showTitle = item?.show?.title;
+  const episodeTitle = item?.episode?.title;
+  const seasonNumber = item?.episode?.season;
+  const episodeNumber = item?.episode?.number;
 
   /* ---------- poster lookup (same as before) ---------- */
   const images =
@@ -61,11 +72,18 @@ export async function getLastWatched(): Promise<LastWatched | null> {
 
   /* ---------- ship it ---------- */
   return {
+    type,
     title:
-      item.movie?.title ??
-      item.episode?.title ??
+      (type === "episode"
+        ? showTitle ?? episodeTitle
+        : item.movie?.title) ??
       item.show?.title ??
+      item.episode?.title ??
       "Unknown title",
+    showTitle: showTitle ?? undefined,
+    episodeTitle: episodeTitle ?? undefined,
+    season: typeof seasonNumber === "number" ? seasonNumber : undefined,
+    episode: typeof episodeNumber === "number" ? episodeNumber : undefined,
     watchedAt: item.watched_at,
     posterUrl: poster ?? "/fallback-poster.jpg",
     url,
