@@ -5,8 +5,8 @@ import "server-only";
 import { cookies } from "next/headers";
 import { getTraktAccessToken } from "@/lib/traktAuth";
 
-type LastWatched = {
-  type: string;
+export type LastWatched = {
+  type: "movie" | "show" | "episode";
   title: string;
   showTitle?: string;
   episodeTitle?: string;
@@ -36,7 +36,8 @@ export async function getLastWatched(): Promise<LastWatched | null> {
   if (!res.ok) return null;
   const [item] = (await res.json()) as any[];
 
-  const type = item?.type ?? (item?.episode ? "episode" : item?.movie ? "movie" : "show");
+  const type: "movie" | "show" | "episode" =
+    item?.type ?? (item?.episode ? "episode" : item?.movie ? "movie" : "show");
   const showTitle = item?.show?.title;
   const episodeTitle = item?.episode?.title;
   const seasonNumber = item?.episode?.season;

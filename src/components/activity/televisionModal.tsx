@@ -30,7 +30,7 @@ export const TelevisionModal: FC<TelevisionModalProps> = ({ callBack }) => {
         border border-neutral-100 bg-white shadow-md
       `}
     >
-      <p className="p-2 text-sm font-medium">Television Tracking</p>
+      <p className="p-2 text-sm font-medium">Watching Tracking</p>
       <p className="p-2 text-xs text-neutral-500">
         Watching activity is sourced from the{" "}
         <Link
@@ -46,4 +46,3 @@ export const TelevisionModal: FC<TelevisionModalProps> = ({ callBack }) => {
     </div>
   );
 };
-
