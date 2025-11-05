@@ -4,6 +4,7 @@ import { format, startOfMonth, subMonths } from "date-fns";
 import Breadcrumbs from "@/components/breadcrumbs";
 import MonthlyHighlightCarousel from "@/components/tv/monthlyHighlightCarousel";
 import { WatchCarouselSkeleton } from "@/components/tv/watchCarouselSkeleton";
+import { PageContainer } from "@/components/ui/page-container";
 
 const MONTH_COUNT = 12;
 
@@ -18,7 +19,7 @@ export default function WatchedMonthsPage() {
   });
 
   return (
-    <div className="mx-auto mb-8 flex w-full max-w-[960px] flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
+    <PageContainer className="mb-8 flex flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
       <Breadcrumbs />
 
       <div className="flex flex-col gap-10">
@@ -34,6 +35,6 @@ export default function WatchedMonthsPage() {
           </Suspense>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

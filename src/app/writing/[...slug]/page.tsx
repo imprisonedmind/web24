@@ -6,6 +6,7 @@ import { spaceToHyphen } from "@/lib/util";
 import Breadcrumbs from "@/components/breadcrumbs";
 import { ReviewScore } from "@/components/writing/reviewScore";
 import { Post } from "@/lib/types";
+import { PageContainer } from "@/components/ui/page-container";
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const id = params.slug[1];
@@ -19,18 +20,14 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
   const score = item?.score;
 
   return (
-    <div>
-      <div
-        className={
-          "mx-auto flex w-full max-w-[720px] justify-between px-[calc(min(16px,8vw))]"
-        }
-      >
+    <>
+      <PageContainer className="flex justify-between px-[calc(min(16px,8vw))]">
         <Breadcrumbs />
         {score !== undefined && <ReviewScore score={score!} />}
         <p className={"flex w-max flex-shrink-0"}>{date}</p>
-      </div>
+      </PageContainer>
       <NotionPage recordMap={recordMap} />
-    </div>
+    </>
   );
 }
 

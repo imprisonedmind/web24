@@ -7,16 +7,17 @@ import {
 import Breadcrumbs from "@/components/breadcrumbs";
 import { WatchCard } from "@/components/tv/watchCard";
 import { WatchGridSkeleton } from "@/components/tv/watchGridSkeleton";
+import { PageContainer } from "@/components/ui/page-container";
 
 export default function WatchedMonthPage() {
   return (
-    <div className="mx-auto mb-8 flex w-full max-w-[960px] flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
+    <PageContainer className="mb-8 flex flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
       <Breadcrumbs />
 
       <Suspense fallback={<WatchGridSkeleton />}>
         <MonthlyWatchGrid />
       </Suspense>
-    </div>
+    </PageContainer>
   );
 }
 
@@ -42,7 +43,7 @@ function WatchGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
       {items.map(item => (
         <WatchCard key={item.id} item={item} />
       ))}

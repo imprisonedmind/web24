@@ -3,16 +3,13 @@ import reviewData from "@/lib/reviewData.json";
 import Breadcrumbs from "@/components/breadcrumbs";
 import { WritingCard } from "@/components/writing/writingCard";
 import { Post } from "@/lib/types";
+import { PageContainer } from "@/components/ui/page-container";
 
 export default function Page() {
   const data = [...blogData, ...reviewData];
 
   return (
-    <div
-      className={
-        "mx-auto flex max-w-[720px] flex-col gap-4 px-[calc(min(16px,8vw))] py-4"
-      }
-    >
+    <PageContainer className="flex flex-col gap-4 px-[calc(min(16px,8vw))] py-4">
       <Breadcrumbs />
       <div className={`grid cursor-pointer grid-cols-1 gap-4 sm:grid-cols-2`}>
         {data
@@ -29,6 +26,6 @@ export default function Page() {
             );
           })}
       </div>
-    </div>
+    </PageContainer>
   );
 }
