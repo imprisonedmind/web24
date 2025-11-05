@@ -2,6 +2,13 @@ import { Metadata } from "next";
 import { NextSeoProps } from "next-seo";
 import { siteConfig } from "@/lib/siteConfig";
 
+type SEOImage = {
+  url: string;
+  width?: number;
+  height?: number;
+  alt?: string;
+};
+
 export type CreateMetadataOptions = {
   title: string;
   description: string;
@@ -19,9 +26,7 @@ function absoluteUrl(path?: string) {
   return `${siteConfig.url}${normalized}`;
 }
 
-function normalizeImages(
-  images?: CreateMetadataOptions["images"]
-): Exclude<NonNullable<Metadata["openGraph"]>["images"], undefined> {
+function normalizeImages(images?: CreateMetadataOptions["images"]): SEOImage[] {
   if (!images?.length) {
     return [
       {
@@ -33,18 +38,14 @@ function normalizeImages(
     ];
   }
 
-  return images.map(image => {
-    if (typeof image === "string") {
-      return {
-        url: absoluteUrl(image)
-      };
-    }
-
-    return {
-      ...image,
-      url: absoluteUrl(image.url)
-    };
-  });
+  return images.map(image =>
+    typeof image === "string"
+      ? { url: absoluteUrl(image) }
+      : {
+          ...image,
+          url: absoluteUrl(image.url)
+        }
+  );
 }
 
 export function createMetadata(options: CreateMetadataOptions): Metadata {
@@ -59,6 +60,7 @@ export function createMetadata(options: CreateMetadataOptions): Metadata {
   } = options;
   const url = absoluteUrl(path);
   const ogImages = normalizeImages(images);
+  const twitterImages = ogImages.map(image => image.url);
 
   return {
     title,
@@ -82,7 +84,7 @@ export function createMetadata(options: CreateMetadataOptions): Metadata {
       creator: siteConfig.twitterCreator,
       title,
       description,
-      images: ogImages.map(image => image.url)
+      images: twitterImages
     }
   };
 }
@@ -100,6 +102,7 @@ export function createSeoProps(options: CreateMetadataOptions): NextSeoProps {
 
   const url = absoluteUrl(path);
   const ogImages = normalizeImages(images);
+  const twitterImages = ogImages.map(image => image.url);
 
   return {
     title,
@@ -118,8 +121,8 @@ export function createSeoProps(options: CreateMetadataOptions): NextSeoProps {
     twitter: {
       cardType: "summary_large_image",
       site: siteConfig.twitterSite,
-      handle: siteConfig.twitterCreator
+      handle: siteConfig.twitterCreator,
+      images: twitterImages
     }
   };
 }
-
