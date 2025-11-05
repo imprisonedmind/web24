@@ -44,8 +44,8 @@ export function WorkPreviewLink({ item }: WorkPreviewLinkProps) {
         target={openInNewTab}
       />
       <div className="flex items-center gap-2">
-        <span className="rounded-full bg-neutral-100 px-2 text-xs tracking-wide text-neutral-600">
-          {item.title}
+        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs tracking-wide text-neutral-600">
+          {item.tag}
         </span>
 
         {item.year ? (
