@@ -13,14 +13,14 @@ export const IPodContainer: FC<IPodContainerProps> = ({
   const isPaused = status === "paused";
 
   return (
-    <div className="relative rounded-lg">
+    <div className="relative grow rounded-lg">
       {/* iPod Body */}
-      <div className="relative h-72 w-auto overflow-hidden rounded-xl border border-gray-400 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-500 shadow-2xl">
+      <div className="relative h-full w-auto overflow-hidden rounded-xl border border-gray-400 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-500 shadow-2xl md:h-72">
         {/* Subtle highlight on top edge */}
         <div className="absolute left-4 right-4 top-0 h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
 
         {/* Screen Area */}
-        <div className="absolute left-2 right-2 top-2 h-36 overflow-hidden rounded-lg border-2 border-gray-700 bg-neutral-300">
+        <div className="absolute left-2 right-2 top-2 h-64 overflow-hidden rounded-lg border-2 border-gray-700 bg-neutral-300 md:h-32">
           <div className="relative h-full w-full">{children}</div>
         </div>
 

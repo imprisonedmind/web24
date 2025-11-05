@@ -60,8 +60,14 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
         typeof songData.durationMs === "number" &&
         typeof songData.progressMs === "number"
       ) {
-        const remaining = Math.max(songData.durationMs - songData.progressMs, 1_000);
-        const delay = Math.min(Math.max(remaining + 2_000, 10_000), 10 * 60_000);
+        const remaining = Math.max(
+          songData.durationMs - songData.progressMs,
+          1_000,
+        );
+        const delay = Math.min(
+          Math.max(remaining + 2_000, 10_000),
+          10 * 60_000,
+        );
         timer = setTimeout(fetchSongData, delay);
         return;
       }
@@ -74,7 +80,13 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [fetchSongData, songData?.title, songData?.isPlaying, songData?.durationMs, songData?.progressMs]);
+  }, [
+    fetchSongData,
+    songData?.title,
+    songData?.isPlaying,
+    songData?.durationMs,
+    songData?.progressMs,
+  ]);
 
   const hasTrack = Boolean(songData?.title);
   const isPlaying = Boolean(songData?.isPlaying);
@@ -136,7 +148,8 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
 
       <div
         className={
-          "flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm"
+          "flex min-h-[32rem] w-full flex-col gap-2 rounded-xl bg-white p-2" +
+          " shadow-sm sm:min-h-0"
         }
       >
         <IPodContainer status={playbackStatus}>
