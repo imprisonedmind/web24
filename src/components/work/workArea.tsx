@@ -1,7 +1,7 @@
-import React, { FC, Fragment } from "react";
+import React, { FC } from "react";
 import { Header } from "@/components/header";
-import { WorkCardData, workData } from "@/lib/workData";
-import { WorkCard } from "@/components/workCard";
+import { WorkCardData } from "@/lib/workData";
+import { WorkCarousel } from "@/components/work/workCarousel";
 
 interface WorkAreaProps {
   header: string;
@@ -10,23 +10,9 @@ interface WorkAreaProps {
 
 export const WorkArea: FC<WorkAreaProps> = ({ header, data }) => {
   return (
-    <div className={"flex flex-col gap-1"}>
+    <div className={"flex flex-col gap-3"}>
       <Header title={header} />
-      <div className={"grid w-full grid-cols-1 gap-4 md:grid-cols-3"}>
-        {data.map((item: WorkCardData, index: number) => {
-          return (
-            <WorkCard
-              key={index}
-              title={item.title}
-              link={item.link}
-              tag={item.tag}
-              src={item.src}
-              alt={item.alt}
-              internal={item.internal}
-            />
-          );
-        })}
-      </div>
+      <WorkCarousel items={data} />
     </div>
   );
 };
