@@ -13,11 +13,6 @@ interface WorkCardProps {
 
 export const WorkCard: FC<WorkCardProps> = (props) => {
   const { title, link, tag, src, alt, internal } = props;
-  const blurDataURL =
-    typeof src === "object" && src !== null && "blurDataURL" in src
-      ? (src as StaticImageData).blurDataURL
-      : undefined;
-  const placeholder = blurDataURL ? "blur" : "empty";
 
   return (
     <Link
@@ -25,7 +20,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
       href={link}
       target={internal ? "_self" : "_blank"}
       className={`
-        flex min-w-[180px] grow flex-col gap-2 rounded-xl bg-white p-2 shadow-sm 
+        flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm 
         transition duration-150 ease-in-out hover:shadow-md
       `}
     >
@@ -36,8 +31,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
           fill={true}
           priority={true}
           sizes={"50vw"}
-          placeholder={placeholder}
-          blurDataURL={blurDataURL}
+          placeholder={"blur"}
           className={"w-full bg-gray-200 object-cover"}
         />
       </div>
