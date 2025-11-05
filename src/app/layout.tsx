@@ -12,6 +12,7 @@ import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/siteConfig";
 import { SeoDefaults } from "@/components/seo/defaultSeo";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,8 @@ export default function RootLayout({
         <div id={"modal"} />
         {children}
       </body>
+
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
     </html>
   );
 }
@@ -50,20 +53,20 @@ export const metadata: Metadata = {
         url: `${siteConfig.url}/lukeOG.jpg`,
         width: 1024,
         height: 683,
-        alt: siteConfig.title
+        alt: siteConfig.title,
       },
       {
         url: `${siteConfig.url}${siteConfig.defaultOgImage}`,
         width: 1200,
         height: 630,
-        alt: siteConfig.title
-      }
-    ]
+        alt: siteConfig.title,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     site: siteConfig.twitterSite,
     creator: siteConfig.twitterCreator,
-    images: [`${siteConfig.url}${siteConfig.defaultOgImage}`]
-  }
+    images: [`${siteConfig.url}${siteConfig.defaultOgImage}`],
+  },
 };
