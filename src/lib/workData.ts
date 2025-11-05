@@ -1,5 +1,5 @@
 import { StaticImageData } from "next/image";
-import trinity from "/public/trinity.jpg";
+import trinity from "/public/trinitySmall.jpg";
 import portal from "/public/projects/portal.png";
 import giggity from "/public/giggity2.png";
 import specno from "/public/Spec.png";
@@ -69,7 +69,7 @@ export const workData = (): WorkCardData[] => [
 
   {
     title: "ootify.me",
-    link: "https://ootify.me",
+    link: "https://ootify.vercel.app/",
     tag: "web app",
     type: "personal",
     src: ootify,
@@ -85,7 +85,6 @@ export const workData = (): WorkCardData[] => [
     type: "personal",
     src: olarm,
     alt: "bloggin website blog cover",
-    favourite: true,
     description: "plugin bridging olarm system to homekit and google-home",
     year: "2024",
   },

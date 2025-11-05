@@ -2,9 +2,10 @@
 
 import { HoverPreviewPortal } from "@/components/preview/hoverPreviewPortal";
 import { SmallLink } from "@/components/smallLink";
-import { WorkPreviewCard } from "@/components/work/workPreviewCard";
 import { useHoverPreview } from "@/hooks/useHoverPreview";
 import { type WorkCardData } from "@/lib/workData";
+import { WorkCard } from "@/components/workCard";
+import { WorkPreviewCard } from "@/components/work/workPreviewCard";
 
 type WorkPreviewLinkProps = {
   item: WorkCardData;

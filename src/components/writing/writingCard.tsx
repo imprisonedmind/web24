@@ -16,7 +16,7 @@ export const WritingCard: FC<WritingCardProps> = ({ item, isReview }) => {
       prefetch={true}
       href={`/${isReview ? "reviews" : "writing"}/${spaceToHyphen(item.title)}/${item.id}`}
       className="
-        flex w-full flex-col gap-4 overflow-clip rounded-xl bg-white p-4
+        flex w-full flex-col gap-4 overflow-clip rounded-xl bg-white p-2
         shadow-sm transition duration-300 ease-in-out hover:shadow-md
       "
     >
@@ -30,7 +30,7 @@ export const WritingCard: FC<WritingCardProps> = ({ item, isReview }) => {
         "
       />
 
-      <div className={"flex flex-col gap-1"}>
+      <div className={"flex flex-col gap-1 px-1 !pt-0 pb-2"}>
         <div className={"flex flex-row items-center justify-between"}>
           <p className={"line-clamp-1 font-medium"}>{item.title}</p>
 
