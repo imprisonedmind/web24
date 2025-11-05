@@ -22,7 +22,7 @@ async function fetchTvStatus(): Promise<TvStatus | null> {
   try {
     const res = await fetch("/api/tv/status", {
       cache: "no-store",
-      credentials: "include"
+      credentials: "include",
     });
     if (!res.ok) {
       console.error("[tv/status] request failed", res.status, res.statusText);
@@ -33,7 +33,7 @@ async function fetchTvStatus(): Promise<TvStatus | null> {
 
     return {
       currentlyWatching: data.currentlyWatching ?? null,
-      lastWatched: data.lastWatched ?? null
+      lastWatched: data.lastWatched ?? null,
     };
   } catch (error) {
     console.error("[tv/status] fetch threw", error);
@@ -41,11 +41,12 @@ async function fetchTvStatus(): Promise<TvStatus | null> {
   }
 }
 
-function getEpisodeCode(status: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]) {
+function getEpisodeCode(
+  status: TvStatus["currentlyWatching"] | TvStatus["lastWatched"],
+) {
   if (!status || status.type !== "episode") return null;
 
-  const season =
-    typeof status.season === "number" ? status.season : undefined;
+  const season = typeof status.season === "number" ? status.season : undefined;
   const episode =
     typeof status.episode === "number" ? status.episode : undefined;
 
@@ -60,7 +61,7 @@ function getEpisodeCode(status: TvStatus["currentlyWatching"] | TvStatus["lastWa
 
 function getDisplayText(
   entry: TvStatus["currentlyWatching"] | TvStatus["lastWatched"],
-  includeEpisodeCode: boolean
+  includeEpisodeCode: boolean,
 ) {
   if (!entry) return "Nothing watched yet";
 
@@ -97,11 +98,11 @@ function computeNextPollDelay(status: TvStatus) {
 
 export function TvWidgetClient({
   initialCurrentlyWatching,
-  initialLastWatched
+  initialLastWatched,
 }: TvWidgetClientProps) {
   const [status, setStatus] = useState<TvStatus>({
     currentlyWatching: initialCurrentlyWatching,
-    lastWatched: initialLastWatched
+    lastWatched: initialLastWatched,
   });
   const statusRef = useRef<TvStatus>(status);
 
@@ -119,7 +120,7 @@ export function TvWidgetClient({
 
     statusRef.current = {
       currentlyWatching: null,
-      lastWatched: statusRef.current.lastWatched
+      lastWatched: statusRef.current.lastWatched,
     };
     setStatus(statusRef.current);
     return null;
@@ -155,11 +156,11 @@ export function TvWidgetClient({
   const activeEntry = status.currentlyWatching ?? status.lastWatched ?? null;
   const infoText = getDisplayText(
     activeEntry,
-    !status.currentlyWatching && activeEntry?.type === "episode"
+    !status.currentlyWatching && activeEntry?.type === "episode",
   );
 
   const episodeCode = getEpisodeCode(
-    status.currentlyWatching ?? status.lastWatched
+    status.currentlyWatching ?? status.lastWatched,
   );
 
   const metaLabel = status.currentlyWatching
@@ -167,7 +168,7 @@ export function TvWidgetClient({
         status.currentlyWatching.type === "episode" ? episodeCode : null,
         typeof status.currentlyWatching.progress === "number"
           ? `${Math.round(status.currentlyWatching.progress)}%`
-          : null
+          : null,
       ]
         .filter(Boolean)
         .join(" • ")
@@ -183,8 +184,8 @@ export function TvWidgetClient({
         link="/watched"
       />
 
-      <div className="flex flex-col gap-2 rounded-xl bg-white p-2 shadow-sm">
-        <div className="relative h-72 w-full overflow-hidden rounded-lg">
+      <div className="flex min-h-[32rem] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0 ">
+        <div className="relative h-full w-full overflow-hidden rounded-lg md:h-72">
           {activeEntry ? (
             <a
               href={activeEntry.url}
