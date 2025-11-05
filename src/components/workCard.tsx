@@ -13,6 +13,11 @@ interface WorkCardProps {
 
 export const WorkCard: FC<WorkCardProps> = (props) => {
   const { title, link, tag, src, alt, internal } = props;
+  const blurDataURL =
+    typeof src === "object" && src !== null && "blurDataURL" in src
+      ? (src as StaticImageData).blurDataURL
+      : undefined;
+  const placeholder = blurDataURL ? "blur" : "empty";
 
   return (
     <Link
@@ -31,7 +36,8 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
           fill={true}
           priority={true}
           sizes={"50vw"}
-          placeholder={"blur"}
+          placeholder={placeholder}
+          blurDataURL={blurDataURL}
           className={"w-full bg-gray-200 object-cover"}
         />
       </div>

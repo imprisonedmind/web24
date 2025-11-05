@@ -1,35 +1,18 @@
 import { Header } from "@/components/header";
-import { WorkCard } from "@/components/workCard";
-import { WorkCardData, workData } from "@/lib/workData";
+import { workData } from "@/lib/workData";
+import { WorkPreviewLink } from "@/components/work/workPreviewLink";
 
 export default function Work() {
+  const items = workData();
+  const favourites = items.filter((item) => item.favourite);
+  const displayItems = (favourites.length ? favourites : items).slice(0, 6);
+
   return (
-    <div className={"flex flex-col gap-1"}>
-      <div className={"px-4 md:px-0"}>
-        <Header title={"work"} seeAll={true} link={"work"} />
-      </div>
-      <div
-        className={
-          "flex grid-cols-3 flex-row gap-2 px-4 pb-4 md:grid md:gap-4 md:px-0" +
-          " overflow-x-auto md:overflow-visible md:pb-0"
-        }
-      >
-        {workData()
-          .slice(0, 3)
-          .map((item: WorkCardData, index: number) => {
-            return (
-              <WorkCard
-                key={index}
-                title={item.title}
-                link={item.link}
-                tag={item.tag}
-                src={item.src}
-                alt={item.alt}
-                internal={item.internal}
-              />
-            );
-          })}
-      </div>
+    <div className="-mt-4 flex w-full flex-col gap-1 px-4 md:mt-0 md:px-0">
+      <Header title="work" seeAll link="work" />
+      {displayItems.map((item) => (
+        <WorkPreviewLink key={item.link} item={item} />
+      ))}
     </div>
   );
 }
