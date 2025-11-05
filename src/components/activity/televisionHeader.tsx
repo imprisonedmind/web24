@@ -16,10 +16,10 @@ export default function TelevisionHeader() {
         modalRoot.current &&
         createPortal(
           <TelevisionModal callBack={() => setOpen(false)} />,
-          modalRoot.current
+          modalRoot.current,
         )}
       <span className="flex flex-row items-center justify-between">
-        <Header title="television" />
+        <Header title="watching" />
 
         <span
           ref={modalRoot}
@@ -32,4 +32,3 @@ export default function TelevisionHeader() {
     </div>
   );
 }
-
