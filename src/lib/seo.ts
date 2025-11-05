@@ -121,8 +121,7 @@ export function createSeoProps(options: CreateMetadataOptions): NextSeoProps {
     twitter: {
       cardType: "summary_large_image",
       site: siteConfig.twitterSite,
-      handle: siteConfig.twitterCreator,
-      images: twitterImages
+      handle: siteConfig.twitterCreator
     }
   };
 }
