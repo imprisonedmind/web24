@@ -8,10 +8,23 @@ import Breadcrumbs from "@/components/breadcrumbs";
 import { WatchCard } from "@/components/tv/watchCard";
 import { WatchGridSkeleton } from "@/components/tv/watchGridSkeleton";
 import { PageContainer } from "@/components/ui/page-container";
+import { createMetadata, createSeoProps, type CreateMetadataOptions } from "@/lib/seo";
+import { Seo } from "@/components/seo/seo";
+
+const RECENT_SEO: CreateMetadataOptions = {
+  title: "Recently Watched | Luke Stephens",
+  description:
+    "See the latest shows and films Luke Stephens watched, complete with posters and quick links.",
+  path: "/watched/recent"
+};
+
+export const metadata = createMetadata(RECENT_SEO);
+const recentSeo = createSeoProps(RECENT_SEO);
 
 export default function WatchedRecentPage() {
   return (
     <PageContainer className="mb-8 flex flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
+      <Seo {...recentSeo} />
       <Breadcrumbs />
 
       <Suspense fallback={<WatchGridSkeleton />}>
