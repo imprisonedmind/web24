@@ -8,6 +8,18 @@ import { getCodingData } from "@/components/coding/coding";
 import Breadcrumbs from "@/components/breadcrumbs";
 import { ActivitySkeleton } from "@/components/activity/activitySkeleton";
 import { PageContainer } from "@/components/ui/page-container";
+import { createMetadata, createSeoProps, type CreateMetadataOptions } from "@/lib/seo";
+import { Seo } from "@/components/seo/seo";
+
+const ACTIVITY_SEO: CreateMetadataOptions = {
+  title: "Activity | Luke Stephens",
+  description:
+    "Yearly breakdowns of Luke Stephens' television watching and work activity, including coding, writing, and design.",
+  path: "/activity"
+};
+
+export const metadata = createMetadata(ACTIVITY_SEO);
+const activitySeo = createSeoProps(ACTIVITY_SEO);
 
 const CATEGORY_LABELS: Record<string, string> = {
   Coding: "coding",
@@ -87,6 +99,7 @@ const WORK_SKELETON_TITLES = [
 export default function Activity() {
   return (
     <PageContainer className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
+      <Seo {...activitySeo} />
       <Breadcrumbs />
 
       <Suspense fallback={<ActivitySkeleton title="watching" />}>
