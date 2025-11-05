@@ -22,7 +22,7 @@ export const MusicClient: FC<MusicClientProps> = ({ initialSongData }) => {
   const [relativePlayed, setRelativePlayed] = useState<string | null>(null);
   const [recentRelative, setRecentRelative] = useState<string[]>([]);
 
-const fetchSongData = useCallback(async () => {
+  const fetchSongData = useCallback(async () => {
     const data = await getSongData();
     setSongData((prev) => {
       if (data?.title) {
@@ -39,6 +39,12 @@ const fetchSongData = useCallback(async () => {
       return data ?? prev ?? null;
     });
   }, []);
+
+  useEffect(() => {
+    if (!initialSongData?.isPlaying) {
+      void fetchSongData();
+    }
+  }, [fetchSongData, initialSongData?.isPlaying]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;

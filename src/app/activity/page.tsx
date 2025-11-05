@@ -1,4 +1,3 @@
-
 // app/activity/page.tsx
 import { Suspense } from "react";
 
@@ -8,13 +7,14 @@ import TelevisionHeader from "@/components/activity/televisionHeader";
 import { getCodingData } from "@/components/coding/coding";
 import Breadcrumbs from "@/components/breadcrumbs";
 import { ActivitySkeleton } from "@/components/activity/activitySkeleton";
+import { PageContainer } from "@/components/ui/page-container";
 
 const CATEGORY_LABELS: Record<string, string> = {
   Coding: "coding",
   "Writing Docs": "writing",
   Designing: "designing",
   Meeting: "meeting",
-  Browsing: "browsing"
+  Browsing: "browsing",
 };
 
 type ActivityDay = {
@@ -24,13 +24,13 @@ type ActivityDay = {
 };
 
 function mapDaysToCategory(days: ActivityDay[], category: string) {
-  return days.map(day => {
-    const match = day.categories?.find(cat => cat.name === category);
+  return days.map((day) => {
+    const match = day.categories?.find((cat) => cat.name === category);
     const total = match?.total ?? 0;
     return {
       date: day.date,
       total,
-      categories: match ? [{ name: match.name, total }] : []
+      categories: match ? [{ name: match.name, total }] : [],
     };
   });
 }
@@ -43,7 +43,7 @@ async function TelevisionActivity() {
   const televisionDays = await getWatchDaysLastYear();
   return (
     <ActivitySection
-      title="television"
+      title="watching"
       days={televisionDays}
       header={<TelevisionHeader />}
     />
@@ -59,13 +59,13 @@ async function WorkActivity() {
       const days = mapDaysToCategory(wakaDays, sourceName);
       return { label, days, total: sumTotals(days) };
     })
-    .filter(section => section.total > 0);
+    .filter((section) => section.total > 0);
 
   if (!sections.length) return null;
 
   return (
     <>
-      {sections.map(section => (
+      {sections.map((section) => (
         <ActivitySection
           key={section.label}
           title={section.label}
@@ -81,22 +81,22 @@ const WORK_SKELETON_TITLES = [
   "writing",
   "designing",
   "meeting",
-  "browsing"
+  "browsing",
 ];
 
 export default function Activity() {
   return (
-    <div className="mx-auto mb-8 flex max-w-[600px] flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
+    <PageContainer className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
       <Breadcrumbs />
 
-      <Suspense fallback={<ActivitySkeleton title="television" />}>
+      <Suspense fallback={<ActivitySkeleton title="watching" />}>
         <TelevisionActivity />
       </Suspense>
 
       <Suspense
         fallback={
           <>
-            {WORK_SKELETON_TITLES.map(title => (
+            {WORK_SKELETON_TITLES.map((title) => (
               <ActivitySkeleton key={title} title={title} />
             ))}
           </>
@@ -104,6 +104,6 @@ export default function Activity() {
       >
         <WorkActivity />
       </Suspense>
-    </div>
+    </PageContainer>
   );
 }
