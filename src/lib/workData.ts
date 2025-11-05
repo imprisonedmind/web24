@@ -15,7 +15,9 @@ import olarm from "/public/olarmHero.jpg";
 import pttt from "/public/pttt.jpg";
 import susWatch from "/public/sus_watch.jpg";
 import ootify from "/public/ootify.jpg";
+import skuld from "/public/skuld.jpg";
 import hyyp from "/public/hyyp.jpg";
+import finchy from "/public/finchy.jpg";
 
 export interface WorkCardData {
   title: string;
@@ -25,6 +27,7 @@ export interface WorkCardData {
   src: StaticImageData;
   alt: string;
   internal?: boolean;
+  favourite?: boolean;
 }
 
 export const workData = (): WorkCardData[] => [
@@ -35,15 +38,16 @@ export const workData = (): WorkCardData[] => [
     type: "professional",
     src: hyyp,
     alt: "Home security system mobile app",
+    favourite: true,
   },
   {
-    title: "ootify.me",
-    link: "https://ootify.me",
-    tag: "web app",
+    title: "skuld-cli",
+    link: "https://github.com/imprisonedmind/skuld",
+    tag: "CLI tool",
     type: "personal",
-    src: ootify,
-    alt: "A device management portal",
-    internal: true
+    src: skuld,
+    alt: "CLI tool for automatic Jira issue management",
+    favourite: true,
   },
   {
     title: "Trinity",
@@ -51,7 +55,27 @@ export const workData = (): WorkCardData[] => [
     tag: "website",
     type: "professional",
     src: trinity,
-    alt: "Trinity website cover image"
+    alt: "Trinity website cover image",
+    favourite: true,
+  },
+  {
+    title: "finchy",
+    link: "https://finchy-website.vercel.app/",
+    tag: "mobile app",
+    type: "personal",
+    src: finchy,
+    alt: "mobile app for spend management",
+    favourite: true,
+  },
+
+  {
+    title: "ootify.me",
+    link: "https://ootify.me",
+    tag: "web app",
+    type: "personal",
+    src: ootify,
+    alt: "A device management portal",
+    favourite: true,
   },
   {
     title: "sus.watch",
@@ -60,6 +84,7 @@ export const workData = (): WorkCardData[] => [
     type: "personal",
     src: susWatch,
     alt: "A device management portal",
+    favourite: true,
   },
   {
     title: "olarm-ws",
@@ -67,7 +92,7 @@ export const workData = (): WorkCardData[] => [
     tag: "plugin",
     type: "personal",
     src: olarm,
-    alt: "bloggin website blog cover"
+    alt: "bloggin website blog cover",
   },
   {
     title: "Portal",
@@ -76,7 +101,7 @@ export const workData = (): WorkCardData[] => [
     type: "professional",
     src: portal,
     alt: "A device management portal",
-    internal: true
+    internal: true,
   },
   {
     title: "PTTT",
@@ -84,7 +109,7 @@ export const workData = (): WorkCardData[] => [
     tag: "website / backend",
     type: "professional",
     src: pttt,
-    alt: "A device management portal"
+    alt: "A device management portal",
   },
   {
     title: "Giggity",
@@ -92,7 +117,7 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     type: "personal",
     src: giggity,
-    alt: "Giggity.co.za website cover image"
+    alt: "Giggity.co.za website cover image",
   },
   {
     title: "bloggin",
@@ -100,7 +125,7 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     type: "personal",
     src: bloggin,
-    alt: "bloggin website blog cover"
+    alt: "bloggin website blog cover",
   },
   {
     title: "Postz",
@@ -108,7 +133,7 @@ export const workData = (): WorkCardData[] => [
     tag: "web app",
     type: "personal",
     src: postz,
-    alt: "Postz website blog cover image"
+    alt: "Postz website blog cover image",
   },
   {
     title: "PitchPlatform",
@@ -116,7 +141,7 @@ export const workData = (): WorkCardData[] => [
     tag: "website",
     type: "professional",
     src: tmw,
-    alt: "TakeMyWord website blog cover image"
+    alt: "TakeMyWord website blog cover image",
   },
   {
     title: "Specno",
@@ -124,7 +149,7 @@ export const workData = (): WorkCardData[] => [
     tag: "wesbite",
     type: "professional",
     src: specno,
-    alt: "Specno.com website cover image"
+    alt: "Specno.com website cover image",
   },
   {
     title: "portfolio",
@@ -132,7 +157,7 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: luke,
-    alt: "Luke Stephens website cover image"
+    alt: "Luke Stephens website cover image",
   },
   {
     title: "show-reel",
@@ -140,7 +165,7 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: showreel,
-    alt: "Luke Stephens 2020 show reel cover image"
+    alt: "Luke Stephens 2020 show reel cover image",
   },
   {
     title: "experiment",
@@ -148,7 +173,7 @@ export const workData = (): WorkCardData[] => [
     tag: "website",
     type: "college",
     src: experiment,
-    alt: "Luke Stephens experimental website cover image"
+    alt: "Luke Stephens experimental website cover image",
   },
   {
     title: "blog",
@@ -156,7 +181,7 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: blog,
-    alt: "Luke Stephens 2020 blog cover image"
+    alt: "Luke Stephens 2020 blog cover image",
   },
   {
     title: "game trailer",
@@ -164,6 +189,6 @@ export const workData = (): WorkCardData[] => [
     tag: "2020",
     type: "college",
     src: acidMage,
-    alt: "Luke Stephens 2020 blog cover image"
-  }
+    alt: "Luke Stephens 2020 blog cover image",
+  },
 ];

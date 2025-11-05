@@ -10,8 +10,8 @@ export default function Work() {
       </div>
       <div
         className={
-          "flex grid-cols-3 flex-row gap-2 px-4 pb-4 md:grid md:gap-4 md:px-0 md:pb-0" +
-          " overflow-x-auto md:overflow-visible"
+          "flex grid-cols-3 flex-row gap-2 px-4 pb-4 md:grid md:gap-4 md:px-0" +
+          " overflow-x-auto md:overflow-visible md:pb-0"
         }
       >
         {workData()

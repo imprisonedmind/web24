@@ -20,7 +20,7 @@ export const WorkCard: FC<WorkCardProps> = (props) => {
       href={link}
       target={internal ? "_self" : "_blank"}
       className={`
-        flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm 
+        flex min-w-[180px] grow flex-col gap-2 rounded-xl bg-white p-2 shadow-sm 
         transition duration-150 ease-in-out hover:shadow-md
       `}
     >
