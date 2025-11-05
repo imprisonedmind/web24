@@ -8,10 +8,23 @@ import Breadcrumbs from "@/components/breadcrumbs";
 import { WatchCard } from "@/components/tv/watchCard";
 import { WatchGridSkeleton } from "@/components/tv/watchGridSkeleton";
 import { PageContainer } from "@/components/ui/page-container";
+import { createMetadata, createSeoProps, type CreateMetadataOptions } from "@/lib/seo";
+import { Seo } from "@/components/seo/seo";
+
+const MONTH_SEO: CreateMetadataOptions = {
+  title: "Most Watched — 30 Days | Luke Stephens",
+  description:
+    "Top television picks from Luke Stephens over the last 30 days, ranked by time watched.",
+  path: "/watched/month"
+};
+
+export const metadata = createMetadata(MONTH_SEO);
+const monthSeo = createSeoProps(MONTH_SEO);
 
 export default function WatchedMonthPage() {
   return (
     <PageContainer className="mb-8 flex flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
+      <Seo {...monthSeo} />
       <Breadcrumbs />
 
       <Suspense fallback={<WatchGridSkeleton />}>
