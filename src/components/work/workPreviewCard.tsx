@@ -10,7 +10,12 @@ interface WorkPreviewCardProps {
 
 export function WorkPreviewCard({ item }: WorkPreviewCardProps) {
   return (
-    <div className="pointer-events-none flex w-full flex-col gap-3 overflow-hidden rounded-xl bg-white p-2 shadow-2xl ring-1 ring-black/5">
+    <div
+      className="
+        flex w-full flex-col gap-4 overflow-clip rounded-xl bg-white p-2
+        shadow-sm transition duration-300 ease-in-out hover:shadow-md
+      "
+    >
       <div className={"relative h-64 w-full overflow-hidden rounded-lg"}>
         <Image
           src={item.src}
