@@ -5,6 +5,18 @@ import Breadcrumbs from "@/components/breadcrumbs";
 import MonthlyHighlightCarousel from "@/components/tv/monthlyHighlightCarousel";
 import { WatchCarouselSkeleton } from "@/components/tv/watchCarouselSkeleton";
 import { PageContainer } from "@/components/ui/page-container";
+import { createMetadata, createSeoProps, type CreateMetadataOptions } from "@/lib/seo";
+import { Seo } from "@/components/seo/seo";
+
+const MONTHS_SEO: CreateMetadataOptions = {
+  title: "Monthly Watching Archive | Luke Stephens",
+  description:
+    "Monthly highlight reels of television watching, explore Luke Stephens' viewing history month by month.",
+  path: "/watched/months"
+};
+
+export const metadata = createMetadata(MONTHS_SEO);
+const monthsSeo = createSeoProps(MONTHS_SEO);
 
 const MONTH_COUNT = 12;
 
@@ -20,6 +32,7 @@ export default function WatchedMonthsPage() {
 
   return (
     <PageContainer className="mb-8 flex flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
+      <Seo {...monthsSeo} />
       <Breadcrumbs />
 
       <div className="flex flex-col gap-10">

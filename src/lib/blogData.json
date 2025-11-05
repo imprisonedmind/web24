@@ -1,5 +1,13 @@
 [
   {
+    "id": "2a2f90ec476b80d486a0f03a58ef5bc8",
+    "date": "05 Nov 25",
+    "title": "protecting the mind against digital pollution",
+    "openGraph": "tinLarge.jpg",
+    "openGraphSmall": "tinSmall.jpg",
+    "description": "How I filter the web by a moral compass - blocking ads, feeds and autoplay across TV, YouTube and browsers with uBlock Origin, NextDNS, Stremio, Revanced."
+  },
+  {
     "id": "20bf90ec476b806c9e76ce2c156e128c",
     "date": "07 Jun 25",
     "title": "how to host a dedicated classic offensive server",

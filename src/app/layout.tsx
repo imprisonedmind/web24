@@ -10,6 +10,9 @@ import "prismjs/themes/prism-tomorrow.css";
 // used for rendering equations (optional)
 import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/lib/siteConfig";
+import { SeoDefaults } from "@/components/seo/defaultSeo";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,43 +28,45 @@ export default function RootLayout({
       </head>
 
       <body className={cn(inter.className, "bg-neutral-50")}>
+        <SeoDefaults />
         <div id={"modal"} />
         {children}
       </body>
+
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
     </html>
   );
 }
 
 export const metadata: Metadata = {
-  title: "Luke Stephens",
-  metadataBase: new URL("https://www.lukestephens.co.za"),
-  description: `an individual, software designer, currently working at Trinity Telecomm (PTY) LTD`,
+  title: siteConfig.title,
+  metadataBase: new URL(siteConfig.url),
+  description: siteConfig.description,
   openGraph: {
     type: "website",
-    url: "https://lukestephens.co.za",
-    title: "Luke Stephens",
-    description:
-      "an individual, type-4 enneagram, passionate, dedicated, resilient.",
-    siteName: "Luke Stephens",
+    url: siteConfig.url,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    siteName: siteConfig.title,
     images: [
       {
-        url: "/lukeOG.jpg",
+        url: `${siteConfig.url}/lukeOG.jpg`,
         width: 1024,
         height: 683,
-        alt: "Luke Stephens, Cape Town, Trinity Iot",
+        alt: siteConfig.title,
       },
       {
-        url: "/luke2.jpg",
+        url: `${siteConfig.url}${siteConfig.defaultOgImage}`,
         width: 1200,
-        height: 600,
-        alt: "Luke Stephens, Cape Town, Trinity Iot",
+        height: 630,
+        alt: siteConfig.title,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@site",
-    creator: "@lukey_stephens",
-    images: "/luke2.jpg",
+    site: siteConfig.twitterSite,
+    creator: siteConfig.twitterCreator,
+    images: [`${siteConfig.url}${siteConfig.defaultOgImage}`],
   },
 };

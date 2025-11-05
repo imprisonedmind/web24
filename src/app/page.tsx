@@ -9,16 +9,32 @@ import Tech from "@/components/tech";
 import Location from "@/components/location";
 import Music from "@/components/music/music";
 import WritingList from "@/components/writing/writingList";
-import { Analytics } from "@vercel/analytics/next";
 import CombinedActivity from "@/components/activity/combinedActivity";
 import TvWidget from "@/components/tv/tvWidget";
 import { PageContainer } from "@/components/ui/page-container";
+import {
+  createMetadata,
+  type CreateMetadataOptions,
+  createSeoProps,
+} from "@/lib/seo";
+import { Seo } from "@/components/seo/seo";
+
+const HOME_SEO: CreateMetadataOptions = {
+  title: "Luke Stephens — software designer",
+  description:
+    "Personal site of Luke Stephens featuring work, activity, and the latest writing, music, and television tracking.",
+  path: "/",
+  images: ["/luke2.jpg", "/lukeOG.jpg"],
+};
+
+export const metadata = createMetadata(HOME_SEO);
+const homeSeo = createSeoProps(HOME_SEO);
 
 export default function Home() {
   return (
     <main className="mb-8">
+      <Seo {...homeSeo} />
       <PageContainer className="flex flex-col gap-8">
-        <Analytics />
         <div className={"mt-8 flex flex-col justify-between gap-4 md:flex-row"}>
           <Image
             src={luke}
