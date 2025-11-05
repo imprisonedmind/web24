@@ -43,6 +43,7 @@ export const NotionPage: FC<NotionPageProps> = (props) => {
       darkMode={false}
       fullPage={false}
       components={{ Code, Collection }}
+      bodyClassName={"!px-0"}
     />
   );
 };
