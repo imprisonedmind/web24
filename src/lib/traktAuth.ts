@@ -8,6 +8,7 @@ import { envEntriesToObject, readEnvEntries, updateEnvFile } from "./envFile";
 
 const ENV_PATH = path.join(process.cwd(), ".env.local");
 const REFRESH_MARGIN_MS = 5 * 60 * 1000;
+const REFRESH_RETRY_DELAY_MS = 15 * 60 * 1000;
 
 type TokenResponse = {
   access_token: string;
@@ -20,7 +21,33 @@ type TokenResponse = {
 
 type EnvRecord = Record<string, string>;
 
-let inFlightRefresh: Promise<string> | null = null;
+let inFlightRefresh: Promise<string | null> | null = null;
+let lastRefreshFailure:
+  | {
+      token: string;
+      timestamp: number;
+    }
+  | null = null;
+const TOKEN_ENV_KEYS = [
+  "TRAKT_ACCESS_TOKEN",
+  "TRAKT_REFRESH_TOKEN",
+  "TRAKT_TOKEN_CREATED_AT",
+  "TRAKT_TOKEN_EXPIRES_IN",
+  "TRAKT_TOKEN_EXPIRES_AT",
+  "TRAKT_TOKEN_SCOPE",
+  "TRAKT_TOKEN_TYPE"
+] as const;
+
+class TraktRefreshError extends Error {
+  constructor(
+    message: string,
+    public readonly status?: number,
+    public readonly responseBody?: string
+  ) {
+    super(message);
+    this.name = "TraktRefreshError";
+  }
+}
 
 async function loadEnvRecord(): Promise<EnvRecord> {
   const entries = await readEnvEntries(ENV_PATH);
@@ -79,6 +106,29 @@ async function persistToken(data: TokenResponse): Promise<string> {
   return data.access_token;
 }
 
+function logTrakt(message: string, error?: unknown) {
+  const details =
+    error instanceof Error ? error.message : typeof error === "string" ? error : undefined;
+  if (details) {
+    console.warn(`[Trakt] ${message}: ${details}`);
+  } else {
+    console.warn(`[Trakt] ${message}`);
+  }
+}
+
+async function clearStoredTokens() {
+  const updates: Record<string, string | undefined> = {};
+  for (const key of TOKEN_ENV_KEYS) {
+    updates[key] = undefined;
+    delete process.env[key];
+  }
+  try {
+    await updateEnvFile(updates, ENV_PATH);
+  } catch (error) {
+    logTrakt("Failed to persist cleared Trakt tokens", error);
+  }
+}
+
 async function refreshToken(
   env: EnvRecord,
   refreshTokenValue: string
@@ -104,7 +154,11 @@ async function refreshToken(
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Failed to refresh Trakt token (${res.status}): ${body}`);
+    throw new TraktRefreshError(
+      `Failed to refresh Trakt token (${res.status}): ${body}`,
+      res.status,
+      body
+    );
   }
 
   const data = (await res.json()) as TokenResponse;
@@ -115,54 +169,99 @@ async function refreshToken(
   return persistToken(data);
 }
 
-export async function getTraktAccessToken(): Promise<string> {
-  const env = await loadEnvRecord();
+export async function getTraktAccessToken(): Promise<string | null> {
+  try {
+    const env = await loadEnvRecord();
 
-  const accessToken =
-    pickEnv(env, "TRAKT_ACCESS_TOKEN") ?? pickEnv(env, "trakt_access_token");
-  if (!accessToken) {
-    throw new Error("Trakt access token not configured. Run `bun run trakt:login`.");
-  }
+    const accessToken =
+      pickEnv(env, "TRAKT_ACCESS_TOKEN") ?? pickEnv(env, "trakt_access_token");
+    if (!accessToken) {
+      return null;
+    }
 
-  const refresh = pickEnv(env, "TRAKT_REFRESH_TOKEN", "trakt_refresh_token");
-  const createdAt = parseInt(pickEnv(env, "TRAKT_TOKEN_CREATED_AT") ?? "", 10);
-  const expiresAtSeconds = parseInt(
-    pickEnv(env, "TRAKT_TOKEN_EXPIRES_AT") ?? "",
-    10
-  );
-  const expiresInSeconds = parseInt(
-    pickEnv(env, "TRAKT_TOKEN_EXPIRES_IN") ?? "",
-    10
-  );
-  const expiresAtMs =
-    Number.isFinite(expiresAtSeconds) && expiresAtSeconds
-      ? expiresAtSeconds * 1000
-      : computeExpiryMs(
-          Number.isFinite(createdAt) ? createdAt : undefined,
-          Number.isFinite(expiresInSeconds) ? expiresInSeconds : undefined
-        );
-
-  const now = Date.now();
-  const needsRefresh =
-    !!refresh &&
-    !!expiresAtMs &&
-    expiresAtMs - REFRESH_MARGIN_MS <= now;
-
-  if (!refresh && expiresAtMs && expiresAtMs <= now) {
-    throw new Error(
-      "Trakt access token expired and no refresh token is available. Run `bun run trakt:login`."
+    const refresh = pickEnv(env, "TRAKT_REFRESH_TOKEN", "trakt_refresh_token");
+    const createdAt = parseInt(pickEnv(env, "TRAKT_TOKEN_CREATED_AT") ?? "", 10);
+    const expiresAtSeconds = parseInt(
+      pickEnv(env, "TRAKT_TOKEN_EXPIRES_AT") ?? "",
+      10
     );
-  }
+    const expiresInSeconds = parseInt(
+      pickEnv(env, "TRAKT_TOKEN_EXPIRES_IN") ?? "",
+      10
+    );
+    const expiresAtMs =
+      Number.isFinite(expiresAtSeconds) && expiresAtSeconds
+        ? expiresAtSeconds * 1000
+        : computeExpiryMs(
+            Number.isFinite(createdAt) ? createdAt : undefined,
+            Number.isFinite(expiresInSeconds) ? expiresInSeconds : undefined
+          );
 
-  if (!needsRefresh) {
-    return accessToken;
-  }
+    const now = Date.now();
+    const tokenExpired = !!expiresAtMs && expiresAtMs <= now;
+    const needsRefresh =
+      !!refresh && !!expiresAtMs && expiresAtMs - REFRESH_MARGIN_MS <= now;
 
-  if (!inFlightRefresh) {
-    inFlightRefresh = refreshToken(env, refresh).finally(() => {
-      inFlightRefresh = null;
-    });
-  }
+    if (!refresh && tokenExpired) {
+      await clearStoredTokens();
+      return null;
+    }
 
-  return inFlightRefresh;
+    if (!needsRefresh) {
+      return accessToken;
+    }
+
+    if (!refresh) {
+      return accessToken;
+    }
+
+    if (
+      lastRefreshFailure &&
+      lastRefreshFailure.token === refresh &&
+      now - lastRefreshFailure.timestamp < REFRESH_RETRY_DELAY_MS
+    ) {
+      return tokenExpired ? null : accessToken;
+    }
+
+    if (!inFlightRefresh) {
+      inFlightRefresh = (async () => {
+        try {
+          const token = await refreshToken(env, refresh);
+          lastRefreshFailure = null;
+          return token;
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : typeof error === "string" ? error : undefined;
+          const responseBody =
+            error instanceof TraktRefreshError
+              ? error.responseBody ?? message
+              : message;
+          const isInvalidGrant =
+            typeof responseBody === "string" &&
+            responseBody.toLowerCase().includes("invalid_grant");
+
+          lastRefreshFailure = {
+            token: refresh,
+            timestamp: Date.now()
+          };
+          logTrakt("Failed to refresh Trakt token", error);
+
+          const expired = !!expiresAtMs && Date.now() >= expiresAtMs;
+          if (expired || isInvalidGrant) {
+            await clearStoredTokens();
+            return null;
+          }
+
+          return accessToken;
+        }
+      })().finally(() => {
+        inFlightRefresh = null;
+      });
+    }
+
+    return inFlightRefresh;
+  } catch (error) {
+    logTrakt("Unable to load Trakt access token", error);
+    return null;
+  }
 }

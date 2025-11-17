@@ -7,6 +7,7 @@ const ID = process.env.TRAKT_CLIENT_ID!;
 async function* historyPages() {
   for (let page = 1; ; page++) {
     const token = await getTraktAccessToken();
+    if (!token) return;
     const res = await fetch(
       `https://api.trakt.tv/sync/history?type=all&page=${page}&limit=100&extended=full`,
       {
@@ -18,7 +19,7 @@ async function* historyPages() {
         cache: "no-store"
       }
     );
-    if (!res.ok) throw new Error(`Trakt ${res.status}`);
+    if (!res.ok) return;
     const arr = await res.json();            // 0-length = no more pages  [oai_citation:3‡forums.trakt.tv](https://forums.trakt.tv/t/date-recorded-with-watching-now/19369?utm_source=chatgpt.com)
     if (!arr.length) return;
     yield arr;
