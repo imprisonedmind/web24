@@ -11,6 +11,7 @@ export const getCodingData = async () => {
     "__REMOVED_WAKATIME_SHARE_URL__",
     {
       method: "GET",
+      cache: "no-store",
       headers: {
         dataType: "jsonp"
       }
@@ -18,7 +19,13 @@ export const getCodingData = async () => {
   );
 
   const json = await data.json();
-  return json.days;
+  const todayIso = new Date().toISOString().split("T")[0];
+  return Array.isArray(json?.days)
+    ? json.days.filter((day: { date?: string }) => {
+        if (!day?.date) return false;
+        return day.date <= todayIso;
+      })
+    : [];
 };
 
 export default async function CombinedActivity() {
