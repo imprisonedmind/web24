@@ -9,13 +9,23 @@ export const getCodingData = async () => {
     "__REMOVED_WAKATIME_SHARE_URL__",
     {
       method: "GET",
+      cache: "no-store",
       headers: {
         dataType: "jsonp",
       },
     },
   );
 
-  return await data.json();
+  const json = await data.json();
+  const todayIso = new Date().toISOString().split("T")[0];
+  const filteredDays = Array.isArray(json?.days)
+    ? json.days.filter((day: { date?: string }) => {
+        if (!day?.date) return false;
+        return day.date <= todayIso;
+      })
+    : [];
+
+  return { ...json, days: filteredDays };
 };
 
 export default async function Coding() {
