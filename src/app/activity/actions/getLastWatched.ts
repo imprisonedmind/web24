@@ -21,6 +21,7 @@ export async function getLastWatched(): Promise<LastWatched | null> {
   const TRAKT_ID = process.env.TRAKT_CLIENT_ID!;
   const cookieToken = cookies().get("trakt_access_token")?.value;
   const ACCESS = cookieToken ?? (await getTraktAccessToken());
+  if (!ACCESS) return null;
 
   const headers = {
     "trakt-api-version": "2",

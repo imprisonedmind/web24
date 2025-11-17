@@ -63,20 +63,36 @@ export function applyEnvUpdates(
   entries: EnvEntry[],
   updates: Record<string, string | undefined>
 ): EnvEntry[] {
-  const remaining = new Map(
-    Object.entries(updates).filter(([, value]) => value !== undefined)
+  const replacements = new Map(
+    Object.entries(updates).filter(([, value]) => value !== undefined) as [string, string][]
+  );
+  const removals = new Set(
+    Object.entries(updates)
+      .filter(([, value]) => value === undefined)
+      .map(([key]) => key)
   );
 
-  const next = entries.map(entry => {
-    if (entry.type !== "pair") return entry;
-    if (!remaining.has(entry.key)) return entry;
-    const value = remaining.get(entry.key)!;
-    remaining.delete(entry.key);
-    return { ...entry, value };
-  });
+  const next: EnvEntry[] = [];
+  for (const entry of entries) {
+    if (entry.type !== "pair") {
+      next.push(entry);
+      continue;
+    }
+    if (removals.has(entry.key)) {
+      removals.delete(entry.key);
+      continue;
+    }
+    if (!replacements.has(entry.key)) {
+      next.push(entry);
+      continue;
+    }
+    const value = replacements.get(entry.key)!;
+    replacements.delete(entry.key);
+    next.push({ ...entry, value });
+  }
 
-  remaining.forEach((value, key) => {
-    next.push({ type: "pair", key, value: value! });
+  replacements.forEach((value, key) => {
+    next.push({ type: "pair", key, value });
   });
 
   return next;

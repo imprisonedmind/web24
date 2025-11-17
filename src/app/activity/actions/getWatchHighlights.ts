@@ -33,9 +33,11 @@ type AggregateEntry = {
 
 const tmdbPosterCache = new Map<string, string>();
 
-async function traktHeaders() {
+async function traktHeaders(): Promise<Record<string, string> | null> {
   const cookieToken = cookies().get("trakt_access_token")?.value;
   const token = cookieToken ?? (await getTraktAccessToken());
+
+  if (!token) return null;
 
   return {
     "trakt-api-version": "2",
@@ -143,6 +145,7 @@ function formatWatchedAt(value?: string | null) {
 
 export async function getRecentlyWatched(limit = 12): Promise<WatchCarouselItem[]> {
   const headers = await traktHeaders();
+  if (!headers) return [];
 
   const res = await fetch(
     `https://api.trakt.tv/sync/history?limit=${limit}&page=1&extended=full,images`,
@@ -232,6 +235,7 @@ export async function getRecentlyWatched(limit = 12): Promise<WatchCarouselItem[
 
 export async function getMostWatchedPast30Days(limit = 12): Promise<WatchCarouselItem[]> {
   const headers = await traktHeaders();
+  if (!headers) return [];
   const since = subDays(new Date(), 30);
   const sinceIso = since.toISOString();
 
@@ -336,6 +340,7 @@ export async function getMostWatchedPast30Days(limit = 12): Promise<WatchCarouse
 
 export async function getMostWatchedAllTime(limit = 12): Promise<WatchCarouselItem[]> {
   const headers = await traktHeaders();
+  if (!headers) return [];
 
   const [showsRes, moviesRes] = await Promise.all([
     fetch(
@@ -440,6 +445,7 @@ export async function getMostWatchedForMonth(
   const rangeEnd = addMonths(rangeStart, 1);
 
   const headers = await traktHeaders();
+  if (!headers) return [];
   const aggregates = new Map<string, AggregateEntry>();
 
   for (let page = 1; page <= 12; page++) {
