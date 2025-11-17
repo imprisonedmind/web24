@@ -38,6 +38,17 @@ const TOKEN_ENV_KEYS = [
   "TRAKT_TOKEN_TYPE"
 ] as const;
 
+class TraktRefreshError extends Error {
+  constructor(
+    message: string,
+    public readonly status?: number,
+    public readonly responseBody?: string
+  ) {
+    super(message);
+    this.name = "TraktRefreshError";
+  }
+}
+
 async function loadEnvRecord(): Promise<EnvRecord> {
   const entries = await readEnvEntries(ENV_PATH);
   const fileEnv = envEntriesToObject(entries);
@@ -143,7 +154,11 @@ async function refreshToken(
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Failed to refresh Trakt token (${res.status}): ${body}`);
+    throw new TraktRefreshError(
+      `Failed to refresh Trakt token (${res.status}): ${body}`,
+      res.status,
+      body
+    );
   }
 
   const data = (await res.json()) as TokenResponse;
@@ -215,6 +230,16 @@ export async function getTraktAccessToken(): Promise<string | null> {
           lastRefreshFailure = null;
           return token;
         } catch (error) {
+          const message =
+            error instanceof Error ? error.message : typeof error === "string" ? error : undefined;
+          const responseBody =
+            error instanceof TraktRefreshError
+              ? error.responseBody ?? message
+              : message;
+          const isInvalidGrant =
+            typeof responseBody === "string" &&
+            responseBody.toLowerCase().includes("invalid_grant");
+
           lastRefreshFailure = {
             token: refresh,
             timestamp: Date.now()
@@ -222,7 +247,7 @@ export async function getTraktAccessToken(): Promise<string | null> {
           logTrakt("Failed to refresh Trakt token", error);
 
           const expired = !!expiresAtMs && Date.now() >= expiresAtMs;
-          if (expired) {
+          if (expired || isInvalidGrant) {
             await clearStoredTokens();
             return null;
           }
