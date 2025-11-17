@@ -9,6 +9,10 @@ export default async function TvWidget() {
     getLastWatched()
   ]);
 
+  if (!currentlyWatching && !lastWatched) {
+    return null;
+  }
+
   return (
     <TvWidgetClient
       initialCurrentlyWatching={currentlyWatching}
