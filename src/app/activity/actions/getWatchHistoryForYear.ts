@@ -13,6 +13,7 @@ const SINCE_ISO = `${SINCE.toISOString().split("T")[0]}T00:00:00Z`; // midnight
 async function* historyPagesLastYear() {
   for (let page = 1; ; page++) {
     const token = await getTraktAccessToken();
+    if (!token) return;
     const url =
       `https://api.trakt.tv/sync/history` +
       `?type=all&page=${page}&limit=100&extended=full&start_at=${encodeURIComponent(SINCE_ISO)}`;
@@ -26,7 +27,7 @@ async function* historyPagesLastYear() {
       next: { revalidate: 3600 }
     });
 
-    if (!res.ok) throw new Error(`Trakt ${res.status}`);
+    if (!res.ok) return;
 
     const arr: any[] = await res.json();
     if (!arr.length) return;                                   // no more pages
