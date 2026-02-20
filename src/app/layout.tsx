@@ -12,7 +12,6 @@ import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/siteConfig";
 import { SeoDefaults } from "@/components/seo/defaultSeo";
-import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,8 +31,6 @@ export default function RootLayout({
         <div id={"modal"} />
         {children}
       </body>
-
-      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
     </html>
   );
 }
