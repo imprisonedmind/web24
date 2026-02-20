@@ -24,6 +24,10 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/faviconX167.svg" sizes="any" />
+        <meta
+          property="og:logo"
+          content={`${siteConfig.url}${siteConfig.openGraphLogo}`}
+        />
       </head>
 
       <body className={cn(inter.className, "bg-neutral-50")}>
