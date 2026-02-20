@@ -37,7 +37,7 @@ export default async function Page({ params }: WritingPageProps) {
     : undefined;
 
   const pageSeo = createSeoProps({
-    title: `${displayTitle} | Luke Stephens`,
+    title: displayTitle,
     description,
     path: slugPath,
     type: "article",
@@ -85,7 +85,7 @@ export async function generateMetadata({
     : undefined;
 
   const options: CreateMetadataOptions = {
-    title: `${title} | Luke Stephens`,
+    title,
     description,
     path: slugPath,
     type: "article",
