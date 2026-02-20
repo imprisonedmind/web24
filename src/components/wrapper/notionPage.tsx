@@ -24,21 +24,30 @@ export const NotionPage: FC<NotionPageProps> = (props) => {
   const { recordMap } = props;
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const videos = document.querySelectorAll("video");
+    const containers = document.querySelectorAll<HTMLElement>(
+      ".notion-asset-wrapper-video > div"
+    );
+    const videos = document.querySelectorAll<HTMLVideoElement>(".notion video");
 
-      videos.forEach((video) => {
-        video.autoplay = true;
-        video.muted = true;
-        video.loop = true;
-        video.play();
+    containers.forEach((container) => {
+      container.style.setProperty("height", "100%", "important");
+      container.style.setProperty("min-height", "0", "important");
+      container.style.setProperty("padding-bottom", "0", "important");
+    });
+
+    videos.forEach((video) => {
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      void video.play().catch(() => {
+        // Ignore blocked/unsupported autoplay attempts.
       });
-    }
-  }, []);
+    });
+  }, [recordMap]);
 
   return (
     <NotionRenderer
-      className={"[v"}
       recordMap={recordMap}
       darkMode={false}
       fullPage={false}
