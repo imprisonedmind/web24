@@ -6,8 +6,7 @@ import MonthlyMostWatchedCarousel from "@/components/tv/monthlyMostWatchedCarous
 import AllTimeWatchedCarousel from "@/components/tv/allTimeWatchedCarousel";
 import { WatchCarouselSkeleton } from "@/components/tv/watchCarouselSkeleton";
 import { PageContainer } from "@/components/ui/page-container";
-import { createMetadata, createSeoProps, type CreateMetadataOptions } from "@/lib/seo";
-import { Seo } from "@/components/seo/seo";
+import { createMetadata, type CreateMetadataOptions } from "@/lib/seo";
 
 const WATCHED_SEO: CreateMetadataOptions = {
   title: "Watching Dashboard | Luke Stephens",
@@ -17,12 +16,10 @@ const WATCHED_SEO: CreateMetadataOptions = {
 };
 
 export const metadata = createMetadata(WATCHED_SEO);
-const watchedSeo = createSeoProps(WATCHED_SEO);
 
 export default function WatchedPage() {
   return (
     <PageContainer className="mb-8 flex flex-col gap-8 py-4 px-[calc(min(16px,8vw))] sm:px-0">
-      <Seo {...watchedSeo} />
       <Breadcrumbs />
 
       <div className="flex flex-col gap-8">

@@ -4,21 +4,29 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "build": "next build",
     "prod": "next build",
     "start": "next start",
     "lint": "next lint",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:deploy": "wrangler deploy",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "trakt:login": "bun run scripts/trakt-auth.ts login",
     "spotify:login": "bun run scripts/spotify-auth.ts login"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.16.5",
     "@radix-ui/react-slot": "^1.2.3",
     "@vercel/analytics": "^1.4.1",
+    "baseline-browser-mapping": "^2.10.0",
+    "caniuse-lite": "^1.0.30001770",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns-tz": "^3.2.0",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.552.0",
-    "next": "14.2.35",
+    "next": "15.5.12",
     "next-seo": "6.1.0",
     "notion-client": "^7.1.5",
     "patch-package": "^8.0.0",
@@ -36,11 +44,12 @@
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.1.4",
+    "eslint-config-next": "15.5.12",
     "postcss": "^8.4.49",
     "prettier": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.15",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "wrangler": "^4.67.0"
   }
 }

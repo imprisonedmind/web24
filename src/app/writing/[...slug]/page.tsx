@@ -9,8 +9,13 @@ import { PageContainer } from "@/components/ui/page-container";
 import { createMetadata, createSeoProps, type CreateMetadataOptions } from "@/lib/seo";
 import { Seo } from "@/components/seo/seo";
 
-export default async function Page({ params }: { params: { slug: string[] } }) {
-  const id = params.slug[1];
+type WritingPageProps = {
+  params: Promise<{ slug: string[] }>;
+};
+
+export default async function Page({ params }: WritingPageProps) {
+  const { slug } = await params;
+  const id = slug[1];
 
   const notion = new NotionAPI();
   const recordMap = await notion.getPage(id);
@@ -20,7 +25,7 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
   const date = item?.date;
   const score = item?.score;
 
-  const slugPath = `/writing/${params.slug.join("/")}`;
+  const slugPath = `/writing/${slug.join("/")}`;
   const displayTitle = item?.title ?? "Writing";
   const description = item?.description ?? "Writing by Luke Stephens.";
   const heroImage = item?.openGraph ? `/${item.openGraph}` : undefined;
@@ -63,13 +68,12 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
 
 export async function generateMetadata({
   params,
-}: {
-  params: { slug: string[] };
-}) {
-  const id = params.slug[1];
+}: WritingPageProps) {
+  const { slug } = await params;
+  const id = slug[1];
   const data: Post[] = [...blogData, ...reviewData];
   const item = data.find((obj) => obj.id === id) ?? null;
-  const slugPath = `/writing/${params.slug.join("/")}`;
+  const slugPath = `/writing/${slug.join("/")}`;
   const title = item?.title ?? "Writing";
   const description = item?.description ?? "Writing by Luke Stephens.";
   const heroImage = item?.openGraph ? `/${item.openGraph}` : undefined;
