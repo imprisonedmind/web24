@@ -133,7 +133,7 @@ function buildUrl(data: WatchingResponse): string {
 }
 
 export async function getCurrentlyWatching(): Promise<CurrentlyWatching | null> {
-  const tokenFromCookie = cookies().get("trakt_access_token")?.value;
+  const tokenFromCookie = (await cookies()).get("trakt_access_token")?.value;
   const token = tokenFromCookie ?? (await getTraktAccessToken());
   if (!token) return null;
 

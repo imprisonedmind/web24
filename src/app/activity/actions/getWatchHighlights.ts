@@ -34,7 +34,7 @@ type AggregateEntry = {
 const tmdbPosterCache = new Map<string, string>();
 
 async function traktHeaders(): Promise<Record<string, string> | null> {
-  const cookieToken = cookies().get("trakt_access_token")?.value;
+  const cookieToken = (await cookies()).get("trakt_access_token")?.value;
   const token = cookieToken ?? (await getTraktAccessToken());
 
   if (!token) return null;
