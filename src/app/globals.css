@@ -7,8 +7,33 @@ html {
 }
 
 @layer components {
-    video {
+    .notion video {
         @apply rounded-2xl
+    }
+
+    .notion-column .notion-asset-wrapper {
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden;
+    }
+
+    .notion-column .notion-asset-wrapper video {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block;
+    }
+
+    .notion-column .notion-asset-wrapper-video > div {
+        height: 100% !important;
+        min-height: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .notion-column .notion-asset-wrapper-video > div > video {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
     }
 }
 
