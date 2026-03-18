@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { publicRoutes, siteConfig } from "@web24/config";
+import { getFeaturedWorkItems } from "@web24/content";
 
 import "./styles.css";
 
@@ -90,6 +91,46 @@ function RoutePage({
   );
 }
 
+function WorkRoute() {
+  const featured = getFeaturedWorkItems(6);
+
+  return (
+    <section className="route-stack">
+      <section className="card route-card">
+        <p className="route-kicker">Work</p>
+        <h2>Selected projects</h2>
+        <p>
+          This is the first real content route moved onto the Vite SPA shell.
+          The data now lives in a shared package with portable image paths
+          instead of Next-specific static imports.
+        </p>
+      </section>
+
+      <section className="work-grid" aria-label="Featured work">
+        {featured.map(item => (
+          <a
+            key={item.title}
+            className="work-card"
+            href={item.link}
+            target={item.internal ? "_self" : "_blank"}
+            rel={item.internal ? undefined : "noreferrer"}
+          >
+            <img className="work-image" src={item.image} alt={item.alt} loading="lazy" />
+            <div className="work-copy">
+              <div className="work-meta">
+                <span className="work-tag">{item.tag}</span>
+                <span className="work-year">{item.year}</span>
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.description ?? item.alt}</p>
+            </div>
+          </a>
+        ))}
+      </section>
+    </section>
+  );
+}
+
 const routeBodies: Record<string, string> = {
   "/":
     "Home will be rebuilt first, then connected to extracted content and live widgets from the new API.",
@@ -111,12 +152,14 @@ export function App({ staticMode = false }: { staticMode?: boolean }) {
           <Route
             key={route.path}
             path={route.path}
-            element={
+            element={route.path === "/work" ? (
+              <WorkRoute />
+            ) : (
               <RoutePage
                 title={route.label}
                 body={routeBodies[route.path] ?? route.seo.description}
               />
-            }
+            )}
           />
         ))}
       </Route>
