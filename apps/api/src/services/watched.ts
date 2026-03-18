@@ -403,6 +403,132 @@ export async function getMostWatchedAllTime(limit = 12, cookieHeader?: string | 
   );
 }
 
+export async function getMostWatchedForMonth(
+  monthIso: string,
+  limit = 12,
+  cookieHeader?: string | null
+) {
+  const monthDate = new Date(monthIso);
+  if (!Number.isFinite(monthDate.valueOf())) return [] satisfies WatchCardItem[];
+
+  const accessToken = await getTraktAccessToken(parseCookie(cookieHeader));
+  if (!accessToken) return [] satisfies WatchCardItem[];
+
+  const rangeStart = new Date(
+    Date.UTC(monthDate.getUTCFullYear(), monthDate.getUTCMonth(), 1, 0, 0, 0)
+  );
+  const rangeEnd = new Date(
+    Date.UTC(monthDate.getUTCFullYear(), monthDate.getUTCMonth() + 1, 1, 0, 0, 0)
+  );
+  const monthKey = `${rangeStart.getUTCFullYear()}-${String(
+    rangeStart.getUTCMonth() + 1
+  ).padStart(2, "0")}`;
+
+  const aggregates = new Map<string, AggregateEntry>();
+
+  for (let page = 1; page <= 12; page++) {
+    const url =
+      "https://api.trakt.tv/sync/history" +
+      `?type=all&page=${page}&limit=100&extended=full,images` +
+      `&start_at=${encodeURIComponent(rangeStart.toISOString())}` +
+      `&end_at=${encodeURIComponent(rangeEnd.toISOString())}`;
+
+    const response = await fetch(url, { headers: traktHeaders(accessToken) });
+    if (!response.ok) break;
+
+    const data = (await response.json()) as any[];
+    if (!data.length) break;
+
+    for (const item of data) {
+      const watchedAt = new Date(item?.watched_at ?? 0);
+      if (!Number.isFinite(watchedAt.valueOf()) || watchedAt < rangeStart || watchedAt >= rangeEnd) {
+        continue;
+      }
+
+      if (item?.type === "movie" && item.movie) {
+        const slug = clampSlug(
+          "movie",
+          item.movie.ids?.slug,
+          String(item.movie.ids?.trakt ?? item.movie.ids?.tmdb)
+        );
+        const key = `movie-${slug}`;
+        const runtime = Number(item.movie.runtime) || 0;
+
+        const entry =
+          aggregates.get(key) ??
+          {
+            id: key,
+            slug,
+            type: "movie" as const,
+            title: item.movie.title ?? "Untitled movie",
+            minutes: 0,
+            plays: 0,
+            images: item.movie.images,
+            tmdbId: item.movie.ids?.tmdb
+          };
+
+        entry.minutes += runtime;
+        entry.plays += 1;
+        if (!entry.images && item.movie.images) entry.images = item.movie.images;
+        if (!entry.tmdbId && item.movie.ids?.tmdb) entry.tmdbId = item.movie.ids?.tmdb;
+        aggregates.set(key, entry);
+        continue;
+      }
+
+      if (item?.show) {
+        const slug = clampSlug(
+          "show",
+          item.show.ids?.slug,
+          String(item.show.ids?.trakt ?? item.show.ids?.tmdb)
+        );
+        const key = `show-${slug}`;
+        const runtime = Number(item.show?.runtime ?? item.episode?.runtime ?? 0) || 0;
+
+        const entry =
+          aggregates.get(key) ??
+          {
+            id: key,
+            slug,
+            type: "show" as const,
+            title: item.show.title ?? item.episode?.title ?? "Untitled show",
+            minutes: 0,
+            plays: 0,
+            images: item.show.images,
+            tmdbId: item.show.ids?.tmdb
+          };
+
+        entry.minutes += runtime;
+        entry.plays += 1;
+        if (!entry.images && item.show.images) entry.images = item.show.images;
+        if (!entry.tmdbId && item.show.ids?.tmdb) entry.tmdbId = item.show.ids?.tmdb;
+        aggregates.set(key, entry);
+      }
+    }
+
+    if (data.length < 100) break;
+  }
+
+  const top = Array.from(aggregates.values())
+    .filter(item => item.minutes > 0)
+    .sort((a, b) => b.minutes - a.minutes)
+    .slice(0, limit);
+
+  return Promise.all(
+    top.map(async item => ({
+      id: `${item.id}-${monthKey}`,
+      title: item.title,
+      posterUrl: await resolvePoster(item.type, item.images, item.tmdbId),
+      href:
+        item.type === "movie"
+          ? `https://trakt.tv/movies/${item.slug}`
+          : `https://trakt.tv/shows/${item.slug}`,
+      meta: `${formatMinutes(item.minutes)} watched • ${item.plays} ${
+        item.plays === 1 ? "play" : "plays"
+      }`
+    }))
+  );
+}
+
 export async function getWatchDaysLastYear(cookieHeader?: string | null) {
   const accessToken = await getTraktAccessToken(parseCookie(cookieHeader));
   if (!accessToken) return [] satisfies WatchDay[];
