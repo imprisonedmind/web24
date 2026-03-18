@@ -1,0 +1,80 @@
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Avenir Next", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(222, 242, 229, 0.9), transparent 32%),
+    linear-gradient(180deg, #f7f4ea 0%, #efe8d5 100%);
+  color: #13261c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+}
+
+.hero {
+  max-width: 44rem;
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #556b5d;
+  font-size: 0.8rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 0.95;
+}
+
+.lede {
+  margin-top: 1.25rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 38rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.card {
+  padding: 1.25rem;
+  border: 1px solid rgba(19, 38, 28, 0.12);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px rgba(19, 38, 28, 0.06);
+}
+
+.card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.card p {
+  margin: 0;
+  line-height: 1.6;
+}
