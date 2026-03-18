@@ -34,8 +34,14 @@ import {
   TechSection
 } from "./components/home";
 import { WorkPreviewLink, WritingPreviewLink } from "./components/previews";
-import { ActivityPreview, MusicWidgetCard, TvWidgetCard } from "./components/widgets";
-import type { WatchDay } from "./types";
+import { ActivitySection, TelevisionActivityHeader } from "./components/activity";
+import { HomeActivityPreview } from "./components/activity";
+import {
+  WatchCarouselSection,
+  WatchCarouselSkeleton
+} from "./components/watched";
+import { MusicWidgetCard, TvWidgetCard } from "./components/widgets";
+import type { WatchDay, WatchedItem } from "./types";
 
 import "./styles.css";
 
@@ -174,7 +180,7 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
           </section>
         </section>
 
-        <ActivityPreview />
+        <HomeActivityPreview />
 
         <section className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-3 md:p-0">
           <LocationSection />
@@ -188,89 +194,7 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
   );
 }
 
-type TvStatus = {
-  currentlyWatching: {
-    type: "movie" | "show" | "episode";
-    title: string;
-    showTitle?: string;
-    episodeTitle?: string;
-    season?: number;
-    episode?: number;
-    posterUrl: string;
-    url: string;
-    progress?: number;
-    startedAt?: string;
-    expiresAt?: string;
-  } | null;
-  lastWatched: {
-    type: "movie" | "show" | "episode";
-    title: string;
-    showTitle?: string;
-    episodeTitle?: string;
-    season?: number;
-    episode?: number;
-    posterUrl: string;
-    watchedAt: string;
-    url: string;
-  } | null;
-};
-
-type WatchedItem = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  posterUrl: string;
-  href: string;
-  meta?: string;
-};
-
-function getEpisodeCode(
-  status: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
-) {
-  if (!status || status.type !== "episode") return null;
-  if (typeof status.season === "number" && typeof status.episode === "number") {
-    return `${status.season}x${status.episode}`;
-  }
-  return null;
-}
-
-function getDisplayTitle(
-  entry: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
-) {
-  if (!entry) return "Nothing watched yet";
-  if (entry.type === "episode") return entry.showTitle ?? entry.title ?? "Untitled";
-  return entry.title ?? "Untitled";
-}
-
-function getDisplaySubtitle(
-  entry: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
-) {
-  if (!entry) return null;
-  if (entry.type !== "episode") return null;
-
-  const code = getEpisodeCode(entry);
-  return [code, entry.episodeTitle].filter(Boolean).join(" • ") || null;
-}
-
-function formatDistanceLabel(value: string) {
-  const diffMs = Math.max(0, Date.now() - new Date(value).getTime());
-  const minutes = Math.floor(diffMs / 60_000);
-
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-function TvStatusPanel() {
-  const [status, setStatus] = useState<TvStatus>({
-    currentlyWatching: null,
-    lastWatched: null
-  });
+function ActivityRoute() {
   const [days, setDays] = useState<WatchDay[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -279,31 +203,17 @@ function TvStatusPanel() {
 
     async function load() {
       try {
-        const [statusResponse, daysResponse] = await Promise.all([
-          fetch("/api/tv/status", { credentials: "include" }),
-          fetch("/api/watched/days-last-year", { credentials: "include" })
-        ]);
-
-        if (!statusResponse.ok) {
-          throw new Error(`tv status failed with ${statusResponse.status}`);
-        }
-
-        const data = (await statusResponse.json()) as Partial<TvStatus>;
-        if (!cancelled) {
-          setStatus({
-            currentlyWatching: data.currentlyWatching ?? null,
-            lastWatched: data.lastWatched ?? null
-          });
-        }
-
-        if (daysResponse.ok) {
-          const daysPayload = (await daysResponse.json()) as { days?: WatchDay[] };
+        const response = await fetch("/api/watched/days-last-year", {
+          credentials: "include"
+        });
+        if (response.ok) {
+          const payload = (await response.json()) as { days?: WatchDay[] };
           if (!cancelled) {
-            setDays(daysPayload.days ?? []);
+            setDays(payload.days ?? []);
           }
         }
       } catch (error) {
-        console.error("[spa/activity] failed to load tv status", error);
+        console.error("[spa/activity] failed to load activity", error);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -318,92 +228,18 @@ function TvStatusPanel() {
     };
   }, []);
 
-  const activeEntry = status.currentlyWatching ?? status.lastWatched;
-  const metaLabel = status.currentlyWatching
-    ? [
-        getEpisodeCode(status.currentlyWatching),
-        typeof status.currentlyWatching.progress === "number"
-          ? `${Math.round(status.currentlyWatching.progress)}%`
-          : null
-      ]
-        .filter(Boolean)
-        .join(" • ")
-    : status.lastWatched?.watchedAt
-      ? formatDistanceLabel(status.lastWatched.watchedAt)
-      : null;
-
   return (
-    <section className="grid gap-4 md:gap-5">
-      <SectionHeader
-        title={status.currentlyWatching ? "watching" : "watched"}
-        action={<SmallLink href="/watched" label="more" />}
-      />
-
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-        <MediaCard className="min-h-[28rem]">
-          {activeEntry ? (
-            <a href={activeEntry.url} target="_blank" rel="noreferrer">
-              <img
-                className="block h-full min-h-[28rem] w-full object-cover"
-                src={activeEntry.posterUrl}
-                alt={activeEntry.title}
-              />
-            </a>
-          ) : (
-            <div className="flex min-h-[28rem] w-full items-center justify-center bg-[#eef1ea] text-[#556b5d]">
-              {loading ? "Loading activity…" : "Nothing watched yet"}
-            </div>
-          )}
-        </MediaCard>
-
-        <MediaCard className="p-5">
-          <p className="mb-3 text-[0.78rem] uppercase tracking-[0.12em] text-[#556b5d]">
-            {status.currentlyWatching ? "Currently watching" : "Last watched"}
-          </p>
-          <h3 className="m-0 text-[1.6rem]">{getDisplayTitle(activeEntry)}</h3>
-          {getDisplaySubtitle(activeEntry) ? (
-            <p className="mt-3 text-[#425348]">{getDisplaySubtitle(activeEntry)}</p>
-          ) : null}
-          {metaLabel ? <p className="mt-3 text-sm text-[#556b5d]">{metaLabel}</p> : null}
-          <p className="mt-3 text-[#425348]">
-            {status.currentlyWatching
-              ? "Live watch state is now coming from the Hono backend and can replace the old Next server-action path."
-              : "Once more activity endpoints are migrated, this route will expand into the full watched and highlights experience."}
-          </p>
-        </MediaCard>
-      </section>
-
-      <section className="grid gap-2">
-        <SectionHeader title="activity" />
-        <div
-          className="mt-4 grid grid-cols-[repeat(14,1fr)] gap-[0.35rem]"
-          aria-label="Watch history heatmap"
-        >
-          {days.length
-            ? days.slice(-98).map(day => {
-                const intensity = Math.min(day.total / (4 * 60 * 60), 1);
-                return (
-                  <div
-                    key={day.date}
-                    className="aspect-square rounded-[0.3rem] border border-[rgba(19,38,28,0.08)]"
-                    title={`${day.date} • ${Math.round(day.total / 60)} min`}
-                    style={{
-                      backgroundColor:
-                        day.total > 0
-                          ? `rgba(234, 121, 8, ${Math.max(intensity, 0.14)})`
-                          : "rgba(229, 231, 235, 0.8)"
-                    }}
-                  />
-                );
-              })
-            : Array.from({ length: 98 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="aspect-square rounded-[0.3rem] border border-[rgba(19,38,28,0.08)] bg-[rgba(229,231,235,0.8)]"
-                />
-              ))}
-        </div>
-      </section>
+    <section className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
+      {loading && !days.length ? (
+        <WatchCarouselSkeleton title="watching" />
+      ) : (
+        <ActivitySection
+          title="watching"
+          days={days}
+          header={<TelevisionActivityHeader />}
+          emptyMessage="No watch activity available."
+        />
+      )}
     </section>
   );
 }
@@ -453,67 +289,40 @@ function WatchedRoute() {
   }, []);
 
   return (
-    <section className="grid gap-5">
-      <SectionHeader title="watched" />
+    <section className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
 
       {loading && !recentItems.length && !monthItems.length && !allTimeItems.length ? (
-        <section className="grid gap-3">
-          <section className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <MediaCard
-                key={index}
-                className="min-h-[20rem] bg-[linear-gradient(180deg,rgba(238,241,234,0.9),rgba(255,255,255,0.85))]"
-              />
-            ))}
-          </section>
-        </section>
+        <>
+          <WatchCarouselSkeleton title="recently watched" />
+          <WatchCarouselSkeleton title="most watched this month" />
+          <WatchCarouselSkeleton title="most watched all time" />
+        </>
       ) : recentItems.length || monthItems.length || allTimeItems.length ? (
         <>
-          <WatchedSection title="Recently watched" items={recentItems} />
-          <WatchedSection title="Most watched this month" items={monthItems} />
-          <WatchedSection title="Most watched all time" items={allTimeItems} />
+          <WatchCarouselSection
+            title="recently watched"
+            items={recentItems}
+            links={[{ title: "all", href: "/watched/recent" }]}
+            emptyMessage="No recent watch history available."
+          />
+          <WatchCarouselSection
+            title="most watched this month"
+            items={monthItems}
+            links={[{ title: "all", href: "/watched/month" }]}
+            emptyMessage="No watch time recorded in the last 30 days."
+          />
+          <WatchCarouselSection
+            title="most watched all time"
+            items={allTimeItems}
+            links={[{ title: "all", href: "/watched/all-time" }]}
+            emptyMessage="No all-time watch stats found."
+          />
         </>
       ) : (
         <MediaCard className="max-w-[44rem] p-5 md:p-6">
           <p className="m-0 text-[#425348]">No recent watched data available.</p>
         </MediaCard>
       )}
-    </section>
-  );
-}
-
-function WatchedSection({
-  title,
-  items
-}: {
-  title: string;
-  items: WatchedItem[];
-}) {
-  if (!items.length) return null;
-
-  return (
-    <section className="grid gap-3">
-      <div className="pl-[0.1rem]">
-        <h3 className="m-0 text-base font-medium">{title}</h3>
-      </div>
-      <section className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4" aria-label={title}>
-        {items.map(item => (
-          <a
-            key={item.id}
-            className="overflow-hidden rounded-[1.2rem] border border-[rgba(19,38,28,0.12)] bg-[rgba(255,255,255,0.82)] text-inherit no-underline shadow-[0_16px_36px_rgba(19,38,28,0.08)]"
-            href={item.href}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <img className="block aspect-[0.75/1] w-full object-cover bg-[#eef1ea]" src={item.posterUrl} alt={item.title} />
-            <div className="p-[0.9rem]">
-              <p className="m-0 font-semibold">{item.title}</p>
-              {item.subtitle ? <p className="m-0 text-[0.88rem] text-[#556b5d]">{item.subtitle}</p> : null}
-              {item.meta ? <p className="mt-[0.35rem] text-[0.88rem] text-[#556b5d]">{item.meta}</p> : null}
-            </div>
-          </a>
-        ))}
-      </section>
     </section>
   );
 }
@@ -620,7 +429,7 @@ export function App({ staticMode = false }: { staticMode?: boolean }) {
             ) : route.path === "/writing" ? (
               <WritingRoute />
             ) : route.path === "/activity" ? (
-              <TvStatusPanel />
+              <ActivityRoute />
             ) : route.path === "/watched" ? (
               <WatchedRoute />
             ) : (

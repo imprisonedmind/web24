@@ -1,10 +1,13 @@
 import { Hono } from "hono";
 
 import { siteConfig, vite8FeatureFlags } from "@web24/config";
+import { hydrateProcessEnvFromRoot } from "./lib/runtimeEnv";
 import { getCurrentlyPlaying } from "./services/music";
 import { musicRoutes } from "./routes/music";
 import { tvRoutes } from "./routes/tv";
 import { watchedRoutes } from "./routes/watched";
+
+await hydrateProcessEnvFromRoot();
 
 const app = new Hono();
 
