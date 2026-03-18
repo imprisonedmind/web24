@@ -34,6 +34,8 @@ import {
   TechSection
 } from "./components/home";
 import { WorkPreviewLink, WritingPreviewLink } from "./components/previews";
+import { ActivityPreview, MusicWidgetCard, TvWidgetCard } from "./components/widgets";
+import type { WatchDay } from "./types";
 
 import "./styles.css";
 
@@ -172,31 +174,12 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
           </section>
         </section>
 
-        <section className="flex flex-col gap-1 px-4 sm:p-0">
-          <div className="relative">
-            <span className="flex flex-row items-center justify-between">
-              <SectionHeader title="activity" action={<SmallLink href="/activity" label="more" />} />
-            </span>
-          </div>
-          <div className="flex justify-end gap-3">
-              {publicRoutes
-                .filter(route => ["/activity", "/watched"].includes(route.path))
-                .map(route => (
-                  <NavItem
-                    key={route.path}
-                    href={route.path}
-                    label={route.label}
-                    staticMode={staticMode}
-                  />
-                ))}
-          </div>
-          <TvStatusPanel />
-        </section>
+        <ActivityPreview />
 
         <section className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-3 md:p-0">
           <LocationSection />
-          <section className="hidden sm:block" />
-          <section className="hidden sm:block" />
+          <TvWidgetCard />
+          <MusicWidgetCard />
         </section>
 
         <TechSection />
@@ -239,12 +222,6 @@ type WatchedItem = {
   posterUrl: string;
   href: string;
   meta?: string;
-};
-
-type WatchDay = {
-  date: string;
-  total: number;
-  categories?: { name: string; total: number }[];
 };
 
 function getEpisodeCode(
