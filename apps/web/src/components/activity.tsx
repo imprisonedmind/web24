@@ -232,7 +232,7 @@ export function ActivitySection({
 }) {
   if (!days.length) {
     return emptyMessage ? (
-      <section className="flex flex-col gap-1 px-4 sm:p-0">
+      <section className="flex flex-col gap-1">
         {header ?? <SectionHeader title={title} />}
         <div className="flex min-h-[108px] items-center rounded-lg bg-white p-4 text-sm text-neutral-500 shadow-sm">
           {emptyMessage}
@@ -242,7 +242,7 @@ export function ActivitySection({
   }
 
   return (
-    <section className="flex flex-col gap-1 px-4 sm:p-0">
+    <section className="flex flex-col gap-1">
       {header ?? <SectionHeader title={title} />}
       <div className="flex flex-row rounded-lg bg-white p-2 pl-1 shadow-sm">
         <HeatMapDates />

@@ -6,6 +6,8 @@ import { ActivityPage } from "./pages/activity-page";
 import { HomePage } from "./pages/home-page";
 import { RoutePage } from "./pages/route-page";
 import { TechPage } from "./pages/tech-page";
+import { WatchedListPage } from "./pages/watched-list-page";
+import { WatchedMonthsPage } from "./pages/watched-months-page";
 import { WatchedPage } from "./pages/watched-page";
 import { WorkPage } from "./pages/work-page";
 import { WritingDetailPage } from "./pages/writing-detail-page";
@@ -51,6 +53,30 @@ const watchedRoute = createRoute({
   component: WatchedPage,
 });
 
+const watchedRecentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/watched/recent",
+  component: () => <WatchedListPage scope="recent" />,
+});
+
+const watchedMonthRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/watched/month",
+  component: () => <WatchedListPage scope="month" />,
+});
+
+const watchedAllTimeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/watched/all-time",
+  component: () => <WatchedListPage scope="all-time" />,
+});
+
+const watchedMonthsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/watched/months",
+  component: WatchedMonthsPage,
+});
+
 const techRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tech",
@@ -70,6 +96,10 @@ const routeTree = rootRoute.addChildren([
   writingDetailRoute,
   activityRoute,
   watchedRoute,
+  watchedRecentRoute,
+  watchedMonthRoute,
+  watchedAllTimeRoute,
+  watchedMonthsRoute,
   techRoute,
   fallbackRoute,
 ]);

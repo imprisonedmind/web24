@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { Breadcrumbs } from "../components/breadcrumbs";
 import { MediaCard } from "../components/legacy";
 import { WatchCarouselSection, WatchCarouselSkeleton } from "../components/watched";
 import { watchedOverviewQueryOptions } from "../lib/api";
@@ -17,15 +18,17 @@ export function WatchedPage() {
   const { recentItems, monthItems, allTimeItems } = data;
 
   return (
-    <section className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
+    <section className="mb-8 flex flex-col gap-8 pb-4">
+      <Breadcrumbs />
+
       {isLoading && !recentItems.length && !monthItems.length && !allTimeItems.length ? (
-        <>
+        <div className="flex flex-col gap-8">
           <WatchCarouselSkeleton title="recently watched" />
           <WatchCarouselSkeleton title="most watched this month" />
           <WatchCarouselSkeleton title="most watched all time" />
-        </>
+        </div>
       ) : recentItems.length || monthItems.length || allTimeItems.length ? (
-        <>
+        <div className="flex flex-col gap-8">
           <WatchCarouselSection
             title="recently watched"
             items={recentItems}
@@ -35,7 +38,10 @@ export function WatchedPage() {
           <WatchCarouselSection
             title="most watched this month"
             items={monthItems}
-            links={[{ title: "all", href: "/watched/month" }]}
+            links={[
+              { title: "all", href: "/watched/month" },
+              { title: "all months", href: "/watched/months" },
+            ]}
             emptyMessage="No watch time recorded in the last 30 days."
           />
           <WatchCarouselSection
@@ -44,7 +50,7 @@ export function WatchedPage() {
             links={[{ title: "all", href: "/watched/all-time" }]}
             emptyMessage="No all-time watch stats found."
           />
-        </>
+        </div>
       ) : (
         <MediaCard className="max-w-[44rem] p-5 md:p-6">
           <p className="m-0 text-[#425348]">No recent watched data available.</p>
