@@ -10,10 +10,12 @@
     "dev": "bun run --parallel dev:web dev:api",
     "dev:web": "bun run --cwd apps/web dev",
     "dev:api": "bun run --cwd apps/api dev",
+    "dev:edge": "bun run build:web && bunx wrangler dev",
     "build": "bun run build:web && bun run build:api",
     "build:web": "bun run --cwd apps/web build",
     "build:api": "bun run --cwd apps/api build",
     "preview:web": "bun run --cwd apps/web preview",
+    "deploy:edge": "bun run build:web && bunx wrangler deploy",
     "typecheck": "bun run typecheck:web && bun run typecheck:api",
     "typecheck:web": "bun run --cwd apps/web typecheck",
     "typecheck:api": "bun run --cwd apps/api typecheck",
@@ -55,7 +57,8 @@
     "prettier": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.15",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "wrangler": "^4.67.0"
   },
   "packageManager": "bun@1.2.23"
 }
