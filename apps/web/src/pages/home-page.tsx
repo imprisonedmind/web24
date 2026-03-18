@@ -8,9 +8,11 @@ import {
   SocialSection,
   TechSection,
 } from "../components/home";
+import { HomeAppsSection } from "../components/home-apps";
 import { HomeActivityWidget } from "../components/home-activity-widget";
+import { HomeWorkSection } from "../components/home-work";
 import { SectionHeader, SmallLink } from "../components/legacy";
-import { WorkPreviewLink, WritingPreviewLink } from "../components/previews";
+import { WritingPreviewLink } from "../components/previews";
 import { MusicWidgetCard, TvWidgetCard } from "../components/widgets";
 
 export function HomePage() {
@@ -35,35 +37,9 @@ export function HomePage() {
       </section>
 
       <section className="flex flex-col gap-8">
-        <section className="-mt-4 flex w-full flex-col gap-1 px-4 md:mt-0 md:px-0">
-          <SectionHeader title="work" action={<SmallLink href="/work" label="more" />} />
-          <div className="hidden flex-col gap-1 md:flex">
-            {featuredWork.map((item) => (
-              <WorkPreviewLink key={item.link} item={item} />
-            ))}
-          </div>
-          <div className="md:hidden">
-            <div className="flex flex-row gap-2 overflow-x-auto pb-4">
-              {featuredWork.slice(0, 3).map((item) => (
-                <a
-                  key={item.link}
-                  className="flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 text-inherit no-underline shadow-sm transition duration-150 ease-in-out hover:shadow-md"
-                  href={item.link}
-                  target={item.internal ? "_self" : "_blank"}
-                  rel={item.internal ? undefined : "noreferrer"}
-                >
-                  <div className="relative h-36 w-full overflow-hidden rounded-lg">
-                    <img className="h-full w-full bg-gray-200 object-cover" src={item.image} alt={item.alt} />
-                  </div>
-                  <div className="flex justify-between gap-2">
-                    <p className="text-sm">{item.title}</p>
-                    <p className="rounded-full bg-neutral-100 p-1 px-2 text-xs">{item.tag}</p>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
+        <HomeWorkSection items={featuredWork} />
+
+        <HomeAppsSection />
 
         <section className="-mt-4 flex w-full flex-col gap-1 px-4 md:mt-0 md:px-0">
           <SectionHeader title="writing" action={<SmallLink href="/writing" label="more" />} />

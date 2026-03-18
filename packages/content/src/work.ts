@@ -95,7 +95,7 @@ export const personalWorkItems: WorkItem[] = [
     title: "Paymatey",
     link: "https://paymatey.net/",
     tag: "web app",
-    image: "https://paymatey.net/og/og_1200x630.png",
+    image: "/paymatey.jpg",
     alt: "Paymatey group wallet cover image",
     favourite: true,
     description: "group wallet app for shared expenses and balances",
@@ -219,6 +219,11 @@ export const workItems: WorkItem[] = [
   ...personalWorkItems,
   ...collegeWorkItems,
 ];
+
+export function getAppWorkItems(limit?: number) {
+  const items = workItems.filter((item) => item.tag === "mobile" || item.tag === "mobile app");
+  return typeof limit === "number" ? items.slice(0, limit) : items;
+}
 
 export function getFeaturedWorkItems(limit = 6) {
   const favourites = workItems.filter((item) => item.favourite);
