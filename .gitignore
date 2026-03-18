@@ -15,6 +15,11 @@
 
 # production
 /build
+/dist
+/apps/*/dist
+/packages/*/dist
+/apps/*/node_modules
+/packages/*/node_modules
 
 # misc
 .DS_Store
@@ -38,3 +43,4 @@ next-env.d.ts
 
 # wrangler local secrets
 .dev.vars
+.vite

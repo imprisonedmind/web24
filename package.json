@@ -2,12 +2,28 @@
   "name": "web24",
   "version": "0.1.1",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "prod": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "dev": "bun run dev:web",
+    "dev:web": "bun run --cwd apps/web dev",
+    "dev:api": "bun run --cwd apps/api dev",
+    "dev:legacy": "next dev",
+    "build": "bun run build:web && bun run build:api",
+    "build:web": "bun run --cwd apps/web build",
+    "build:api": "bun run --cwd apps/api build",
+    "preview:web": "bun run --cwd apps/web preview",
+    "typecheck": "bun run typecheck:web && bun run typecheck:api",
+    "typecheck:web": "bun run --cwd apps/web typecheck",
+    "typecheck:api": "bun run --cwd apps/api typecheck",
+    "lint": "bun run lint:web && bun run lint:api",
+    "lint:web": "bun run --cwd apps/web lint",
+    "lint:api": "bun run --cwd apps/api lint",
+    "legacy:build": "next build",
+    "legacy:start": "next start",
+    "legacy:lint": "next lint",
     "cf:build": "opennextjs-cloudflare build",
     "cf:deploy": "wrangler deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
@@ -51,5 +67,6 @@
     "tailwindcss": "^3.4.15",
     "typescript": "^5.7.2",
     "wrangler": "^4.67.0"
-  }
+  },
+  "packageManager": "bun@1.2.23"
 }
