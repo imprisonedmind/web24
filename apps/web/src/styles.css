@@ -60,6 +60,24 @@ body {
   margin-top: 3rem;
 }
 
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(19, 38, 28, 0.12);
+  background: rgba(255, 255, 255, 0.74);
+  color: inherit;
+  text-decoration: none;
+}
+
 .card {
   padding: 1.25rem;
   border: 1px solid rgba(19, 38, 28, 0.12);
@@ -77,4 +95,17 @@ body {
 .card p {
   margin: 0;
   line-height: 1.6;
+}
+
+.route-card {
+  max-width: 44rem;
+  margin-top: 2rem;
+}
+
+.route-kicker {
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  color: #556b5d;
 }
