@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 
 import { siteConfig, vite8FeatureFlags } from "@web24/config";
+import { tvRoutes } from "./routes/tv";
 
 const app = new Hono();
 
@@ -20,6 +21,8 @@ app.get("/api/migration/status", c => {
     vite8: vite8FeatureFlags
   });
 });
+
+app.route("/api/tv", tvRoutes);
 
 const server = Bun.serve({
   port: 3001,

@@ -1,7 +1,36 @@
+type RuntimeEnv = {
+  NEXT_PUBLIC_SITE_URL?: string;
+  SITE_URL?: string;
+  VITE_SITE_URL?: string;
+};
+
+function readRuntimeEnv(): RuntimeEnv {
+  const env: RuntimeEnv = {};
+
+  if (
+    typeof import.meta !== "undefined" &&
+    typeof import.meta.env !== "undefined"
+  ) {
+    env.NEXT_PUBLIC_SITE_URL = import.meta.env.NEXT_PUBLIC_SITE_URL;
+    env.SITE_URL = import.meta.env.SITE_URL;
+    env.VITE_SITE_URL = import.meta.env.VITE_SITE_URL;
+  }
+
+  if (typeof process !== "undefined" && process.env) {
+    env.NEXT_PUBLIC_SITE_URL ??= process.env.NEXT_PUBLIC_SITE_URL;
+    env.SITE_URL ??= process.env.SITE_URL;
+    env.VITE_SITE_URL ??= process.env.VITE_SITE_URL;
+  }
+
+  return env;
+}
+
+const runtimeEnv = readRuntimeEnv();
+
 const rawSiteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  process.env.SITE_URL ??
-  process.env.VITE_SITE_URL ??
+  runtimeEnv.NEXT_PUBLIC_SITE_URL ??
+  runtimeEnv.SITE_URL ??
+  runtimeEnv.VITE_SITE_URL ??
   "https://lukestephens.co.za";
 
 const normalizedSiteUrl = rawSiteUrl.replace(/\/$/, "");
