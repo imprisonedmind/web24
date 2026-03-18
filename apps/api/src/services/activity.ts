@@ -92,3 +92,7 @@ export async function getHomeActivityDays(cookieHeader?: string | null) {
 
   return mergeDays(codingDays, watchDays);
 }
+
+export async function getFullActivityDays(cookieHeader?: string | null) {
+  return getHomeActivityDays(cookieHeader);
+}

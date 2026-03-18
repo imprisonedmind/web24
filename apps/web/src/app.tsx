@@ -238,7 +238,7 @@ function ActivityRoute() {
 
     async function load() {
       try {
-        const response = await fetch("/api/watched/days-last-year", {
+        const response = await fetch("/api/activity/full", {
           credentials: "include"
         });
         if (response.ok) {
