@@ -83,14 +83,14 @@ function IpodScreenComponent({
           href={track.songUrl || "#"}
           target="_blank"
           rel="noreferrer"
-          className="flex flex-1 flex-col items-center justify-between gap-3 p-2 pb-1"
+          className="flex min-h-0 flex-1 flex-col items-center justify-between gap-3 p-2 pb-1"
         >
-          <div className="flex-start flex w-full grow gap-2 overflow-hidden">
-            <div className="relative aspect-square h-full w-auto flex-shrink-0 overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
+          <div className="flex w-full min-h-0 grow gap-2 overflow-hidden">
+            <div className="relative aspect-square h-full max-w-[96px] flex-shrink-0 overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
               <img
                 src={track.albumImageUrl || "/lukeOG.jpg"}
                 alt={track.title}
-                className="h-full w-full object-cover"
+                className="block h-full w-full object-cover"
               />
             </div>
 

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 
 import type { WorkItem, WritingPost } from "@web24/content";
 import { getWritingRoutePath } from "@web24/content";
