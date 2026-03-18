@@ -5,6 +5,7 @@ import { AppFrame } from "./components/app-frame";
 import { ActivityPage } from "./pages/activity-page";
 import { HomePage } from "./pages/home-page";
 import { RoutePage } from "./pages/route-page";
+import { TechPage } from "./pages/tech-page";
 import { WatchedPage } from "./pages/watched-page";
 import { WorkPage } from "./pages/work-page";
 import { WritingDetailPage } from "./pages/writing-detail-page";
@@ -50,6 +51,12 @@ const watchedRoute = createRoute({
   component: WatchedPage,
 });
 
+const techRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/tech",
+  component: TechPage,
+});
+
 const fallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/$",
@@ -63,6 +70,7 @@ const routeTree = rootRoute.addChildren([
   writingDetailRoute,
   activityRoute,
   watchedRoute,
+  techRoute,
   fallbackRoute,
 ]);
 
