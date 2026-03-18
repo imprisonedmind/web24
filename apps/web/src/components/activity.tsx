@@ -234,7 +234,7 @@ export function ActivitySection({
     return emptyMessage ? (
       <section className="flex flex-col gap-1 px-4 sm:p-0">
         {header ?? <SectionHeader title={title} />}
-        <div className="rounded-lg bg-white p-4 text-sm text-neutral-500 shadow-sm">
+        <div className="flex min-h-[108px] items-center rounded-lg bg-white p-4 text-sm text-neutral-500 shadow-sm">
           {emptyMessage}
         </div>
       </section>
