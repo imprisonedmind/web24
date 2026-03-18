@@ -62,6 +62,10 @@ export function TvWidgetCard() {
       : activeEntry.title
     : "Nothing watched yet";
 
+  if (!activeEntry) {
+    return null;
+  }
+
   return (
     <div className="flex w-full flex-col gap-1">
       <SectionHeader title={label} action={<SmallLink href="/watched" label="more" />} />
