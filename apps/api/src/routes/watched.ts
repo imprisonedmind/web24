@@ -2,6 +2,7 @@ import { Hono } from "hono";
 
 import {
   getMostWatchedAllTime,
+  getMostWatchedForMonth,
   getMostWatchedPast30Days,
   getRecentlyWatched,
   getWatchDaysLastYear
@@ -40,6 +41,20 @@ watchedRoutes.get("/all-time", async c => {
     return c.json({ items }, 200);
   } catch (error) {
     console.error("[api/watched/all-time] failed", error);
+    return c.json({ items: [] }, 500);
+  }
+});
+
+watchedRoutes.get("/monthly", async c => {
+  try {
+    const monthIso = c.req.query("monthIso");
+    if (!monthIso) return c.json({ items: [] }, 400);
+
+    const limit = Number(c.req.query("limit") ?? "12");
+    const items = await getMostWatchedForMonth(monthIso, limit, c.req.header("cookie"));
+    return c.json({ items }, 200);
+  } catch (error) {
+    console.error("[api/watched/monthly] failed", error);
     return c.json({ items: [] }, 500);
   }
 });
