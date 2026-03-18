@@ -58,3 +58,19 @@ export function SmallLink({
     </Link>
   );
 }
+
+export function MediaCard({
+  children,
+  className = ""
+}: {
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`overflow-hidden rounded-[1.4rem] border border-[rgba(19,38,28,0.12)] bg-[rgba(255,255,255,0.78)] shadow-[0_16px_36px_rgba(19,38,28,0.08)] ${className}`.trim()}
+    >
+      {children}
+    </div>
+  );
+}

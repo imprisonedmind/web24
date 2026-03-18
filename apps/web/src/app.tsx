@@ -17,7 +17,7 @@ import {
   getTopWritingPosts,
   sortWritingPosts
 } from "@web24/content";
-import { BulletPoint, SectionHeader, SmallLink } from "./components/legacy";
+import { BulletPoint, MediaCard, SectionHeader, SmallLink } from "./components/legacy";
 
 import "./styles.css";
 
@@ -369,49 +369,47 @@ function TvStatusPanel() {
 
   return (
     <section className="route-stack compact-stack">
-      <div className="section-label">
-        <h3>{status.currentlyWatching ? "watching" : "watched"}</h3>
-        <SmallLink href="/watched" label="more" />
-      </div>
+      <SectionHeader
+        title={status.currentlyWatching ? "watching" : "watched"}
+        action={<SmallLink href="/watched" label="more" />}
+      />
 
-      <section className="activity-grid compact-activity-grid">
-        <article className="activity-card activity-poster-card">
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+        <MediaCard className="min-h-[28rem]">
           {activeEntry ? (
             <a href={activeEntry.url} target="_blank" rel="noreferrer">
               <img
-                className="activity-poster"
+                className="block h-full min-h-[28rem] w-full object-cover"
                 src={activeEntry.posterUrl}
                 alt={activeEntry.title}
               />
             </a>
           ) : (
-            <div className="activity-empty">
+            <div className="flex min-h-[28rem] w-full items-center justify-center bg-[#eef1ea] text-[#556b5d]">
               {loading ? "Loading activity…" : "Nothing watched yet"}
             </div>
           )}
-        </article>
+        </MediaCard>
 
-        <article className="activity-card activity-copy-card">
-          <p className="route-kicker">
+        <MediaCard className="p-5">
+          <p className="mb-3 text-[0.78rem] uppercase tracking-[0.12em] text-[#556b5d]">
             {status.currentlyWatching ? "Currently watching" : "Last watched"}
           </p>
-          <h3>{getDisplayTitle(activeEntry)}</h3>
+          <h3 className="m-0 text-[1.6rem]">{getDisplayTitle(activeEntry)}</h3>
           {getDisplaySubtitle(activeEntry) ? (
-            <p className="activity-subtitle">{getDisplaySubtitle(activeEntry)}</p>
+            <p className="mt-3 text-[#425348]">{getDisplaySubtitle(activeEntry)}</p>
           ) : null}
-          {metaLabel ? <p className="activity-meta">{metaLabel}</p> : null}
-          <p className="activity-body">
+          {metaLabel ? <p className="mt-3 text-sm text-[#556b5d]">{metaLabel}</p> : null}
+          <p className="mt-3 text-[#425348]">
             {status.currentlyWatching
               ? "Live watch state is now coming from the Hono backend and can replace the old Next server-action path."
               : "Once more activity endpoints are migrated, this route will expand into the full watched and highlights experience."}
           </p>
-        </article>
+        </MediaCard>
       </section>
 
-      <section className="activity-history">
-        <div className="section-label">
-          <h3>activity</h3>
-        </div>
+      <section className="grid gap-2">
+        <SectionHeader title="activity" />
         <div className="heatmap-grid" aria-label="Watch history heatmap">
           {days.length
             ? days.slice(-98).map(day => {
@@ -485,15 +483,16 @@ function WatchedRoute() {
 
   return (
     <section className="route-stack compact-stack">
-      <div className="section-label">
-        <h3>watched</h3>
-      </div>
+      <SectionHeader title="watched" />
 
       {loading && !recentItems.length && !monthItems.length && !allTimeItems.length ? (
-        <section className="watched-section">
-          <section className="watched-grid">
+        <section className="grid gap-3">
+          <section className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">
             {Array.from({ length: 6 }).map((_, index) => (
-              <article key={index} className="watched-card watched-skeleton" />
+              <MediaCard
+                key={index}
+                className="min-h-[20rem] bg-[linear-gradient(180deg,rgba(238,241,234,0.9),rgba(255,255,255,0.85))]"
+              />
             ))}
           </section>
         </section>
@@ -522,24 +521,24 @@ function WatchedSection({
   if (!items.length) return null;
 
   return (
-    <section className="watched-section">
-      <div className="section-heading">
-        <h3 className="watched-section-title">{title}</h3>
+    <section className="grid gap-3">
+      <div className="pl-[0.1rem]">
+        <h3 className="m-0 text-base font-medium">{title}</h3>
       </div>
-      <section className="watched-grid" aria-label={title}>
+      <section className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4" aria-label={title}>
         {items.map(item => (
           <a
             key={item.id}
-            className="watched-card"
+            className="overflow-hidden rounded-[1.2rem] border border-[rgba(19,38,28,0.12)] bg-[rgba(255,255,255,0.82)] text-inherit no-underline shadow-[0_16px_36px_rgba(19,38,28,0.08)]"
             href={item.href}
             target="_blank"
             rel="noreferrer"
           >
-            <img className="watched-image" src={item.posterUrl} alt={item.title} />
-            <div className="watched-copy">
-              <p className="watched-title">{item.title}</p>
-              {item.subtitle ? <p className="watched-subtitle">{item.subtitle}</p> : null}
-              {item.meta ? <p className="watched-meta">{item.meta}</p> : null}
+            <img className="block aspect-[0.75/1] w-full object-cover bg-[#eef1ea]" src={item.posterUrl} alt={item.title} />
+            <div className="p-[0.9rem]">
+              <p className="m-0 font-semibold">{item.title}</p>
+              {item.subtitle ? <p className="m-0 text-[0.88rem] text-[#556b5d]">{item.subtitle}</p> : null}
+              {item.meta ? <p className="mt-[0.35rem] text-[0.88rem] text-[#556b5d]">{item.meta}</p> : null}
             </div>
           </a>
         ))}
