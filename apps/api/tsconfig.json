@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["bun"],
+    "baseUrl": ".",
+    "paths": {
+      "@web24/config": ["../../packages/config/src/index.ts"],
+      "@web24/config/*": ["../../packages/config/src/*"]
+    }
+  },
+  "include": ["src"]
+}
