@@ -44,7 +44,6 @@ function getConvexUrl() {
   const value =
     process.env.VITE_CONVEX_URL ??
     process.env.CONVEX_URL ??
-    process.env.NEXT_PUBLIC_CONVEX_URL ??
     process.env.CONVEX_SITE_URL;
 
   if (!value) {

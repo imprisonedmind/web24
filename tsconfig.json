@@ -3,29 +3,18 @@
   "compilerOptions": {
     "allowJs": true,
     "incremental": true,
-    "jsx": "preserve",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": ["./src/*"],
-      "@web24/config": ["./packages/config/src/index.ts"],
-      "@web24/config/*": ["./packages/config/src/*"],
-      "@web24/content": ["./packages/content/src/index.ts"],
-      "@web24/content/*": ["./packages/content/src/*"]
-    }
+    "jsx": "react-jsx"
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
+    "convex/**/*.ts",
+    "scripts/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "apps",
-    "packages/*/dist"
+    "packages",
+    "src",
+    ".next",
+    ".open-next"
   ]
 }

@@ -498,8 +498,7 @@ async function main() {
   const env = await loadEnv();
   const convexUrl =
     pickEnv(env, "VITE_CONVEX_URL") ??
-    pickEnv(env, "CONVEX_URL") ??
-    pickEnv(env, "NEXT_PUBLIC_CONVEX_URL");
+    pickEnv(env, "CONVEX_URL");
 
   if (!convexUrl) formatError("Missing VITE_CONVEX_URL or CONVEX_URL in .env.local");
 
