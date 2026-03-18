@@ -1,8 +1,12 @@
+import { AsyncCache } from "../lib/cache";
 import querystring from "node:querystring";
 
 const NOW_PLAYING_ENDPOINT = "https://api.spotify.com/v1/me/player/currently-playing";
 const RECENTLY_PLAYED_ENDPOINT = "https://api.spotify.com/v1/me/player/recently-played";
 const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
+const spotifyCache = new AsyncCache<SongData | null>();
+const DEFAULT_SPOTIFY_TTL_MS = 45_000;
+const SPOTIFY_STALE_MS = 5 * 60_000;
 
 type SpotifyImage = {
   url?: string | null;
@@ -125,6 +129,12 @@ function mapTrack(track?: SpotifyTrack | null, extras: Partial<SongData> = {}) {
 }
 
 export async function getCurrentlyPlaying(requireTrack = true): Promise<SongData | null> {
+  const cacheKey = requireTrack ? "spotify:current:required" : "spotify:current:optional";
+  return spotifyCache.getOrRefresh({
+    key: cacheKey,
+    ttlMs: DEFAULT_SPOTIFY_TTL_MS,
+    staleWhileRevalidateMs: SPOTIFY_STALE_MS,
+    loader: async () => {
   let recentTracks: RecentlyPlayedTrack[] = [];
 
   try {
@@ -192,4 +202,22 @@ export async function getCurrentlyPlaying(requireTrack = true): Promise<SongData
         songUrl: "#",
         recentlyPlayed: []
       };
+    }
+  });
+}
+
+export function cacheCurrentlyPlaying(data: SongData | null, requireTrack = true) {
+  const cacheKey = requireTrack ? "spotify:current:required" : "spotify:current:optional";
+  let ttlMs = DEFAULT_SPOTIFY_TTL_MS;
+
+  if (
+    data?.isPlaying &&
+    typeof data.durationMs === "number" &&
+    typeof data.progressMs === "number"
+  ) {
+    const remainingMs = Math.max(data.durationMs - data.progressMs, 1_000);
+    ttlMs = Math.min(Math.max(remainingMs + 2_000, 10_000), 10 * 60_000);
+  }
+
+  spotifyCache.set(cacheKey, data, ttlMs, SPOTIFY_STALE_MS);
 }

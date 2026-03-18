@@ -35,7 +35,11 @@ export function NotionPage({ recordMap }: { recordMap: ExtendedRecordMap }) {
       recordMap={recordMap}
       darkMode={false}
       fullPage={false}
-      components={{ Code, Collection }}
+      components={{
+        Code,
+        Collection,
+        Tweet: () => null,
+      }}
       bodyClassName="!px-0"
     />
   );

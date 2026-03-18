@@ -1,3 +1,4 @@
+import { AsyncCache } from "../lib/cache";
 import { getWatchDaysLastYear } from "./watched";
 
 type ActivityDay = {
@@ -8,6 +9,9 @@ type ActivityDay = {
 
 const WAKATIME_SHARE_URL =
   "https://wakatime.com/share/@018c620c-4d0b-4835-a919-aefff3d87af2/c68e7bc4-65b4-4421-914f-3e1e404c199d.json";
+const WAKATIME_TTL_MS = 60 * 60 * 1000;
+const WAKATIME_STALE_MS = 6 * 60 * 60 * 1000;
+const codingActivityCache = new AsyncCache<ActivityDay[]>();
 
 function mergeDays(wakaDays: ActivityDay[], traktDays: ActivityDay[]) {
   const map: Record<string, ActivityDay> = {};
@@ -60,28 +64,35 @@ function mergeDays(wakaDays: ActivityDay[], traktDays: ActivityDay[]) {
 }
 
 export async function getCodingActivityDays() {
-  try {
-    const response = await fetch(WAKATIME_SHARE_URL, {
-      headers: {
-        dataType: "jsonp"
+  return codingActivityCache.getOrRefresh({
+    key: "wakatime:coding-days",
+    ttlMs: WAKATIME_TTL_MS,
+    staleWhileRevalidateMs: WAKATIME_STALE_MS,
+    loader: async () => {
+      try {
+        const response = await fetch(WAKATIME_SHARE_URL, {
+          headers: {
+            dataType: "jsonp"
+          }
+        });
+
+        if (!response.ok) {
+          console.warn(`[api/activity] wakatime request failed (${response.status})`);
+          return [] as ActivityDay[];
+        }
+
+        const payload = (await response.json()) as { days?: ActivityDay[] } | null;
+        const todayIso = new Date().toISOString().split("T")[0];
+
+        return Array.isArray(payload?.days)
+          ? payload.days.filter(day => day?.date && day.date <= todayIso)
+          : [];
+      } catch (error) {
+        console.error("[api/activity] failed to fetch wakatime activity", error);
+        return [] as ActivityDay[];
       }
-    });
-
-    if (!response.ok) {
-      console.warn(`[api/activity] wakatime request failed (${response.status})`);
-      return [] as ActivityDay[];
     }
-
-    const payload = (await response.json()) as { days?: ActivityDay[] } | null;
-    const todayIso = new Date().toISOString().split("T")[0];
-
-    return Array.isArray(payload?.days)
-      ? payload.days.filter(day => day?.date && day.date <= todayIso)
-      : [];
-  } catch (error) {
-    console.error("[api/activity] failed to fetch wakatime activity", error);
-    return [] as ActivityDay[];
-  }
+  });
 }
 
 export async function getHomeActivityDays(cookieHeader?: string | null) {

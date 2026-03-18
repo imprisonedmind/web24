@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { siteConfig, vite8FeatureFlags } from "@web24/config";
 import { activityRoutes } from "./routes/activity";
 import { hydrateProcessEnvFromRoot } from "./lib/runtimeEnv";
-import { getCurrentlyPlaying } from "./services/music";
+import { cacheCurrentlyPlaying, getCurrentlyPlaying } from "./services/music";
 import { musicRoutes } from "./routes/music";
 import { tvRoutes } from "./routes/tv";
 import { watchedRoutes } from "./routes/watched";
@@ -37,7 +37,9 @@ app.route("/api/music", musicRoutes);
 app.route("/api/writing", writingRoutes);
 app.get("/api/currentlyPlaying", async c => {
   try {
-    return c.json(await getCurrentlyPlaying(true), 200);
+    const data = await getCurrentlyPlaying(true);
+    cacheCurrentlyPlaying(data, true);
+    return c.json(data, 200);
   } catch (error) {
     console.error("[api/currentlyPlaying] failed", error);
     return c.json(null, 500);

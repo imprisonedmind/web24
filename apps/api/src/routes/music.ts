@@ -1,12 +1,13 @@
 import { Hono } from "hono";
 
-import { getCurrentlyPlaying } from "../services/music";
+import { cacheCurrentlyPlaying, getCurrentlyPlaying } from "../services/music";
 
 const musicRoutes = new Hono();
 
 musicRoutes.get("/currently-playing", async c => {
   try {
     const data = await getCurrentlyPlaying(true);
+    cacheCurrentlyPlaying(data, true);
     return c.json(data, 200);
   } catch (error) {
     console.error("[api/music/currently-playing] failed", error);
