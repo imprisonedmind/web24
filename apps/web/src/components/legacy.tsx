@@ -74,3 +74,11 @@ export function MediaCard({
     </div>
   );
 }
+
+export function ReviewScoreBadge({ score }: { score: number }) {
+  return (
+    <span className="inline-flex rounded-full bg-neutral-100 px-2 py-1 text-xs tracking-wide text-neutral-600">
+      {score.toFixed(1)}
+    </span>
+  );
+}

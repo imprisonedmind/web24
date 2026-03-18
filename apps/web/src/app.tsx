@@ -11,13 +11,29 @@ import {
 
 import { publicRoutes, siteConfig } from "@web24/config";
 import {
+  workItems,
   getFeaturedWorkItems,
   getWritingPostBySlugParts,
   getWritingRoutePath,
   getTopWritingPosts,
   sortWritingPosts
 } from "@web24/content";
-import { BulletPoint, MediaCard, SectionHeader, SmallLink } from "./components/legacy";
+import {
+  MediaCard,
+  ReviewScoreBadge,
+  SectionHeader,
+  SmallLink
+} from "./components/legacy";
+import { WorkSection, WritingCard } from "./components/catalog";
+import {
+  BioSection,
+  EducationSection,
+  EmploymentSection,
+  LocationSection,
+  SocialSection,
+  TechSection
+} from "./components/home";
+import { WorkPreviewLink, WritingPreviewLink } from "./components/previews";
 
 import "./styles.css";
 
@@ -48,14 +64,20 @@ function NavItem({
 }) {
   if (staticMode) {
     return (
-      <a className="nav-link" href={href}>
+      <a
+        className="inline-flex items-center rounded-full border border-[rgba(19,38,28,0.12)] bg-[rgba(255,255,255,0.74)] px-[0.95rem] py-[0.65rem] no-underline"
+        href={href}
+      >
         {label}
       </a>
     );
   }
 
   return (
-    <Link className="nav-link" to={href}>
+    <Link
+      className="inline-flex items-center rounded-full border border-[rgba(19,38,28,0.12)] bg-[rgba(255,255,255,0.74)] px-[0.95rem] py-[0.65rem] no-underline"
+      to={href}
+    >
       {label}
     </Link>
   );
@@ -65,7 +87,7 @@ function AppFrame({ staticMode = false }: { staticMode?: boolean }) {
   useRouteSeo();
 
   return (
-    <main className="app-shell">
+    <main className="mx-auto max-w-5xl px-[calc(min(16px,8vw))] py-8 md:py-10">
       <Outlet />
     </main>
   );
@@ -79,11 +101,13 @@ function RoutePage({
   body: string;
 }) {
   return (
-    <section className="card route-card">
-      <p className="route-kicker">Public route</p>
-      <h2>{title}</h2>
-      <p>{body}</p>
-    </section>
+    <MediaCard className="max-w-[44rem] p-5 md:p-6">
+      <p className="mb-3 text-[0.78rem] uppercase tracking-[0.12em] text-[#556b5d]">
+        Public route
+      </p>
+      <h2 className="m-0 text-base font-semibold md:text-lg">{title}</h2>
+      <p className="mt-3 text-[#425348]">{body}</p>
+    </MediaCard>
   );
 }
 
@@ -92,94 +116,69 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
   const topWriting = getTopWritingPosts(3);
 
   return (
-    <section className="grid gap-8">
-      <section className="grid gap-4 md:grid-cols-[300px_1fr]">
+    <section className="mb-8 flex flex-col gap-8">
+      <section className="mt-8 flex flex-col justify-between gap-4 md:flex-row">
         <img
           className="mx-auto hidden max-h-[400px] max-w-[300px] rounded-2xl object-cover md:flex"
           src="/luke2.jpg"
           alt="Luke Stephens"
         />
 
-        <div className="grid gap-4">
-          <div>
-            <h1 className="text-xl font-medium">luke stephens</h1>
-            <h2 className="text-neutral-500">
-              an individual, type-4 enneagram, passionate, dedicated, resilient.
-            </h2>
-          </div>
-
-          <div>
-            <SectionHeader title="social" />
-            <div className="flex flex-col">
-              <SmallLink href="https://www.thecrag.com/climber/luke6" label="thecrag.com" external />
-              <SmallLink href="https://twitter.com/lukey_stephens" label="twitter.com" external />
-              <SmallLink href="https://layers.to/lukey" label="layers.to" external />
-              <SmallLink href="https://github.com/imprisonedmind" label="github.com" external />
-            </div>
-          </div>
-
-          <div>
-            <SectionHeader title="employment" />
-            <p className="text-sm text-neutral-500">Trinity Telecomms (PTY) LTD</p>
-            <BulletPoint title="design and research lead" date="'23-current" />
-            <BulletPoint title="software designer" date="'21-current" />
-            <p className="mt-2 text-sm text-neutral-500">Specno</p>
-            <BulletPoint title="multimedia designer" date="'19-20" />
-          </div>
-
-          <div>
-            <SectionHeader title="education" />
-            <p className="text-sm text-neutral-500">BA Visual Communications Degree</p>
-            <BulletPoint title="major in multimedia" date="'18-20" />
-          </div>
+        <div className="flex flex-col justify-between gap-4 px-4 md:gap-0 md:px-0">
+          <BioSection />
+          <SocialSection />
+          <EmploymentSection />
+          <EducationSection />
         </div>
       </section>
 
-      <section className="grid gap-8">
-        <section className="grid gap-1">
+      <section className="flex flex-col gap-8">
+        <section className="-mt-4 flex w-full flex-col gap-1 px-4 md:mt-0 md:px-0">
           <SectionHeader title="work" action={<SmallLink href="/work" label="more" />} />
-          <section className="grid gap-1 pr-3">
+          <div className="hidden flex-col gap-1 md:flex">
             {featuredWork.map(item => (
-              <a
-                key={item.title}
-                className="flex items-center justify-between gap-3 text-sm text-neutral-600"
-                href={item.link}
-                target={item.internal ? "_self" : "_blank"}
-                rel={item.internal ? undefined : "noreferrer"}
-              >
-                <span className="truncate">{item.description ?? item.title}</span>
-                <span className="inline-flex whitespace-nowrap text-xs text-neutral-400">
-                  <span>{item.tag}</span>
-                  {item.year ? <span className="ml-2">{item.year}</span> : null}
-                </span>
-              </a>
+              <WorkPreviewLink key={item.link} item={item} />
             ))}
-          </section>
+          </div>
+          <div className="md:hidden">
+            <div className="flex flex-row gap-2 overflow-x-auto pb-4">
+              {featuredWork.slice(0, 3).map(item => (
+                <a
+                  key={item.link}
+                  className="flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 text-inherit no-underline shadow-sm transition duration-150 ease-in-out hover:shadow-md"
+                  href={item.link}
+                  target={item.internal ? "_self" : "_blank"}
+                  rel={item.internal ? undefined : "noreferrer"}
+                >
+                  <div className="relative h-36 w-full overflow-hidden rounded-lg">
+                    <img className="h-full w-full bg-gray-200 object-cover" src={item.image} alt={item.alt} />
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <p className="text-sm">{item.title}</p>
+                    <p className="rounded-full bg-neutral-100 p-1 px-2 text-xs">{item.tag}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
         </section>
 
-        <section className="grid gap-1">
+        <section className="-mt-4 flex w-full flex-col gap-1 px-4 md:mt-0 md:px-0">
           <SectionHeader title="writing" action={<SmallLink href="/writing" label="more" />} />
-          <section className="grid gap-1 pr-3">
+          <section className="grid gap-1">
             {topWriting.map(post => (
-              <Link
-                key={post.id}
-                className="flex items-center justify-between gap-3 text-sm text-neutral-600"
-                to={getWritingRoutePath(post)}
-              >
-                <span className="truncate">{post.title}</span>
-                <span className="inline-flex whitespace-nowrap text-xs text-neutral-400">
-                  <span>{post.date}</span>
-                  {post.score !== undefined ? <span className="ml-2">{post.score.toFixed(1)}</span> : null}
-                </span>
-              </Link>
+              <WritingPreviewLink key={post.id} item={post} />
             ))}
           </section>
         </section>
 
-        <section className="grid gap-1">
-          <div className="flex items-center justify-between pr-3">
-            <h3 className="w-fit text-lg font-medium">activity</h3>
-            <div className="flex flex-wrap gap-3">
+        <section className="flex flex-col gap-1 px-4 sm:p-0">
+          <div className="relative">
+            <span className="flex flex-row items-center justify-between">
+              <SectionHeader title="activity" action={<SmallLink href="/activity" label="more" />} />
+            </span>
+          </div>
+          <div className="flex justify-end gap-3">
               {publicRoutes
                 .filter(route => ["/activity", "/watched"].includes(route.path))
                 .map(route => (
@@ -190,28 +189,17 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
                     staticMode={staticMode}
                   />
                 ))}
-            </div>
           </div>
           <TvStatusPanel />
         </section>
 
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-1">
-          <section className="grid gap-1">
-            <SectionHeader title="location" />
-            <div className="flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm">
-              <div className="relative h-72 w-full overflow-hidden rounded-lg">
-                <img className="h-full w-full scale-[1.2] object-cover" src="/map.png" alt="Cape Town map" />
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="text-sm lowercase text-neutral-800">Cape Town</p>
-                <div className="flex rounded-full bg-neutral-100 p-1 px-2 text-xs">
-                  <span>-33.93,</span>
-                  <span>18.47</span>
-                </div>
-              </div>
-            </div>
-          </section>
+        <section className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-3 md:p-0">
+          <LocationSection />
+          <section className="hidden sm:block" />
+          <section className="hidden sm:block" />
         </section>
+
+        <TechSection />
       </section>
     </section>
   );
@@ -368,7 +356,7 @@ function TvStatusPanel() {
       : null;
 
   return (
-    <section className="route-stack compact-stack">
+    <section className="grid gap-4 md:gap-5">
       <SectionHeader
         title={status.currentlyWatching ? "watching" : "watched"}
         action={<SmallLink href="/watched" label="more" />}
@@ -410,14 +398,17 @@ function TvStatusPanel() {
 
       <section className="grid gap-2">
         <SectionHeader title="activity" />
-        <div className="heatmap-grid" aria-label="Watch history heatmap">
+        <div
+          className="mt-4 grid grid-cols-[repeat(14,1fr)] gap-[0.35rem]"
+          aria-label="Watch history heatmap"
+        >
           {days.length
             ? days.slice(-98).map(day => {
                 const intensity = Math.min(day.total / (4 * 60 * 60), 1);
                 return (
                   <div
                     key={day.date}
-                    className="heatmap-cell"
+                    className="aspect-square rounded-[0.3rem] border border-[rgba(19,38,28,0.08)]"
                     title={`${day.date} • ${Math.round(day.total / 60)} min`}
                     style={{
                       backgroundColor:
@@ -429,7 +420,10 @@ function TvStatusPanel() {
                 );
               })
             : Array.from({ length: 98 }).map((_, index) => (
-                <div key={index} className="heatmap-cell heatmap-skeleton" />
+                <div
+                  key={index}
+                  className="aspect-square rounded-[0.3rem] border border-[rgba(19,38,28,0.08)] bg-[rgba(229,231,235,0.8)]"
+                />
               ))}
         </div>
       </section>
@@ -482,7 +476,7 @@ function WatchedRoute() {
   }, []);
 
   return (
-    <section className="route-stack compact-stack">
+    <section className="grid gap-5">
       <SectionHeader title="watched" />
 
       {loading && !recentItems.length && !monthItems.length && !allTimeItems.length ? (
@@ -503,9 +497,9 @@ function WatchedRoute() {
           <WatchedSection title="Most watched all time" items={allTimeItems} />
         </>
       ) : (
-        <section className="card route-card">
-          <p>No recent watched data available.</p>
-        </section>
+        <MediaCard className="max-w-[44rem] p-5 md:p-6">
+          <p className="m-0 text-[#425348]">No recent watched data available.</p>
+        </MediaCard>
       )}
     </section>
   );
@@ -548,41 +542,17 @@ function WatchedSection({
 }
 
 function WorkRoute() {
-  const featured = getFeaturedWorkItems(6);
+  const sections = [
+    { title: "professional", items: workItems.filter(item => item.type === "professional") },
+    { title: "personal", items: workItems.filter(item => item.type === "personal") },
+    { title: "college", items: workItems.filter(item => item.type === "college") }
+  ].filter(section => section.items.length);
 
   return (
-    <section className="route-stack">
-      <section className="card route-card">
-        <p className="route-kicker">Work</p>
-        <h2>Selected projects</h2>
-        <p>
-          This is the first real content route moved onto the Vite SPA shell.
-          The data now lives in a shared package with portable image paths
-          instead of Next-specific static imports.
-        </p>
-      </section>
-
-      <section className="work-grid" aria-label="Featured work">
-        {featured.map(item => (
-          <a
-            key={item.title}
-            className="work-card"
-            href={item.link}
-            target={item.internal ? "_self" : "_blank"}
-            rel={item.internal ? undefined : "noreferrer"}
-          >
-            <img className="work-image" src={item.image} alt={item.alt} loading="lazy" />
-            <div className="work-copy">
-              <div className="work-meta">
-                <span className="work-tag">{item.tag}</span>
-                <span className="work-year">{item.year}</span>
-              </div>
-              <h3>{item.title}</h3>
-              <p>{item.description ?? item.alt}</p>
-            </div>
-          </a>
-        ))}
-      </section>
+    <section className="flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4">
+      {sections.map(section => (
+        <WorkSection key={section.title} title={section.title} items={section.items} />
+      ))}
     </section>
   );
 }
@@ -591,37 +561,13 @@ function WritingRoute() {
   const posts = sortWritingPosts();
 
   return (
-    <section className="route-stack">
-      <section className="card route-card">
-        <p className="route-kicker">Writing</p>
-        <h2>Published notes, essays, and reviews</h2>
-        <p>
-          The writing index is now sourced from a shared content package. This
-          becomes the route manifest for build-time prerendering and future
-          detail-page migration.
-        </p>
-      </section>
-
-      <section className="writing-grid" aria-label="Writing posts">
+    <section
+      className="grid grid-cols-1 gap-4 px-[calc(min(16px,8vw))] py-4 sm:grid-cols-2"
+      aria-label="Writing posts"
+    >
         {posts.map(post => (
-          <a key={post.id} className="writing-card" href={getWritingRoutePath(post)}>
-            <img
-              className="writing-image"
-              src={`/${post.openGraph}`}
-              alt={post.title}
-              loading="lazy"
-            />
-            <div className="writing-copy">
-              <div className="writing-meta">
-                <span>{post.date}</span>
-                {post.score !== undefined ? <span>{post.score.toFixed(1)}</span> : null}
-              </div>
-              <h3>{post.title}</h3>
-              <p>{post.description}</p>
-            </div>
-          </a>
+          <WritingCard key={post.id} post={post} />
         ))}
-      </section>
     </section>
   );
 }
@@ -635,24 +581,31 @@ function WritingDetailRoute() {
   }
 
   return (
-    <section className="route-stack">
-      <section className="card route-card">
-        <p className="route-kicker">Writing Detail</p>
-        <h2>{post.title}</h2>
-        <p>{post.description}</p>
-      </section>
+    <section className="grid gap-6">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="grid gap-2">
+          <SmallLink href="/writing" label="back to writing" />
+          <h1 className="m-0 text-2xl font-semibold tracking-tight">{post.title}</h1>
+          <p className="m-0 max-w-3xl text-neutral-600">{post.description}</p>
+        </div>
 
-      <article className="writing-detail">
+        <div className="flex flex-shrink-0 flex-wrap items-center gap-3 text-sm text-neutral-600 sm:text-base">
+          {post.score !== undefined ? <ReviewScoreBadge score={post.score} /> : null}
+          <p className="whitespace-nowrap m-0">{post.date}</p>
+        </div>
+      </div>
+
+      <article className="overflow-hidden rounded-[1.4rem] bg-white shadow-sm">
         <img
-          className="writing-detail-image"
+          className="block max-h-[24rem] w-full object-cover"
           src={`/${post.openGraph}`}
           alt={post.title}
         />
-        <div className="writing-detail-meta">
+        <div className="flex justify-between gap-4 px-4 pb-0 pt-4 text-sm text-neutral-500">
           <span>{post.date}</span>
           {post.score !== undefined ? <span>score {post.score.toFixed(1)}</span> : null}
         </div>
-        <p className="writing-detail-copy">
+        <p className="m-0 p-4 leading-7 text-neutral-600">
           This page is now part of the prerendered route manifest for the Vite
           SPA. The next migration step is replacing this extracted summary view
           with the full Notion-backed content rendering path.
