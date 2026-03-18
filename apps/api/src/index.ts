@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 
 import { siteConfig, vite8FeatureFlags } from "@web24/config";
+import { activityRoutes } from "./routes/activity";
 import { hydrateProcessEnvFromRoot } from "./lib/runtimeEnv";
 import { getCurrentlyPlaying } from "./services/music";
 import { musicRoutes } from "./routes/music";
@@ -30,6 +31,7 @@ app.get("/api/migration/status", c => {
 
 app.route("/api/tv", tvRoutes);
 app.route("/api/watched", watchedRoutes);
+app.route("/api/activity", activityRoutes);
 app.route("/api/music", musicRoutes);
 app.get("/api/currentlyPlaying", async c => {
   try {

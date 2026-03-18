@@ -6,6 +6,7 @@
   color-scheme: light;
   font-family: "IBM Plex Sans", "Avenir Next", sans-serif;
   color: #13261c;
+  --page-max-width: 640px;
 }
 
 * {

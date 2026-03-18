@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useEffect, useState, type ReactNode } from "react";
 
 import type { WatchDay } from "../types";
@@ -48,11 +49,13 @@ function chunkArray(days: WatchDay[], chunkSize: number) {
 }
 
 function HeatMapDates() {
+  const labels = ["S", "M", "T", "W", "T", "F", "S"] as const;
+
   return (
     <ul className="grid grid-rows-[7] gap-[3px] p-[2px]">
-      {["S", "M", "T", "W", "T", "F", "S"].map(title => (
+      {labels.map((title, index) => (
         <li
-          key={title}
+          key={`${title}-${index}`}
           className="m-auto flex h-[10px] w-[10px] items-center justify-center rounded-sm border-[0.5px] border-gray-200 bg-white text-[7px] font-medium shadow-sm"
         >
           {title}
@@ -78,13 +81,25 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
   const defaultColor = "#f3f4f6";
   const defaultBorderColor = "#e5e7eb";
   const todayBorderColor = "#0ea5e9";
+  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setModalRoot(document.getElementById("modal"));
+    }
+  }, []);
 
   return (
     <div className="flex flex-col gap-[3px] p-[2px]">
       {chunk.map(chunkItem => {
-        const dominantCategory = chunkItem.categories?.reduce((max, current) =>
-          current.total > max.total ? current : max
-        );
+        const dominantCategory =
+          chunkItem.categories && chunkItem.categories.length > 0
+            ? chunkItem.categories.reduce((max, current) =>
+                current.total > max.total ? current : max
+              )
+            : undefined;
         const baseColor = dominantCategory ? categoryColors[dominantCategory.name] ?? defaultColor : defaultColor;
         const opacity = Math.min((chunkItem.total / 2300) / 14, 1);
         const red = parseInt(baseColor.slice(1, 3), 16);
@@ -100,16 +115,77 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
         return (
           <div
             key={chunkItem.date}
-            className={`h-[10px] w-[10px] flex-shrink-0 rounded-sm ${chunkItem.date === today ? "border-[1px]" : "border-[0.3px]"}`}
-            style={{
-              backgroundColor:
-                chunkItem.total < 60
-                  ? defaultColor
-                  : `rgba(${red}, ${green}, ${blue}, ${opacity})`,
-              borderColor
-            }}
-            title={`${chunkItem.date} • ${Math.round(chunkItem.total / 60)} min`}
-          />
+            className="relative"
+          >
+            {hoveredDate === chunkItem.date && modalRoot && hoverPosition
+              ? createPortal(
+                  <div
+                    className="pointer-events-none absolute z-10 flex h-fit w-max flex-col gap-2 rounded-sm bg-white p-2 shadow-lg"
+                    style={{ top: `${hoverPosition.y}px`, left: `${hoverPosition.x + 10}px` }}
+                  >
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs font-semibold">
+                        {chunkItem.date === today ? "Today's Stats!" : chunkItem.date}
+                      </p>
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <p>Total:</p>
+                        <p>
+                          {chunkItem.total >= 3600
+                            ? `${Math.floor(chunkItem.total / 3600)}h ${Math.round((chunkItem.total % 3600) / 60)}m`
+                            : `${Math.round(chunkItem.total / 60)}m`}
+                        </p>
+                      </div>
+                    </div>
+                    {chunkItem.categories && chunkItem.categories.length > 0 ? (
+                      <div className="flex flex-col gap-1">
+                        <p className="text-xs font-semibold">Categories</p>
+                        <ul>
+                          {chunkItem.categories
+                            .filter(category => category.total > 60)
+                            .map(category => (
+                              <li
+                                key={category.name}
+                                className="flex justify-between gap-4 text-xs text-gray-500"
+                              >
+                                <p>{category.name}:</p>
+                                <p>
+                                  {category.total >= 3600
+                                    ? `${Math.floor(category.total / 3600)}h ${Math.round((category.total % 3600) / 60)}m`
+                                    : `${Math.round(category.total / 60)}m`}
+                                </p>
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-500">No categories</p>
+                    )}
+                  </div>,
+                  modalRoot
+                )
+              : null}
+            <div
+              className={`h-[10px] w-[10px] flex-shrink-0 cursor-pointer rounded-sm ${chunkItem.date === today ? "border-[1px]" : "border-[0.3px]"}`}
+              style={{
+                backgroundColor:
+                  chunkItem.total < 60
+                    ? defaultColor
+                    : `rgba(${red}, ${green}, ${blue}, ${opacity})`,
+                borderColor
+              }}
+              onMouseEnter={event => {
+                setHoveredDate(chunkItem.date);
+                setHoverPosition({ x: event.pageX, y: event.pageY });
+              }}
+              onMouseMove={event => {
+                setHoverPosition({ x: event.pageX, y: event.pageY });
+              }}
+              onMouseLeave={() => {
+                setHoveredDate(null);
+                setHoverPosition(null);
+              }}
+            />
+          </div>
         );
       })}
     </div>
@@ -165,109 +241,4 @@ export function TelevisionActivityHeader() {
 
 export function ActivityRouteHeader() {
   return <SectionHeader title="activity" action={<SmallLink href="/" label="home" />} />;
-}
-
-function mergeDays(wakaDays: WatchDay[], traktDays: WatchDay[]) {
-  const map: Record<string, WatchDay> = {};
-
-  for (const day of wakaDays) {
-    map[day.date] = {
-      date: day.date,
-      total: day.total,
-      categories: Array.isArray(day.categories) ? [...day.categories] : []
-    };
-  }
-
-  for (const day of traktDays) {
-    if (!map[day.date]) {
-      map[day.date] = {
-        date: day.date,
-        total: day.total,
-        categories: Array.isArray(day.categories) ? [...day.categories] : []
-      };
-      continue;
-    }
-
-    map[day.date].total += day.total;
-    for (const category of day.categories ?? []) {
-      const existing = map[day.date].categories?.find(item => item.name === category.name);
-      if (existing) {
-        existing.total += category.total;
-      } else {
-        map[day.date].categories = [...(map[day.date].categories ?? []), category];
-      }
-    }
-  }
-
-  const sortedKeys = Object.keys(map).sort();
-  if (!sortedKeys.length) return [];
-
-  const start = new Date(`${sortedKeys[0]}T00:00:00Z`);
-  const end = new Date();
-  const current = new Date(start);
-
-  while (current <= end) {
-    const iso = current.toISOString().slice(0, 10);
-    if (!map[iso]) {
-      map[iso] = { date: iso, total: 0, categories: [] };
-    }
-    current.setUTCDate(current.getUTCDate() + 1);
-  }
-
-  return Object.values(map).sort((a, b) => a.date.localeCompare(b.date));
-}
-
-export function HomeActivityPreview() {
-  const [days, setDays] = useState<WatchDay[]>([]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const [wakaResponse, watchResponse] = await Promise.all([
-          fetch(
-            "https://wakatime.com/share/@018c620c-4d0b-4835-a919-aefff3d87af2/c68e7bc4-65b4-4421-914f-3e1e404c199d.json",
-            {
-              method: "GET",
-              headers: {
-                dataType: "jsonp"
-              }
-            }
-          ),
-          fetch("/api/watched/days-last-year", { credentials: "include" })
-        ]);
-
-        const todayIso = new Date().toISOString().split("T")[0];
-        const wakaPayload = wakaResponse.ok ? await wakaResponse.json() : null;
-        const wakaDays = Array.isArray(wakaPayload?.days)
-          ? (wakaPayload.days as WatchDay[]).filter(day => day?.date && day.date <= todayIso)
-          : [];
-
-        const watchPayload = watchResponse.ok
-          ? ((await watchResponse.json()) as { days?: WatchDay[] })
-          : { days: [] };
-
-        if (!cancelled) {
-          setDays(mergeDays(wakaDays, watchPayload.days ?? []));
-        }
-      } catch (error) {
-        console.error("[web/home-activity] failed", error);
-      }
-    }
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return (
-    <ActivitySection
-      title="activity"
-      days={days}
-      header={<SectionHeader title="activity" action={<SmallLink href="/activity" label="more" />} />}
-      emptyMessage="No activity available."
-    />
-  );
 }
