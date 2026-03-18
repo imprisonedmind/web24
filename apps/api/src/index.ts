@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 
 import { siteConfig, vite8FeatureFlags } from "@web24/config";
+import { getCurrentlyPlaying } from "./services/music";
+import { musicRoutes } from "./routes/music";
 import { tvRoutes } from "./routes/tv";
 import { watchedRoutes } from "./routes/watched";
 
@@ -25,6 +27,15 @@ app.get("/api/migration/status", c => {
 
 app.route("/api/tv", tvRoutes);
 app.route("/api/watched", watchedRoutes);
+app.route("/api/music", musicRoutes);
+app.get("/api/currentlyPlaying", async c => {
+  try {
+    return c.json(await getCurrentlyPlaying(true), 200);
+  } catch (error) {
+    console.error("[api/currentlyPlaying] failed", error);
+    return c.json(null, 500);
+  }
+});
 
 const server = Bun.serve({
   port: 3001,
