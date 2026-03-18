@@ -7,6 +7,7 @@ import { getCurrentlyPlaying } from "./services/music";
 import { musicRoutes } from "./routes/music";
 import { tvRoutes } from "./routes/tv";
 import { watchedRoutes } from "./routes/watched";
+import { writingRoutes } from "./routes/writing";
 
 await hydrateProcessEnvFromRoot();
 
@@ -33,6 +34,7 @@ app.route("/api/tv", tvRoutes);
 app.route("/api/watched", watchedRoutes);
 app.route("/api/activity", activityRoutes);
 app.route("/api/music", musicRoutes);
+app.route("/api/writing", writingRoutes);
 app.get("/api/currentlyPlaying", async c => {
   try {
     return c.json(await getCurrentlyPlaying(true), 200);

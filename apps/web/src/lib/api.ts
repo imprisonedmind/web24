@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+import type { ExtendedRecordMap } from "notion-types";
 
 import type { WatchDay, WatchedItem } from "../types";
 
@@ -100,3 +101,13 @@ export const musicQueryOptions = queryOptions({
   queryFn: async () => fetchJson<SongData | null>("/api/currentlyPlaying"),
   refetchInterval: 45_000,
 });
+
+export function writingRecordMapQueryOptions(id: string) {
+  return queryOptions({
+    queryKey: ["writing", id],
+    queryFn: async () => {
+      const payload = await fetchJson<{ recordMap: ExtendedRecordMap | null }>(`/api/writing/${id}`);
+      return payload.recordMap;
+    }
+  });
+}
