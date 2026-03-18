@@ -131,6 +131,15 @@ type TvStatus = {
   } | null;
 };
 
+type WatchedItem = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  posterUrl: string;
+  href: string;
+  meta?: string;
+};
+
 function getEpisodeCode(
   status: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
 ) {
@@ -279,6 +288,80 @@ function TvStatusPanel() {
   );
 }
 
+function WatchedRoute() {
+  const [items, setItems] = useState<WatchedItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const response = await fetch("/api/watched/recent?limit=12", {
+          credentials: "include"
+        });
+        if (!response.ok) throw new Error(`watched recent failed with ${response.status}`);
+        const data = (await response.json()) as { items?: WatchedItem[] };
+        if (!cancelled) setItems(data.items ?? []);
+      } catch (error) {
+        console.error("[spa/watched] failed to load recent watched", error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <section className="route-stack">
+      <section className="card route-card">
+        <p className="route-kicker">Watched</p>
+        <h2>Recent watch history via Hono</h2>
+        <p>
+          This page is now reading recent watch history from the new backend.
+          Monthly and all-time aggregates can follow on top of the same API
+          boundary.
+        </p>
+      </section>
+
+      {loading && !items.length ? (
+        <section className="watched-grid">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <article key={index} className="watched-card watched-skeleton" />
+          ))}
+        </section>
+      ) : items.length ? (
+        <section className="watched-grid" aria-label="Recently watched">
+          {items.map(item => (
+            <a
+              key={item.id}
+              className="watched-card"
+              href={item.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img className="watched-image" src={item.posterUrl} alt={item.title} />
+              <div className="watched-copy">
+                <p className="watched-title">{item.title}</p>
+                {item.subtitle ? <p className="watched-subtitle">{item.subtitle}</p> : null}
+                {item.meta ? <p className="watched-meta">{item.meta}</p> : null}
+              </div>
+            </a>
+          ))}
+        </section>
+      ) : (
+        <section className="card route-card">
+          <p>No recent watched data available.</p>
+        </section>
+      )}
+    </section>
+  );
+}
+
 function WorkRoute() {
   const featured = getFeaturedWorkItems(6);
 
@@ -422,6 +505,8 @@ export function App({ staticMode = false }: { staticMode?: boolean }) {
               <WritingRoute />
             ) : route.path === "/activity" ? (
               <TvStatusPanel />
+            ) : route.path === "/watched" ? (
+              <WatchedRoute />
             ) : (
               <RoutePage
                 title={route.label}
