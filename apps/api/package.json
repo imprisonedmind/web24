@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@web24/config": "workspace:*",
-    "hono": "^4.10.0"
+    "hono": "^4.10.0",
+    "notion-client": "^7.8.3"
   },
   "devDependencies": {
     "@types/bun": "latest",
