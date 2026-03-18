@@ -1,19 +1,18 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import type { Config } from "tailwindcss";
-
-const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 const config: Config = {
   darkMode: ["class"],
-  content: [
-    path.join(rootDir, "apps/web/**/*.{js,ts,jsx,tsx,mdx,html}"),
-    path.join(rootDir, "packages/**/*.{js,ts,jsx,tsx,mdx}"),
-    path.join(rootDir, "src/pages/**/*.{js,ts,jsx,tsx,mdx}"),
-    path.join(rootDir, "src/components/**/*.{js,ts,jsx,tsx,mdx}"),
-    path.join(rootDir, "src/app/**/*.{js,ts,jsx,tsx,mdx}")
-  ],
+  content: {
+    relative: true,
+    files: [
+      "./apps/web/index.html",
+      "./apps/web/src/**/*.{js,ts,jsx,tsx,mdx}",
+      "./packages/**/*.{js,ts,jsx,tsx,mdx}",
+      "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+      "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+      "./src/app/**/*.{js,ts,jsx,tsx,mdx}"
+    ]
+  },
   theme: {
     screens: {
       xs: "426px",

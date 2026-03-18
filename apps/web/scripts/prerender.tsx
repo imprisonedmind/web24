@@ -3,7 +3,6 @@ import path from "node:path";
 
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { MemoryRouter } from "react-router-dom";
 
 import { publicRoutes, siteConfig } from "@web24/config";
 import { getWritingPrerenderRoutes } from "@web24/content";
@@ -55,11 +54,7 @@ async function prerenderRoute(
   template: string,
   route: (typeof publicRoutes)[number]
 ) {
-  const markup = renderToStaticMarkup(
-    <MemoryRouter initialEntries={[route.path]}>
-      <App staticMode />
-    </MemoryRouter>
-  );
+  const markup = renderToStaticMarkup(<App staticMode initialPath={route.path} />);
 
   const withTitle = template
     .replace(/<title>.*<\/title>/, `<title>${route.seo.title}</title>`)

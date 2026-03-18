@@ -1,49 +1,15 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
+import {
+  musicQueryOptions,
+  tvStatusQueryOptions,
+  type SongData,
+  type TvEntry,
+} from "../lib/api";
 import { SectionHeader, SmallLink } from "./legacy";
 import { IPodContainer } from "./music-ipod-container";
 import { IpodScreen } from "./music-ipod-screen";
-
-type TvEntry = {
-  type: "movie" | "show" | "episode";
-  title: string;
-  showTitle?: string;
-  episodeTitle?: string;
-  season?: number;
-  episode?: number;
-  posterUrl: string;
-  url: string;
-  progress?: number;
-  watchedAt?: string;
-};
-
-type TvStatus = {
-  currentlyWatching: TvEntry | null;
-  lastWatched: TvEntry | null;
-};
-
-type RecentlyPlayedTrack = {
-  title: string;
-  artist: string;
-  album: string;
-  albumImageUrl: string;
-  songUrl: string;
-  playedAt?: string;
-  durationMs?: number;
-};
-
-type SongData = {
-  isPlaying: boolean;
-  title: string;
-  artist: string;
-  album: string;
-  albumImageUrl: string;
-  songUrl: string;
-  playedAt?: string;
-  recentlyPlayed?: RecentlyPlayedTrack[];
-  durationMs?: number;
-  progressMs?: number;
-};
 
 function formatDistanceLabel(value?: string | null) {
   if (!value) return null;
@@ -70,39 +36,12 @@ function getEpisodeCode(entry?: TvEntry | null) {
 }
 
 export function TvWidgetCard() {
-  const [status, setStatus] = useState<TvStatus>({
-    currentlyWatching: null,
-    lastWatched: null
-  });
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const response = await fetch("/api/tv/status", { credentials: "include" });
-        if (!response.ok) return;
-
-        const payload = (await response.json()) as Partial<TvStatus>;
-        if (!cancelled) {
-          setStatus({
-            currentlyWatching: payload.currentlyWatching ?? null,
-            lastWatched: payload.lastWatched ?? null
-          });
-        }
-      } catch (error) {
-        console.error("[web/tv-widget] failed", error);
-      }
-    }
-
-    void load();
-    const interval = window.setInterval(load, 30_000);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, []);
+  const {
+    data: status = {
+      currentlyWatching: null,
+      lastWatched: null,
+    },
+  } = useQuery(tvStatusQueryOptions);
 
   const activeEntry = status.currentlyWatching ?? status.lastWatched;
   const label = status.currentlyWatching ? "watching" : "watched";
@@ -157,91 +96,28 @@ export function TvWidgetCard() {
 }
 
 export function MusicWidgetCard() {
-  const [songData, setSongData] = useState<SongData | null>(null);
+  const { data: currentSongData = null } = useQuery(musicQueryOptions);
+  const [songData, setSongData] = useState<SongData | null>(currentSongData);
   const [relativePlayed, setRelativePlayed] = useState<string | null>(null);
   const [recentRelative, setRecentRelative] = useState<string[]>([]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const response = await fetch("/api/currentlyPlaying");
-        if (!response.ok) return;
-        const payload = (await response.json()) as SongData | null;
-        if (cancelled) return;
-
-        setSongData(prev => {
-          if (payload?.title) {
-            return payload;
-          }
-
-          if (prev?.title) {
-            return {
-              ...prev,
-              isPlaying: false,
-              playedAt: payload?.playedAt ?? prev.playedAt
-            };
-          }
-
-          return payload ?? prev ?? null;
-        });
-      } catch (error) {
-        console.error("[web/music-widget] failed", error);
+    setSongData(prev => {
+      if (currentSongData?.title) {
+        return currentSongData;
       }
-    }
 
-    void load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let timer: number | undefined;
-
-    async function load() {
-      try {
-        const response = await fetch("/api/currentlyPlaying");
-        if (!response.ok) return;
-        const payload = (await response.json()) as SongData | null;
-        setSongData(prev => {
-          if (payload?.title) {
-            return payload;
-          }
-
-          if (prev?.title) {
-            return {
-              ...prev,
-              isPlaying: false,
-              playedAt: payload?.playedAt ?? prev.playedAt
-            };
-          }
-
-          return payload ?? prev ?? null;
-        });
-      } catch (error) {
-        console.error("[web/music-widget] failed", error);
+      if (prev?.title) {
+        return {
+          ...prev,
+          isPlaying: false,
+          playedAt: currentSongData?.playedAt ?? prev.playedAt,
+        };
       }
-    }
 
-    if (
-      songData?.isPlaying &&
-      typeof songData.durationMs === "number" &&
-      typeof songData.progressMs === "number"
-    ) {
-      const remaining = Math.max(songData.durationMs - songData.progressMs, 1_000);
-      const delay = Math.min(Math.max(remaining + 2_000, 10_000), 10 * 60_000);
-      timer = window.setTimeout(load, delay);
-    } else {
-      timer = window.setTimeout(load, songData?.title ? 45_000 : 30_000);
-    }
-
-    return () => {
-      if (timer) window.clearTimeout(timer);
-    };
-  }, [songData?.title, songData?.isPlaying, songData?.durationMs, songData?.progressMs]);
+      return currentSongData ?? prev ?? null;
+    });
+  }, [currentSongData]);
 
   useEffect(() => {
     if (!songData?.title || !songData.playedAt || songData.isPlaying) {

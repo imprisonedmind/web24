@@ -1,3 +1,4 @@
+import { BlueDot } from "./blue-dot";
 import { BulletPoint, SectionHeader, SmallLink } from "./legacy";
 
 export function BioSection() {
@@ -56,10 +57,11 @@ export function EducationSection() {
 
 export function LocationSection() {
   return (
-    <section className="grid gap-1">
+    <div className="flex w-full flex-col gap-1">
       <SectionHeader title="location" />
       <div className="flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm">
         <div className="relative h-72 w-full overflow-hidden rounded-lg">
+          <BlueDot />
           <img className="h-full w-full scale-[1.2] object-cover" src="/map.png" alt="Cape Town map" />
         </div>
         <div className="flex items-center justify-between">
@@ -70,7 +72,7 @@ export function LocationSection() {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
