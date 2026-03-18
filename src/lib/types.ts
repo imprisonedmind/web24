@@ -30,3 +30,5 @@ export interface Post {
   openGraphSmall: string;
   description: string;
 }
+
+export type { WritingPost as Post } from "@web24/content";

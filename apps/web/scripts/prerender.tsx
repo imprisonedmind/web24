@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 
 import { publicRoutes, siteConfig } from "@web24/config";
+import { getWritingPrerenderRoutes } from "@web24/content";
 
 import { App } from "../src/app";
 
@@ -80,8 +81,9 @@ async function prerenderRoute(
 
 async function main() {
   const template = await readFile(templatePath, "utf8");
+  const routes = [...publicRoutes, ...getWritingPrerenderRoutes()];
 
-  await Promise.all(publicRoutes.map(route => prerenderRoute(template, route)));
+  await Promise.all(routes.map(route => prerenderRoute(template, route)));
 }
 
 main().catch(error => {
