@@ -14,6 +14,7 @@ import {
   getFeaturedWorkItems,
   getWritingPostBySlugParts,
   getWritingRoutePath,
+  getTopWritingPosts,
   sortWritingPosts
 } from "@web24/content";
 
@@ -106,6 +107,9 @@ function SmallLink({
 }
 
 function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
+  const featuredWork = getFeaturedWorkItems(6);
+  const topWriting = getTopWritingPosts(3);
+
   return (
     <section className="home-grid">
       <section className="home-intro">
@@ -156,7 +160,23 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
             <h3>work</h3>
             <SmallLink href="/work" label="more" />
           </div>
-          <WorkRoute />
+          <section className="home-preview-list">
+            {featuredWork.map(item => (
+              <a
+                key={item.title}
+                className="home-preview-row"
+                href={item.link}
+                target={item.internal ? "_self" : "_blank"}
+                rel={item.internal ? undefined : "noreferrer"}
+              >
+                <span className="truncate">{item.description ?? item.title}</span>
+                <span className="home-preview-meta">
+                  <span>{item.tag}</span>
+                  {item.year ? <span>{item.year}</span> : null}
+                </span>
+              </a>
+            ))}
+          </section>
         </section>
 
         <section className="route-stack">
@@ -164,7 +184,17 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
             <h3>writing</h3>
             <SmallLink href="/writing" label="more" />
           </div>
-          <WritingRoute />
+          <section className="home-preview-list">
+            {topWriting.map(post => (
+              <Link key={post.id} className="home-preview-row" to={getWritingRoutePath(post)}>
+                <span className="truncate">{post.title}</span>
+                <span className="home-preview-meta">
+                  <span>{post.date}</span>
+                  {post.score !== undefined ? <span>{post.score.toFixed(1)}</span> : null}
+                </span>
+              </Link>
+            ))}
+          </section>
         </section>
 
         <section className="route-stack">
@@ -184,6 +214,26 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
             </div>
           </div>
           <TvStatusPanel />
+        </section>
+
+        <section className="home-secondary-grid">
+          <section className="route-stack">
+            <div className="section-label">
+              <h3>location</h3>
+            </div>
+            <div className="mini-card">
+              <div className="mini-card-media">
+                <img className="mini-card-image" src="/map.png" alt="Cape Town map" />
+              </div>
+              <div className="mini-card-footer">
+                <p>Cape Town</p>
+                <div className="pill">
+                  <span>-33.93,</span>
+                  <span>18.47</span>
+                </div>
+              </div>
+            </div>
+          </section>
         </section>
       </section>
     </section>
