@@ -7,7 +7,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@web24/config": ["../../packages/config/src/index.ts"],
-      "@web24/config/*": ["../../packages/config/src/*"]
+      "@web24/config/*": ["../../packages/config/src/*"],
+      "@web24/content": ["../../packages/content/src/index.ts"],
+      "@web24/content/*": ["../../packages/content/src/*"]
     }
   },
   "include": ["src", "vite.config.ts"]
