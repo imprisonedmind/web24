@@ -67,8 +67,10 @@ export const homeActivityQueryOptions = queryOptions({
 export const fullActivityQueryOptions = queryOptions({
   queryKey: ["activity", "full"],
   queryFn: async () => {
-    const payload = await fetchJson<{ days?: WatchDay[] }>("/api/activity/full");
-    return payload.days ?? [];
+    return fetchJson<{
+      watchingDays?: WatchDay[];
+      workSections?: { label: string; days: WatchDay[] }[];
+    }>("/api/activity/full");
   },
   refetchInterval: 30_000,
 });
