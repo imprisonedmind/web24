@@ -109,6 +109,7 @@ export function createAppRouter({ history }: { history: RouterHistory }) {
     routeTree,
     history,
     defaultPreload: "intent",
+    scrollRestoration: true,
   });
 }
 
