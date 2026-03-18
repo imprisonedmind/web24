@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run dev:web",
+    "dev": "bun run --parallel dev:web dev:api",
     "dev:web": "bun run --cwd apps/web dev",
     "dev:api": "bun run --cwd apps/api dev",
     "dev:legacy": "next dev",

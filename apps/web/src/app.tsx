@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Link,
   Navigate,
@@ -100,6 +100,181 @@ function RoutePage({
       <p className="route-kicker">Public route</p>
       <h2>{title}</h2>
       <p>{body}</p>
+    </section>
+  );
+}
+
+type TvStatus = {
+  currentlyWatching: {
+    type: "movie" | "show" | "episode";
+    title: string;
+    showTitle?: string;
+    episodeTitle?: string;
+    season?: number;
+    episode?: number;
+    posterUrl: string;
+    url: string;
+    progress?: number;
+    startedAt?: string;
+    expiresAt?: string;
+  } | null;
+  lastWatched: {
+    type: "movie" | "show" | "episode";
+    title: string;
+    showTitle?: string;
+    episodeTitle?: string;
+    season?: number;
+    episode?: number;
+    posterUrl: string;
+    watchedAt: string;
+    url: string;
+  } | null;
+};
+
+function getEpisodeCode(
+  status: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
+) {
+  if (!status || status.type !== "episode") return null;
+  if (typeof status.season === "number" && typeof status.episode === "number") {
+    return `${status.season}x${status.episode}`;
+  }
+  return null;
+}
+
+function getDisplayTitle(
+  entry: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
+) {
+  if (!entry) return "Nothing watched yet";
+  if (entry.type === "episode") return entry.showTitle ?? entry.title ?? "Untitled";
+  return entry.title ?? "Untitled";
+}
+
+function getDisplaySubtitle(
+  entry: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
+) {
+  if (!entry) return null;
+  if (entry.type !== "episode") return null;
+
+  const code = getEpisodeCode(entry);
+  return [code, entry.episodeTitle].filter(Boolean).join(" • ") || null;
+}
+
+function formatDistanceLabel(value: string) {
+  const diffMs = Math.max(0, Date.now() - new Date(value).getTime());
+  const minutes = Math.floor(diffMs / 60_000);
+
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+function TvStatusPanel() {
+  const [status, setStatus] = useState<TvStatus>({
+    currentlyWatching: null,
+    lastWatched: null
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const response = await fetch("/api/tv/status", {
+          credentials: "include"
+        });
+
+        if (!response.ok) {
+          throw new Error(`tv status failed with ${response.status}`);
+        }
+
+        const data = (await response.json()) as Partial<TvStatus>;
+        if (!cancelled) {
+          setStatus({
+            currentlyWatching: data.currentlyWatching ?? null,
+            lastWatched: data.lastWatched ?? null
+          });
+        }
+      } catch (error) {
+        console.error("[spa/activity] failed to load tv status", error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void load();
+    const interval = window.setInterval(load, 30_000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  const activeEntry = status.currentlyWatching ?? status.lastWatched;
+  const metaLabel = status.currentlyWatching
+    ? [
+        getEpisodeCode(status.currentlyWatching),
+        typeof status.currentlyWatching.progress === "number"
+          ? `${Math.round(status.currentlyWatching.progress)}%`
+          : null
+      ]
+        .filter(Boolean)
+        .join(" • ")
+    : status.lastWatched?.watchedAt
+      ? formatDistanceLabel(status.lastWatched.watchedAt)
+      : null;
+
+  return (
+    <section className="route-stack">
+      <section className="card route-card">
+        <p className="route-kicker">Activity</p>
+        <h2>Live TV status via Hono</h2>
+        <p>
+          This route is now backed by the new API service instead of the old
+          Next route handler. It is the first dynamic frontend path using the
+          new backend.
+        </p>
+      </section>
+
+      <section className="activity-grid">
+        <article className="activity-card activity-poster-card">
+          {activeEntry ? (
+            <a href={activeEntry.url} target="_blank" rel="noreferrer">
+              <img
+                className="activity-poster"
+                src={activeEntry.posterUrl}
+                alt={activeEntry.title}
+              />
+            </a>
+          ) : (
+            <div className="activity-empty">
+              {loading ? "Loading activity…" : "Nothing watched yet"}
+            </div>
+          )}
+        </article>
+
+        <article className="activity-card activity-copy-card">
+          <p className="route-kicker">
+            {status.currentlyWatching ? "Currently watching" : "Last watched"}
+          </p>
+          <h3>{getDisplayTitle(activeEntry)}</h3>
+          {getDisplaySubtitle(activeEntry) ? (
+            <p className="activity-subtitle">{getDisplaySubtitle(activeEntry)}</p>
+          ) : null}
+          {metaLabel ? <p className="activity-meta">{metaLabel}</p> : null}
+          <p className="activity-body">
+            {status.currentlyWatching
+              ? "Live watch state is now coming from the Hono backend and can replace the old Next server-action path."
+              : "Once more activity endpoints are migrated, this route will expand into the full watched and highlights experience."}
+          </p>
+        </article>
+      </section>
     </section>
   );
 }
@@ -245,6 +420,8 @@ export function App({ staticMode = false }: { staticMode?: boolean }) {
               <WorkRoute />
             ) : route.path === "/writing" ? (
               <WritingRoute />
+            ) : route.path === "/activity" ? (
+              <TvStatusPanel />
             ) : (
               <RoutePage
                 title={route.label}

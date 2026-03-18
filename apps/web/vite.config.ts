@@ -14,6 +14,9 @@ export default defineConfig(({ command }) => ({
     tsconfigPaths: true
   },
   server: {
+    proxy: {
+      "/api": "http://localhost:3001"
+    },
     forwardConsole: true,
     port: 5173
   },
