@@ -1,4 +1,5 @@
 import { BlueDot } from "./blue-dot";
+import { orderedTechItems } from "../lib/tech";
 import { BulletPoint, SectionHeader, SmallLink } from "./legacy";
 
 export function BioSection() {
@@ -77,27 +78,31 @@ export function LocationSection() {
 }
 
 export function TechSection() {
-  const items = [
-    ["NextJs", "https://nextjs.org/"],
-    ["Django", "https://www.djangoproject.com/"],
-    ["Supabase", "https://supabase.com"],
-    ["Firebase", "https://firebase.google.com/"],
-    ["React Native", "https://reactnative.dev/"],
-    ["Flutter", "https://flutter.dev/"],
-    ["MongoDB", "https://www.mongodb.com/"],
-    ["Postgres", "https://www.postgresql.org/"],
-    ["OpenAI", "https://openai.com/"],
-    ["Tailwind", "https://tailwindcss.com/"],
-    ["Figma", "https://www.figma.com/"]
-  ] as const;
+  const marqueeItems = [...orderedTechItems, ...orderedTechItems];
 
   return (
     <div className="px-4 md:px-0">
-      <SectionHeader title="tech" />
-      <div className="flex flex-col">
-        {items.map(([label, href]) => (
-          <SmallLink key={label} href={href} label={label} external />
-        ))}
+      <SectionHeader title="tech" action={<SmallLink href="/tech" label="more" />} />
+      <div className="tech-marquee relative overflow-hidden py-4">
+        <div className="tech-marquee-track flex w-max items-center gap-4 px-4">
+          {marqueeItems.map((item, index) => (
+            <a
+              key={`${item.label}-${index}`}
+              href={item.href}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-14 min-w-[96px] items-center justify-center px-1 transition duration-150 ease-in-out hover:opacity-75"
+              aria-label={item.label}
+              title={item.label}
+            >
+              <img
+                src={item.src}
+                alt={item.label}
+                className="h-10 w-auto max-w-[104px] object-contain"
+              />
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );
