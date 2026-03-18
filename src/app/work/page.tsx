@@ -1,4 +1,4 @@
-import { workData } from "@/lib/workData";
+import { collegeWorkItems, personalWorkItems, professionalWorkItems } from "@web24/content";
 import Breadcrumbs from "@/components/breadcrumbs";
 import React from "react";
 import { WorkArea } from "@/components/work/workArea";
@@ -17,18 +17,23 @@ export const metadata = createMetadata(WORK_SEO);
 const workSeo = createSeoProps(WORK_SEO);
 
 export default function Page() {
-  const specificData = (value: string) => {
-    return workData().filter((item) => item.type === value);
-  };
-
   return (
     <PageContainer className="flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4">
       <Seo {...workSeo} />
       <Breadcrumbs />
 
-      <WorkArea header={"professional"} data={specificData("professional")} />
-      <WorkArea header={"personal"} data={specificData("personal")} />
-      <WorkArea header={"college"} data={specificData("college")} />
+      <WorkArea
+        header={"professional"}
+        data={professionalWorkItems.map((item) => ({ ...item, src: item.image }))}
+      />
+      <WorkArea
+        header={"personal"}
+        data={personalWorkItems.map((item) => ({ ...item, src: item.image }))}
+      />
+      <WorkArea
+        header={"college"}
+        data={collegeWorkItems.map((item) => ({ ...item, src: item.image }))}
+      />
     </PageContainer>
   );
 }

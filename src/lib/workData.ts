@@ -4,7 +4,6 @@ export interface WorkCardData {
   title: string;
   link: string;
   tag: string;
-  type: string;
   src: string;
   alt: string;
   internal?: boolean;
