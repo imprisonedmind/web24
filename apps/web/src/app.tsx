@@ -140,6 +140,12 @@ type WatchedItem = {
   meta?: string;
 };
 
+type WatchDay = {
+  date: string;
+  total: number;
+  categories?: { name: string; total: number }[];
+};
+
 function getEpisodeCode(
   status: TvStatus["currentlyWatching"] | TvStatus["lastWatched"]
 ) {
@@ -187,6 +193,7 @@ function TvStatusPanel() {
     currentlyWatching: null,
     lastWatched: null
   });
+  const [days, setDays] = useState<WatchDay[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -194,20 +201,28 @@ function TvStatusPanel() {
 
     async function load() {
       try {
-        const response = await fetch("/api/tv/status", {
-          credentials: "include"
-        });
+        const [statusResponse, daysResponse] = await Promise.all([
+          fetch("/api/tv/status", { credentials: "include" }),
+          fetch("/api/watched/days-last-year", { credentials: "include" })
+        ]);
 
-        if (!response.ok) {
-          throw new Error(`tv status failed with ${response.status}`);
+        if (!statusResponse.ok) {
+          throw new Error(`tv status failed with ${statusResponse.status}`);
         }
 
-        const data = (await response.json()) as Partial<TvStatus>;
+        const data = (await statusResponse.json()) as Partial<TvStatus>;
         if (!cancelled) {
           setStatus({
             currentlyWatching: data.currentlyWatching ?? null,
             lastWatched: data.lastWatched ?? null
           });
+        }
+
+        if (daysResponse.ok) {
+          const daysPayload = (await daysResponse.json()) as { days?: WatchDay[] };
+          if (!cancelled) {
+            setDays(daysPayload.days ?? []);
+          }
         }
       } catch (error) {
         console.error("[spa/activity] failed to load tv status", error);
@@ -284,12 +299,41 @@ function TvStatusPanel() {
           </p>
         </article>
       </section>
+
+      <section className="card route-card">
+        <p className="route-kicker">Watch history</p>
+        <h2>Last year heatmap</h2>
+        <div className="heatmap-grid" aria-label="Watch history heatmap">
+          {days.length
+            ? days.slice(-98).map(day => {
+                const intensity = Math.min(day.total / (4 * 60 * 60), 1);
+                return (
+                  <div
+                    key={day.date}
+                    className="heatmap-cell"
+                    title={`${day.date} • ${Math.round(day.total / 60)} min`}
+                    style={{
+                      backgroundColor:
+                        day.total > 0
+                          ? `rgba(234, 121, 8, ${Math.max(intensity, 0.14)})`
+                          : "rgba(229, 231, 235, 0.8)"
+                    }}
+                  />
+                );
+              })
+            : Array.from({ length: 98 }).map((_, index) => (
+                <div key={index} className="heatmap-cell heatmap-skeleton" />
+              ))}
+        </div>
+      </section>
     </section>
   );
 }
 
 function WatchedRoute() {
-  const [items, setItems] = useState<WatchedItem[]>([]);
+  const [recentItems, setRecentItems] = useState<WatchedItem[]>([]);
+  const [monthItems, setMonthItems] = useState<WatchedItem[]>([]);
+  const [allTimeItems, setAllTimeItems] = useState<WatchedItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -297,12 +341,26 @@ function WatchedRoute() {
 
     async function load() {
       try {
-        const response = await fetch("/api/watched/recent?limit=12", {
-          credentials: "include"
-        });
-        if (!response.ok) throw new Error(`watched recent failed with ${response.status}`);
-        const data = (await response.json()) as { items?: WatchedItem[] };
-        if (!cancelled) setItems(data.items ?? []);
+        const [recentResponse, monthResponse, allTimeResponse] = await Promise.all([
+          fetch("/api/watched/recent?limit=12", { credentials: "include" }),
+          fetch("/api/watched/month?limit=12", { credentials: "include" }),
+          fetch("/api/watched/all-time?limit=12", { credentials: "include" })
+        ]);
+
+        if (recentResponse.ok) {
+          const data = (await recentResponse.json()) as { items?: WatchedItem[] };
+          if (!cancelled) setRecentItems(data.items ?? []);
+        }
+
+        if (monthResponse.ok) {
+          const data = (await monthResponse.json()) as { items?: WatchedItem[] };
+          if (!cancelled) setMonthItems(data.items ?? []);
+        }
+
+        if (allTimeResponse.ok) {
+          const data = (await allTimeResponse.json()) as { items?: WatchedItem[] };
+          if (!cancelled) setAllTimeItems(data.items ?? []);
+        }
       } catch (error) {
         console.error("[spa/watched] failed to load recent watched", error);
       } finally {
@@ -324,40 +382,65 @@ function WatchedRoute() {
         <p>
           This page is now reading recent watch history from the new backend.
           Monthly and all-time aggregates can follow on top of the same API
-          boundary.
+          boundary. Those aggregate feeds are now coming from Hono as well.
         </p>
       </section>
 
-      {loading && !items.length ? (
-        <section className="watched-grid">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <article key={index} className="watched-card watched-skeleton" />
-          ))}
+      {loading && !recentItems.length && !monthItems.length && !allTimeItems.length ? (
+        <section className="watched-section">
+          <section className="watched-grid">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <article key={index} className="watched-card watched-skeleton" />
+            ))}
+          </section>
         </section>
-      ) : items.length ? (
-        <section className="watched-grid" aria-label="Recently watched">
-          {items.map(item => (
-            <a
-              key={item.id}
-              className="watched-card"
-              href={item.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <img className="watched-image" src={item.posterUrl} alt={item.title} />
-              <div className="watched-copy">
-                <p className="watched-title">{item.title}</p>
-                {item.subtitle ? <p className="watched-subtitle">{item.subtitle}</p> : null}
-                {item.meta ? <p className="watched-meta">{item.meta}</p> : null}
-              </div>
-            </a>
-          ))}
-        </section>
+      ) : recentItems.length || monthItems.length || allTimeItems.length ? (
+        <>
+          <WatchedSection title="Recently watched" items={recentItems} />
+          <WatchedSection title="Most watched this month" items={monthItems} />
+          <WatchedSection title="Most watched all time" items={allTimeItems} />
+        </>
       ) : (
         <section className="card route-card">
           <p>No recent watched data available.</p>
         </section>
       )}
+    </section>
+  );
+}
+
+function WatchedSection({
+  title,
+  items
+}: {
+  title: string;
+  items: WatchedItem[];
+}) {
+  if (!items.length) return null;
+
+  return (
+    <section className="watched-section">
+      <div className="section-heading">
+        <p className="route-kicker">{title}</p>
+      </div>
+      <section className="watched-grid" aria-label={title}>
+        {items.map(item => (
+          <a
+            key={item.id}
+            className="watched-card"
+            href={item.href}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img className="watched-image" src={item.posterUrl} alt={item.title} />
+            <div className="watched-copy">
+              <p className="watched-title">{item.title}</p>
+              {item.subtitle ? <p className="watched-subtitle">{item.subtitle}</p> : null}
+              {item.meta ? <p className="watched-meta">{item.meta}</p> : null}
+            </div>
+          </a>
+        ))}
+      </section>
     </section>
   );
 }

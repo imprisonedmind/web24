@@ -319,6 +319,23 @@ body {
   }
 }
 
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 0.3rem;
+  border: 1px solid rgba(19, 38, 28, 0.08);
+}
+
+.heatmap-skeleton {
+  background: rgba(229, 231, 235, 0.8);
+}
+
 .watched-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
@@ -372,4 +389,13 @@ body {
   min-height: 20rem;
   background:
     linear-gradient(180deg, rgba(238, 241, 234, 0.9), rgba(255, 255, 255, 0.85));
+}
+
+.watched-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.section-heading {
+  padding-left: 0.1rem;
 }
