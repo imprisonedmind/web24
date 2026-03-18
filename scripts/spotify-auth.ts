@@ -6,7 +6,7 @@ import {
   envEntriesToObject,
   readEnvEntries,
   updateEnvFile
-} from "../src/lib/envFile";
+} from "../packages/config/src/envFile";
 
 const ENV_PATH = path.join(process.cwd(), ".env.local");
 const AUTH_URL = "https://accounts.spotify.com/authorize";
