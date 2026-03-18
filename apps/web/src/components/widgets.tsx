@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 
-import type { WatchDay } from "../types";
 import { SectionHeader, SmallLink } from "./legacy";
 
 type TvEntry = {
@@ -66,62 +65,6 @@ function getEpisodeCode(entry?: TvEntry | null) {
     return `${entry.season}x${entry.episode}`;
   }
   return null;
-}
-
-export function ActivityPreview() {
-  const [days, setDays] = useState<WatchDay[]>([]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const response = await fetch("/api/watched/days-last-year", { credentials: "include" });
-        if (!response.ok) return;
-
-        const payload = (await response.json()) as { days?: WatchDay[] };
-        if (!cancelled) {
-          setDays(payload.days ?? []);
-        }
-      } catch (error) {
-        console.error("[web/activity-preview] failed", error);
-      }
-    }
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return (
-    <section className="flex flex-col gap-1 px-4 sm:p-0">
-      <SectionHeader title="activity" action={<SmallLink href="/activity" label="more" />} />
-      <div className="flex flex-row rounded-lg bg-white p-2 pl-1 shadow-sm">
-        <div className="grid w-full grid-cols-[repeat(14,1fr)] gap-[3px] overflow-hidden pr-[16px] sm:pr-[14px]">
-          {(days.length ? days.slice(-98) : Array.from({ length: 98 }, () => null)).map((day, index) => {
-            const total = day?.total ?? 0;
-            const date = day?.date ?? `placeholder-${index}`;
-            const intensity = Math.min(total / (4 * 60 * 60), 1);
-
-            return (
-              <div
-                key={date}
-                className="aspect-square rounded-[3px] border border-neutral-100"
-                title={day ? `${day.date} • ${Math.round(day.total / 60)} min` : undefined}
-                style={{
-                  backgroundColor:
-                    total > 0
-                      ? `rgba(34, 197, 94, ${Math.max(intensity, 0.14)})`
-                      : "rgba(229, 231, 235, 0.8)"
-                }}
-              />
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
 }
 
 export function TvWidgetCard() {
