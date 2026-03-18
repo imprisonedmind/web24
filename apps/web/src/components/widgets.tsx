@@ -156,6 +156,7 @@ export function TvWidgetCard() {
 
 export function MusicWidgetCard() {
   const [songData, setSongData] = useState<SongData | null>(null);
+  const [relativePlayed, setRelativePlayed] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -179,6 +180,21 @@ export function MusicWidgetCard() {
       window.clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    if (!songData?.playedAt || songData.isPlaying) {
+      setRelativePlayed(null);
+      return;
+    }
+
+    const update = () => {
+      setRelativePlayed(formatDistanceLabel(songData.playedAt));
+    };
+
+    update();
+    const interval = window.setInterval(update, 60_000);
+    return () => window.clearInterval(interval);
+  }, [songData?.playedAt, songData?.isPlaying]);
 
   const headerTitle = songData?.isPlaying ? "listening" : "listened";
   const latestRecent = songData?.recentlyPlayed?.[0];
@@ -214,36 +230,93 @@ export function MusicWidgetCard() {
                   </span>
                 </div>
 
-                <div className="flex flex-1 flex-col pb-2">
-                  {playlist.length ? (
-                    playlist.map((item, index) => (
-                      <a
-                        key={`${item.title}-${item.playedAt ?? index}`}
-                        href={item.songUrl || "#"}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`flex items-center justify-between px-1 py-1 text-[10px] transition ${
-                          index === 0
-                            ? "bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 text-white"
-                            : "hover:bg-neutral-500/30"
-                        }`}
-                      >
-                        <div className="flex min-w-0 flex-1 flex-col leading-tight">
-                          <span className={`truncate font-semibold ${index === 0 ? "text-white" : "text-neutral-500"}`}>
-                            {item.title}
-                          </span>
+                {songData?.isPlaying ? (
+                  <a
+                    href={songData.songUrl || "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex flex-1 flex-col items-center justify-between gap-3 p-2 pb-1"
+                  >
+                    <div className="flex w-full grow gap-2">
+                      <div className="relative aspect-square h-full w-auto flex-shrink-0 overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
+                        <img
+                          src={songData.albumImageUrl || "/fallback-poster.jpg"}
+                          alt={songData.title}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+
+                      <div className="my-auto flex flex-col gap-1 text-left leading-tight">
+                        <p className="text-[10px] font-semibold text-black">{songData.title}</p>
+                        <div>
+                          <p className="overflow-ellipsis text-[9px] text-neutral-600">
+                            {songData.artist}
+                          </p>
+                          <p className="overflow-ellipsis text-[8px] text-neutral-500">
+                            {songData.album}
+                          </p>
                         </div>
-                        <span className={`pl-2 text-[12px] ${index === 0 ? "text-white" : "text-neutral-500"}`}>
-                          ❯
-                        </span>
-                      </a>
-                    ))
-                  ) : (
-                    <div className="flex flex-1 items-center justify-center px-6 text-center text-[11px] text-neutral-400">
-                      <p>No recent listens found.</p>
+                      </div>
                     </div>
-                  )}
-                </div>
+
+                    <div className="w-full max-w-[180px] flex-shrink-0 space-y-1 text-left text-[9px] text-neutral-400">
+                      <div className="h-[3px] w-full overflow-hidden rounded-full bg-neutral-300">
+                        <div
+                          className="h-full rounded-full bg-blue-500"
+                          style={{
+                            width: `${
+                              songData.durationMs && songData.progressMs
+                                ? Math.min(songData.progressMs / songData.durationMs, 1) * 100
+                                : 0
+                            }%`
+                          }}
+                        />
+                      </div>
+                      {songData.durationMs ? (
+                        <div className="flex items-center justify-between">
+                          <span>{formatClock(songData.progressMs ?? 0)}</span>
+                          <span>{formatClock(songData.durationMs)}</span>
+                        </div>
+                      ) : null}
+                    </div>
+                    {relativePlayed && !songData.durationMs ? (
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">
+                        {relativePlayed}
+                      </span>
+                    ) : null}
+                  </a>
+                ) : (
+                  <div className="flex flex-1 flex-col pb-2">
+                    {playlist.length ? (
+                      playlist.map((item, index) => (
+                        <a
+                          key={`${item.title}-${item.playedAt ?? index}`}
+                          href={item.songUrl || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={`flex items-center justify-between px-1 py-1 text-[10px] transition ${
+                            index === 0
+                              ? "bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 text-white"
+                              : "hover:bg-neutral-500/30"
+                          }`}
+                        >
+                          <div className="flex min-w-0 flex-1 flex-col leading-tight">
+                            <span className={`truncate font-semibold ${index === 0 ? "text-white" : "text-neutral-500"}`}>
+                              {item.title}
+                            </span>
+                          </div>
+                          <span className={`pl-2 text-[12px] ${index === 0 ? "text-white" : "text-neutral-500"}`}>
+                            ❯
+                          </span>
+                        </a>
+                      ))
+                    ) : (
+                      <div className="flex flex-1 items-center justify-center px-6 text-center text-[11px] text-neutral-400">
+                        <p>No recent listens found.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 scale-[0.8] transform">
@@ -270,4 +343,11 @@ export function MusicWidgetCard() {
       </div>
     </div>
   );
+}
+
+function formatClock(ms: number) {
+  const safe = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(safe / 60);
+  const seconds = safe % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }

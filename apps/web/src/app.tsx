@@ -35,7 +35,6 @@ import {
 } from "./components/home";
 import { WorkPreviewLink, WritingPreviewLink } from "./components/previews";
 import { ActivitySection, TelevisionActivityHeader } from "./components/activity";
-import { HomeActivityPreview } from "./components/activity";
 import {
   WatchCarouselSection,
   WatchCarouselSkeleton
@@ -95,7 +94,7 @@ function AppFrame({ staticMode = false }: { staticMode?: boolean }) {
   useRouteSeo();
 
   return (
-    <main className="mx-auto max-w-5xl px-[calc(min(16px,8vw))] py-8 md:py-10">
+    <main className="mx-auto w-full max-w-[var(--page-max-width)] px-[calc(min(16px,8vw))] py-8 md:py-10">
       <Outlet />
     </main>
   );
@@ -191,6 +190,42 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
         <TechSection />
       </section>
     </section>
+  );
+}
+
+function HomeActivityPreview() {
+  const [days, setDays] = useState<WatchDay[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const response = await fetch("/api/activity/home", { credentials: "include" });
+        if (!response.ok) return;
+
+        const payload = (await response.json()) as { days?: WatchDay[] };
+        if (!cancelled) {
+          setDays(payload.days ?? []);
+        }
+      } catch (error) {
+        console.error("[web/home-activity] failed", error);
+      }
+    }
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <ActivitySection
+      title="activity"
+      days={days}
+      header={<SectionHeader title="activity" action={<SmallLink href="/activity" label="more" />} />}
+      emptyMessage="No activity available."
+    />
   );
 }
 
