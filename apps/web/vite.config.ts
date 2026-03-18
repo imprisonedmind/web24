@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig(({ command }) => ({
   appType: "spa",
+  publicDir: "../../public",
   define: {
     __VUE_OPTIONS_API__: false,
     __VUE_PROD_DEVTOOLS__: false,
