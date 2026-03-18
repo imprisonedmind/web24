@@ -92,6 +92,31 @@ export const watchedOverviewQueryOptions = queryOptions({
   },
 });
 
+export function watchedListQueryOptions(
+  scope: "recent" | "month" | "all-time",
+  limit: number,
+) {
+  return queryOptions({
+    queryKey: ["watched", scope, limit],
+    queryFn: async () => {
+      const payload = await fetchJson<{ items?: WatchedItem[] }>(`/api/watched/${scope}?limit=${limit}`);
+      return payload.items ?? [];
+    },
+  });
+}
+
+export function watchedMonthlyQueryOptions(monthIso: string, limit: number) {
+  return queryOptions({
+    queryKey: ["watched", "monthly", monthIso, limit],
+    queryFn: async () => {
+      const payload = await fetchJson<{ items?: WatchedItem[] }>(
+        `/api/watched/monthly?monthIso=${encodeURIComponent(monthIso)}&limit=${limit}`,
+      );
+      return payload.items ?? [];
+    },
+  });
+}
+
 export const tvStatusQueryOptions = queryOptions({
   queryKey: ["tv", "status"],
   queryFn: async () => fetchJson<TvStatus>("/api/tv/status"),

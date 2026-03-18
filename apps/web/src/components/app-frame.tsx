@@ -21,7 +21,7 @@ export function AppFrame() {
   }, [pathname]);
 
   return (
-    <main className="mx-auto w-full max-w-[var(--page-max-width)] px-[calc(min(16px,8vw))] py-8 md:py-10">
+    <main className="mx-auto w-full max-w-[var(--page-max-width)] px-2 pb-8 pt-2 md:px-0 md:py-10">
       <Outlet />
     </main>
   );

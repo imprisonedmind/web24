@@ -28,7 +28,7 @@ export function HomePage() {
           alt="Luke Stephens"
         />
 
-        <div className="flex flex-col justify-between gap-4 px-4 md:gap-0 md:px-0">
+        <div className="flex flex-col justify-between gap-4 md:gap-0">
           <BioSection />
           <SocialSection />
           <EmploymentSection />
@@ -41,7 +41,7 @@ export function HomePage() {
 
         <HomeAppsSection />
 
-        <section className="-mt-4 flex w-full flex-col gap-1 px-4 md:mt-0 md:px-0">
+        <section className="-mt-4 flex w-full flex-col gap-1 md:mt-0">
           <SectionHeader title="writing" action={<SmallLink href="/writing" label="more" />} />
           <section className="grid gap-1">
             {topWriting.map((post) => (
@@ -52,7 +52,7 @@ export function HomePage() {
 
         <HomeActivityWidget />
 
-        <section className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-3 md:p-0">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <LocationSection />
           <TvWidgetCard />
           <MusicWidgetCard />

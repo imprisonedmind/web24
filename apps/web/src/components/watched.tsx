@@ -1,5 +1,12 @@
 import type { WatchedItem } from "../types";
 import { SmallLink } from "./legacy";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "./ui/carousel";
 
 export function WatchCard({ item }: { item: WatchedItem }) {
   return (
@@ -105,13 +112,19 @@ export function WatchCarouselSection({
         ) : null}
       </div>
 
-      <div className="flex gap-3 overflow-x-auto pb-2">
-        {items.map(item => (
-          <div key={item.id} className="w-32 flex-shrink-0 sm:w-40">
-            <WatchCard item={item} />
-          </div>
-        ))}
-      </div>
+      <Carousel opts={{ align: "start", dragFree: true }}>
+        <CarouselContent className="gap-3 p-2 px-0 sm:px-0">
+          {items.map((item) => (
+            <CarouselItem key={item.id} className="basis-auto pl-0">
+              <div className="w-32 sm:w-40">
+                <WatchCard item={item} />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="hidden h-7 w-7 sm:flex" />
+        <CarouselNext className="hidden h-7 w-7 sm:flex" />
+      </Carousel>
     </div>
   );
 }
