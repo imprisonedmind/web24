@@ -64,25 +64,6 @@ function AppFrame({ staticMode = false }: { staticMode?: boolean }) {
 
   return (
     <main className="app-shell">
-      <header className="hero">
-        <p className="eyebrow">Cutover in progress</p>
-        <h1>{siteConfig.title}</h1>
-        <p className="lede">
-          The new frontend is a Vite 8 SPA with prerendered public routes and a
-          Hono API. This shell is the first migration milestone.
-        </p>
-        <nav className="nav">
-          {publicRoutes.map(route => (
-            <NavItem
-              key={route.path}
-              href={route.path}
-              label={route.label}
-              staticMode={staticMode}
-            />
-          ))}
-        </nav>
-      </header>
-
       <Outlet />
     </main>
   );
@@ -100,6 +81,111 @@ function RoutePage({
       <p className="route-kicker">Public route</p>
       <h2>{title}</h2>
       <p>{body}</p>
+    </section>
+  );
+}
+
+function SmallLink({
+  href,
+  label,
+  external = false
+}: {
+  href: string;
+  label: string;
+  external?: boolean;
+}) {
+  if (external) {
+    return (
+      <a className="small-link" href={href} target="_blank" rel="noreferrer">
+        {label}
+      </a>
+    );
+  }
+
+  return <Link className="small-link" to={href}>{label}</Link>;
+}
+
+function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
+  return (
+    <section className="home-grid">
+      <section className="home-intro">
+        <img className="home-photo" src="/luke2.jpg" alt="Luke Stephens" />
+
+        <div className="home-copy">
+          <div className="info-block">
+            <h1>luke stephens</h1>
+            <h2>an individual, type-4 enneagram, passionate, dedicated, resilient.</h2>
+          </div>
+
+          <div className="info-block">
+            <div className="section-label">
+              <h3>social</h3>
+            </div>
+            <div className="flex flex-col">
+              <SmallLink href="https://www.thecrag.com/climber/luke6" label="thecrag.com" external />
+              <SmallLink href="https://twitter.com/lukey_stephens" label="twitter.com" external />
+              <SmallLink href="https://layers.to/lukey" label="layers.to" external />
+              <SmallLink href="https://github.com/imprisonedmind" label="github.com" external />
+            </div>
+          </div>
+
+          <div className="info-block">
+            <div className="section-label">
+              <h3>employment</h3>
+            </div>
+            <p className="text-sm muted-copy">Trinity Telecomms (PTY) LTD</p>
+            <p className="bullet-row">design and research lead &apos;23-current</p>
+            <p className="bullet-row">software designer &apos;21-current</p>
+            <p className="mt-2 text-sm muted-copy">Specno</p>
+            <p className="bullet-row">multimedia designer &apos;19-20</p>
+          </div>
+
+          <div className="info-block">
+            <div className="section-label">
+              <h3>education</h3>
+            </div>
+            <p className="text-sm muted-copy">BA Visual Communications Degree</p>
+            <p className="bullet-row">major in multimedia &apos;18-20</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-sections">
+        <section className="route-stack">
+          <div className="section-label">
+            <h3>work</h3>
+            <SmallLink href="/work" label="more" />
+          </div>
+          <WorkRoute />
+        </section>
+
+        <section className="route-stack">
+          <div className="section-label">
+            <h3>writing</h3>
+            <SmallLink href="/writing" label="more" />
+          </div>
+          <WritingRoute />
+        </section>
+
+        <section className="route-stack">
+          <div className="section-label">
+            <h3>activity</h3>
+            <div className="nav">
+              {publicRoutes
+                .filter(route => ["/activity", "/watched"].includes(route.path))
+                .map(route => (
+                  <NavItem
+                    key={route.path}
+                    href={route.path}
+                    label={route.label}
+                    staticMode={staticMode}
+                  />
+                ))}
+            </div>
+          </div>
+          <TvStatusPanel />
+        </section>
+      </section>
     </section>
   );
 }
@@ -577,8 +663,9 @@ export function App({ staticMode = false }: { staticMode?: boolean }) {
   return (
     <Routes>
       <Route element={<AppFrame staticMode={staticMode} />}>
+        <Route path="/" element={<HomeRoute staticMode={staticMode} />} />
         <Route path="/writing/:slug/:id" element={<WritingDetailRoute />} />
-        {publicRoutes.map(route => (
+        {publicRoutes.filter(route => route.path !== "/").map(route => (
           <Route
             key={route.path}
             path={route.path}

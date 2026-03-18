@@ -1,9 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   color-scheme: light;
   font-family: "IBM Plex Sans", "Avenir Next", sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(222, 242, 229, 0.9), transparent 32%),
-    linear-gradient(180deg, #f7f4ea 0%, #efe8d5 100%);
   color: #13261c;
 }
 
@@ -20,12 +21,13 @@ body,
 
 body {
   min-height: 100vh;
+  background: rgb(250 250 250);
 }
 
 .app-shell {
-  max-width: 72rem;
+  max-width: 64rem;
   margin: 0 auto;
-  padding: 4rem 1.5rem 5rem;
+  padding: 2rem 1rem 4rem;
 }
 
 .hero {
@@ -64,7 +66,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 .nav-link {
@@ -76,6 +78,86 @@ body {
   background: rgba(255, 255, 255, 0.74);
   color: inherit;
   text-decoration: none;
+}
+
+.home-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.home-intro {
+  display: grid;
+  gap: 1rem;
+}
+
+.home-photo {
+  width: 100%;
+  max-width: 300px;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 1rem;
+  display: none;
+}
+
+.home-copy {
+  display: grid;
+  gap: 1rem;
+}
+
+.info-block h1,
+.info-block h2,
+.info-block p {
+  margin: 0;
+}
+
+.info-block h1 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.info-block h2,
+.muted-copy {
+  color: rgb(115 115 115);
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 0.75rem;
+}
+
+.section-label h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.small-link {
+  font-size: 0.875rem;
+  color: rgb(115 115 115);
+  text-underline-offset: 4px;
+  text-decoration: none;
+}
+
+.small-link:hover {
+  text-decoration: underline;
+}
+
+.bullet-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.bullet-row::before {
+  content: "•";
+}
+
+.home-sections {
+  display: grid;
+  gap: 2rem;
 }
 
 .card {
@@ -316,6 +398,17 @@ body {
 @media (max-width: 768px) {
   .activity-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 768px) {
+  .home-intro {
+    grid-template-columns: 300px 1fr;
+    align-items: start;
+  }
+
+  .home-photo {
+    display: block;
   }
 }
 
