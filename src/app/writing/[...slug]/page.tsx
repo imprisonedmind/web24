@@ -1,7 +1,6 @@
 import { NotionAPI } from "notion-client";
+import { writingPosts } from "@web24/content";
 import { NotionPage } from "@/components/wrapper/notionPage";
-import blogData from "@/lib/blogData.json";
-import reviewData from "@/lib/reviewData.json";
 import Breadcrumbs from "@/components/breadcrumbs";
 import { ReviewScore } from "@/components/writing/reviewScore";
 import { Post } from "@/lib/types";
@@ -20,7 +19,7 @@ export default async function Page({ params }: WritingPageProps) {
   const notion = new NotionAPI();
   const recordMap = await notion.getPage(id);
 
-  const data: Post[] = [...blogData, ...reviewData];
+  const data: Post[] = writingPosts;
   const item = data.find((obj) => obj.id === id) ?? null;
   const date = item?.date;
   const score = item?.score;
@@ -71,7 +70,7 @@ export async function generateMetadata({
 }: WritingPageProps) {
   const { slug } = await params;
   const id = slug[1];
-  const data: Post[] = [...blogData, ...reviewData];
+  const data: Post[] = writingPosts;
   const item = data.find((obj) => obj.id === id) ?? null;
   const slugPath = `/writing/${slug.join("/")}`;
   const title = item?.title ?? "Writing";

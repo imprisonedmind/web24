@@ -174,3 +174,83 @@ body {
   border-radius: 999px;
   background: rgba(222, 242, 229, 0.9);
 }
+
+.writing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.writing-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(19, 38, 28, 0.12);
+  border-radius: 1.4rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 16px 36px rgba(19, 38, 28, 0.08);
+}
+
+.writing-image {
+  width: 100%;
+  aspect-ratio: 1.5 / 1;
+  object-fit: cover;
+  background: #dde3d8;
+}
+
+.writing-copy {
+  padding: 1rem;
+}
+
+.writing-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  color: #556b5d;
+}
+
+.writing-copy h3 {
+  margin: 0.5rem 0;
+  font-size: 1.05rem;
+}
+
+.writing-copy p {
+  margin: 0;
+  line-height: 1.6;
+  color: #425348;
+}
+
+.writing-detail {
+  max-width: 52rem;
+  overflow: hidden;
+  border: 1px solid rgba(19, 38, 28, 0.12);
+  border-radius: 1.4rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 16px 36px rgba(19, 38, 28, 0.08);
+}
+
+.writing-detail-image {
+  width: 100%;
+  max-height: 24rem;
+  object-fit: cover;
+  display: block;
+}
+
+.writing-detail-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1rem 0;
+  font-size: 0.85rem;
+  color: #556b5d;
+}
+
+.writing-detail-copy {
+  margin: 0;
+  padding: 1rem;
+  line-height: 1.7;
+  color: #425348;
+}

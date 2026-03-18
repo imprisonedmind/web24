@@ -1,8 +1,21 @@
 import { useEffect } from "react";
-import { Link, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useParams
+} from "react-router-dom";
 
 import { publicRoutes, siteConfig } from "@web24/config";
-import { getFeaturedWorkItems } from "@web24/content";
+import {
+  getFeaturedWorkItems,
+  getWritingPostBySlugParts,
+  getWritingRoutePath,
+  sortWritingPosts
+} from "@web24/content";
 
 import "./styles.css";
 
@@ -131,6 +144,81 @@ function WorkRoute() {
   );
 }
 
+function WritingRoute() {
+  const posts = sortWritingPosts();
+
+  return (
+    <section className="route-stack">
+      <section className="card route-card">
+        <p className="route-kicker">Writing</p>
+        <h2>Published notes, essays, and reviews</h2>
+        <p>
+          The writing index is now sourced from a shared content package. This
+          becomes the route manifest for build-time prerendering and future
+          detail-page migration.
+        </p>
+      </section>
+
+      <section className="writing-grid" aria-label="Writing posts">
+        {posts.map(post => (
+          <a key={post.id} className="writing-card" href={getWritingRoutePath(post)}>
+            <img
+              className="writing-image"
+              src={`/${post.openGraph}`}
+              alt={post.title}
+              loading="lazy"
+            />
+            <div className="writing-copy">
+              <div className="writing-meta">
+                <span>{post.date}</span>
+                {post.score !== undefined ? <span>{post.score.toFixed(1)}</span> : null}
+              </div>
+              <h3>{post.title}</h3>
+              <p>{post.description}</p>
+            </div>
+          </a>
+        ))}
+      </section>
+    </section>
+  );
+}
+
+function WritingDetailRoute() {
+  const params = useParams<{ slug: string; id: string }>();
+  const post = getWritingPostBySlugParts(params.slug, params.id);
+
+  if (!post) {
+    return <Navigate to="/writing" replace />;
+  }
+
+  return (
+    <section className="route-stack">
+      <section className="card route-card">
+        <p className="route-kicker">Writing Detail</p>
+        <h2>{post.title}</h2>
+        <p>{post.description}</p>
+      </section>
+
+      <article className="writing-detail">
+        <img
+          className="writing-detail-image"
+          src={`/${post.openGraph}`}
+          alt={post.title}
+        />
+        <div className="writing-detail-meta">
+          <span>{post.date}</span>
+          {post.score !== undefined ? <span>score {post.score.toFixed(1)}</span> : null}
+        </div>
+        <p className="writing-detail-copy">
+          This page is now part of the prerendered route manifest for the Vite
+          SPA. The next migration step is replacing this extracted summary view
+          with the full Notion-backed content rendering path.
+        </p>
+      </article>
+    </section>
+  );
+}
+
 const routeBodies: Record<string, string> = {
   "/":
     "Home will be rebuilt first, then connected to extracted content and live widgets from the new API.",
@@ -148,12 +236,15 @@ export function App({ staticMode = false }: { staticMode?: boolean }) {
   return (
     <Routes>
       <Route element={<AppFrame staticMode={staticMode} />}>
+        <Route path="/writing/:slug/:id" element={<WritingDetailRoute />} />
         {publicRoutes.map(route => (
           <Route
             key={route.path}
             path={route.path}
             element={route.path === "/work" ? (
               <WorkRoute />
+            ) : route.path === "/writing" ? (
+              <WritingRoute />
             ) : (
               <RoutePage
                 title={route.label}

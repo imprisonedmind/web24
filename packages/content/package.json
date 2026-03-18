@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./work": "./src/work.ts"
+    "./work": "./src/work.ts",
+    "./writing": "./src/writing.ts"
   }
 }
