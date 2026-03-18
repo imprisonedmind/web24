@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, ScrollRestoration, useRouterState } from "@tanstack/react-router";
+import { Outlet, useRouterState } from "@tanstack/react-router";
 
 import { publicRoutes } from "@web24/config";
 
@@ -21,7 +21,6 @@ export function AppFrame() {
   }, [pathname]);
   return (
     <main className="mx-auto w-full max-w-[var(--page-max-width)] px-2 pb-8 pt-2 md:px-0 md:py-10">
-      <ScrollRestoration />
       <Outlet />
     </main>
   );
