@@ -4,6 +4,10 @@
   "main": "./apps/api/src/worker.ts",
   "compatibility_date": "2026-03-18",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "SITE_URL": "https://lukestephens.co.za",
+    "CONVEX_URL": "https://robust-gull-695.eu-west-1.convex.cloud"
+  },
   "assets": {
     "directory": "./apps/web/dist",
     "binding": "ASSETS",
