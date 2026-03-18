@@ -12,6 +12,13 @@ const WAKATIME_SHARE_URL =
 const WAKATIME_TTL_MS = 60 * 60 * 1000;
 const WAKATIME_STALE_MS = 6 * 60 * 60 * 1000;
 const codingActivityCache = new AsyncCache<ActivityDay[]>();
+const CATEGORY_LABELS: Record<string, string> = {
+  Coding: "coding",
+  "Writing Docs": "writing",
+  Designing: "designing",
+  Meeting: "meeting",
+  Browsing: "browsing"
+};
 
 function mergeDays(wakaDays: ActivityDay[], traktDays: ActivityDay[]) {
   const map: Record<string, ActivityDay> = {};
@@ -104,6 +111,37 @@ export async function getHomeActivityDays(cookieHeader?: string | null) {
   return mergeDays(codingDays, watchDays);
 }
 
+function mapDaysToCategory(days: ActivityDay[], category: string) {
+  return days.map(day => {
+    const match = day.categories?.find(cat => cat.name === category);
+    const total = match?.total ?? 0;
+    return {
+      date: day.date,
+      total,
+      categories: match ? [{ name: match.name, total }] : []
+    } satisfies ActivityDay;
+  });
+}
+
+function sumTotals(days: { total: number }[]) {
+  return days.reduce((acc, curr) => acc + (curr.total ?? 0), 0);
+}
+
 export async function getFullActivityDays(cookieHeader?: string | null) {
-  return getHomeActivityDays(cookieHeader);
+  const [codingDays, watchingDays] = await Promise.all([
+    getCodingActivityDays(),
+    getWatchDaysLastYear(cookieHeader)
+  ]);
+
+  const workSections = Object.entries(CATEGORY_LABELS)
+    .map(([sourceName, label]) => {
+      const days = mapDaysToCategory(codingDays, sourceName);
+      return { label, days, total: sumTotals(days) };
+    })
+    .filter(section => section.total > 0);
+
+  return {
+    watchingDays,
+    workSections
+  };
 }

@@ -16,11 +16,11 @@ activityRoutes.get("/home", async c => {
 
 activityRoutes.get("/full", async c => {
   try {
-    const days = await getFullActivityDays(c.req.header("cookie"));
-    return c.json({ days }, 200);
+    const payload = await getFullActivityDays(c.req.header("cookie"));
+    return c.json(payload, 200);
   } catch (error) {
     console.error("[api/activity/full] failed", error);
-    return c.json({ days: [] }, 500);
+    return c.json({ watchingDays: [], workSections: [] }, 500);
   }
 });
 
