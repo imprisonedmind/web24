@@ -4,15 +4,17 @@
   "type": "module",
   "scripts": {
     "dev": "bunx --bun vite",
-    "build": "tsc -p tsconfig.app.json && bunx --bun vite build",
+    "build": "tsc -p tsconfig.app.json && bunx --bun vite build && bun run prerender",
     "preview": "bunx --bun vite preview",
+    "prerender": "bun run ./scripts/prerender.tsx",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "lint": "tsc -p tsconfig.app.json --noEmit"
   },
   "dependencies": {
     "@web24/config": "workspace:*",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
