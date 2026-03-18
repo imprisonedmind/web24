@@ -17,6 +17,7 @@ import {
   getTopWritingPosts,
   sortWritingPosts
 } from "@web24/content";
+import { BulletPoint, SectionHeader, SmallLink } from "./components/legacy";
 
 import "./styles.css";
 
@@ -86,45 +87,29 @@ function RoutePage({
   );
 }
 
-function SmallLink({
-  href,
-  label,
-  external = false
-}: {
-  href: string;
-  label: string;
-  external?: boolean;
-}) {
-  if (external) {
-    return (
-      <a className="small-link" href={href} target="_blank" rel="noreferrer">
-        {label}
-      </a>
-    );
-  }
-
-  return <Link className="small-link" to={href}>{label}</Link>;
-}
-
 function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
   const featuredWork = getFeaturedWorkItems(6);
   const topWriting = getTopWritingPosts(3);
 
   return (
-    <section className="home-grid">
-      <section className="home-intro">
-        <img className="home-photo" src="/luke2.jpg" alt="Luke Stephens" />
+    <section className="grid gap-8">
+      <section className="grid gap-4 md:grid-cols-[300px_1fr]">
+        <img
+          className="mx-auto hidden max-h-[400px] max-w-[300px] rounded-2xl object-cover md:flex"
+          src="/luke2.jpg"
+          alt="Luke Stephens"
+        />
 
-        <div className="home-copy">
-          <div className="info-block">
-            <h1>luke stephens</h1>
-            <h2>an individual, type-4 enneagram, passionate, dedicated, resilient.</h2>
+        <div className="grid gap-4">
+          <div>
+            <h1 className="text-xl font-medium">luke stephens</h1>
+            <h2 className="text-neutral-500">
+              an individual, type-4 enneagram, passionate, dedicated, resilient.
+            </h2>
           </div>
 
-          <div className="info-block">
-            <div className="section-label">
-              <h3>social</h3>
-            </div>
+          <div>
+            <SectionHeader title="social" />
             <div className="flex flex-col">
               <SmallLink href="https://www.thecrag.com/climber/luke6" label="thecrag.com" external />
               <SmallLink href="https://twitter.com/lukey_stephens" label="twitter.com" external />
@@ -133,74 +118,68 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
             </div>
           </div>
 
-          <div className="info-block">
-            <div className="section-label">
-              <h3>employment</h3>
-            </div>
-            <p className="text-sm muted-copy">Trinity Telecomms (PTY) LTD</p>
-            <p className="bullet-row">design and research lead &apos;23-current</p>
-            <p className="bullet-row">software designer &apos;21-current</p>
-            <p className="mt-2 text-sm muted-copy">Specno</p>
-            <p className="bullet-row">multimedia designer &apos;19-20</p>
+          <div>
+            <SectionHeader title="employment" />
+            <p className="text-sm text-neutral-500">Trinity Telecomms (PTY) LTD</p>
+            <BulletPoint title="design and research lead" date="'23-current" />
+            <BulletPoint title="software designer" date="'21-current" />
+            <p className="mt-2 text-sm text-neutral-500">Specno</p>
+            <BulletPoint title="multimedia designer" date="'19-20" />
           </div>
 
-          <div className="info-block">
-            <div className="section-label">
-              <h3>education</h3>
-            </div>
-            <p className="text-sm muted-copy">BA Visual Communications Degree</p>
-            <p className="bullet-row">major in multimedia &apos;18-20</p>
+          <div>
+            <SectionHeader title="education" />
+            <p className="text-sm text-neutral-500">BA Visual Communications Degree</p>
+            <BulletPoint title="major in multimedia" date="'18-20" />
           </div>
         </div>
       </section>
 
-      <section className="home-sections">
-        <section className="route-stack">
-          <div className="section-label">
-            <h3>work</h3>
-            <SmallLink href="/work" label="more" />
-          </div>
-          <section className="home-preview-list">
+      <section className="grid gap-8">
+        <section className="grid gap-1">
+          <SectionHeader title="work" action={<SmallLink href="/work" label="more" />} />
+          <section className="grid gap-1 pr-3">
             {featuredWork.map(item => (
               <a
                 key={item.title}
-                className="home-preview-row"
+                className="flex items-center justify-between gap-3 text-sm text-neutral-600"
                 href={item.link}
                 target={item.internal ? "_self" : "_blank"}
                 rel={item.internal ? undefined : "noreferrer"}
               >
                 <span className="truncate">{item.description ?? item.title}</span>
-                <span className="home-preview-meta">
+                <span className="inline-flex whitespace-nowrap text-xs text-neutral-400">
                   <span>{item.tag}</span>
-                  {item.year ? <span>{item.year}</span> : null}
+                  {item.year ? <span className="ml-2">{item.year}</span> : null}
                 </span>
               </a>
             ))}
           </section>
         </section>
 
-        <section className="route-stack">
-          <div className="section-label">
-            <h3>writing</h3>
-            <SmallLink href="/writing" label="more" />
-          </div>
-          <section className="home-preview-list">
+        <section className="grid gap-1">
+          <SectionHeader title="writing" action={<SmallLink href="/writing" label="more" />} />
+          <section className="grid gap-1 pr-3">
             {topWriting.map(post => (
-              <Link key={post.id} className="home-preview-row" to={getWritingRoutePath(post)}>
+              <Link
+                key={post.id}
+                className="flex items-center justify-between gap-3 text-sm text-neutral-600"
+                to={getWritingRoutePath(post)}
+              >
                 <span className="truncate">{post.title}</span>
-                <span className="home-preview-meta">
+                <span className="inline-flex whitespace-nowrap text-xs text-neutral-400">
                   <span>{post.date}</span>
-                  {post.score !== undefined ? <span>{post.score.toFixed(1)}</span> : null}
+                  {post.score !== undefined ? <span className="ml-2">{post.score.toFixed(1)}</span> : null}
                 </span>
               </Link>
             ))}
           </section>
         </section>
 
-        <section className="route-stack">
-          <div className="section-label">
-            <h3>activity</h3>
-            <div className="nav">
+        <section className="grid gap-1">
+          <div className="flex items-center justify-between pr-3">
+            <h3 className="w-fit text-lg font-medium">activity</h3>
+            <div className="flex flex-wrap gap-3">
               {publicRoutes
                 .filter(route => ["/activity", "/watched"].includes(route.path))
                 .map(route => (
@@ -216,18 +195,16 @@ function HomeRoute({ staticMode = false }: { staticMode?: boolean }) {
           <TvStatusPanel />
         </section>
 
-        <section className="home-secondary-grid">
-          <section className="route-stack">
-            <div className="section-label">
-              <h3>location</h3>
-            </div>
-            <div className="mini-card">
-              <div className="mini-card-media">
-                <img className="mini-card-image" src="/map.png" alt="Cape Town map" />
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+          <section className="grid gap-1">
+            <SectionHeader title="location" />
+            <div className="flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm">
+              <div className="relative h-72 w-full overflow-hidden rounded-lg">
+                <img className="h-full w-full scale-[1.2] object-cover" src="/map.png" alt="Cape Town map" />
               </div>
-              <div className="mini-card-footer">
-                <p>Cape Town</p>
-                <div className="pill">
+              <div className="flex items-center justify-between">
+                <p className="text-sm lowercase text-neutral-800">Cape Town</p>
+                <div className="flex rounded-full bg-neutral-100 p-1 px-2 text-xs">
                   <span>-33.93,</span>
                   <span>18.47</span>
                 </div>
@@ -391,18 +368,13 @@ function TvStatusPanel() {
       : null;
 
   return (
-    <section className="route-stack">
-      <section className="card route-card">
-        <p className="route-kicker">Activity</p>
-        <h2>Live TV status via Hono</h2>
-        <p>
-          This route is now backed by the new API service instead of the old
-          Next route handler. It is the first dynamic frontend path using the
-          new backend.
-        </p>
-      </section>
+    <section className="route-stack compact-stack">
+      <div className="section-label">
+        <h3>{status.currentlyWatching ? "watching" : "watched"}</h3>
+        <SmallLink href="/watched" label="more" />
+      </div>
 
-      <section className="activity-grid">
+      <section className="activity-grid compact-activity-grid">
         <article className="activity-card activity-poster-card">
           {activeEntry ? (
             <a href={activeEntry.url} target="_blank" rel="noreferrer">
@@ -436,9 +408,10 @@ function TvStatusPanel() {
         </article>
       </section>
 
-      <section className="card route-card">
-        <p className="route-kicker">Watch history</p>
-        <h2>Last year heatmap</h2>
+      <section className="activity-history">
+        <div className="section-label">
+          <h3>activity</h3>
+        </div>
         <div className="heatmap-grid" aria-label="Watch history heatmap">
           {days.length
             ? days.slice(-98).map(day => {
@@ -511,16 +484,10 @@ function WatchedRoute() {
   }, []);
 
   return (
-    <section className="route-stack">
-      <section className="card route-card">
-        <p className="route-kicker">Watched</p>
-        <h2>Recent watch history via Hono</h2>
-        <p>
-          This page is now reading recent watch history from the new backend.
-          Monthly and all-time aggregates can follow on top of the same API
-          boundary. Those aggregate feeds are now coming from Hono as well.
-        </p>
-      </section>
+    <section className="route-stack compact-stack">
+      <div className="section-label">
+        <h3>watched</h3>
+      </div>
 
       {loading && !recentItems.length && !monthItems.length && !allTimeItems.length ? (
         <section className="watched-section">
@@ -557,7 +524,7 @@ function WatchedSection({
   return (
     <section className="watched-section">
       <div className="section-heading">
-        <p className="route-kicker">{title}</p>
+        <h3 className="watched-section-title">{title}</h3>
       </div>
       <section className="watched-grid" aria-label={title}>
         {items.map(item => (
