@@ -65,6 +65,39 @@ function HeatMapDates() {
   );
 }
 
+function formatDateLabel(dateString: string) {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
+
+  const [year, month, day] = dateString.split("-");
+  const formattedMonth = months[parseInt(month, 10) - 1];
+
+  return `${day} ${formattedMonth} ${year.slice(2)}`;
+}
+
+function formatDuration(timeInSeconds: number) {
+  const hours = Math.floor(timeInSeconds / 3600);
+  const minutes = Math.round((timeInSeconds % 3600) / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  return `${minutes}m`;
+}
+
 function Chunk({ chunk }: { chunk: WatchDay[] }) {
   const categoryColors: Record<string, string> = {
     Coding: "#20b958",
@@ -100,17 +133,26 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
                 current.total > max.total ? current : max
               )
             : undefined;
-        const baseColor = dominantCategory ? categoryColors[dominantCategory.name] ?? defaultColor : defaultColor;
+        const baseColor = dominantCategory
+          ? categoryColors[dominantCategory.name] ?? defaultColor
+          : defaultColor;
         const opacity = Math.min((chunkItem.total / 2300) / 14, 1);
         const red = parseInt(baseColor.slice(1, 3), 16);
         const green = parseInt(baseColor.slice(3, 5), 16);
         const blue = parseInt(baseColor.slice(5, 7), 16);
         const borderColor =
-          chunkItem.date === today
-            ? todayBorderColor
-            : dominantCategory
-              ? categoryColors[dominantCategory.name] ?? defaultBorderColor
-              : defaultBorderColor;
+          !chunkItem.categories || chunkItem.total < 60
+            ? defaultBorderColor
+            : chunkItem.date === today
+              ? todayBorderColor
+              : categoryColors[dominantCategory?.name ?? ""] ?? defaultBorderColor;
+        const backgroundColor =
+          !chunkItem.categories || chunkItem.total < 60
+            ? defaultColor
+            : `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+        const visibleCategories = (chunkItem.categories ?? []).filter(category => category.total > 60);
+        const dateTitle =
+          chunkItem.date === today ? "Today's Stats!" : formatDateLabel(chunkItem.date);
 
         return (
           <div
@@ -124,35 +166,23 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
                     style={{ top: `${hoverPosition.y}px`, left: `${hoverPosition.x + 10}px` }}
                   >
                     <div className="flex flex-col gap-1">
-                      <p className="text-xs font-semibold">
-                        {chunkItem.date === today ? "Today's Stats!" : chunkItem.date}
-                      </p>
+                      <p className="text-xs font-semibold">{dateTitle}</p>
                       <div className="flex justify-between text-xs text-gray-500">
                         <p>Total:</p>
-                        <p>
-                          {chunkItem.total >= 3600
-                            ? `${Math.floor(chunkItem.total / 3600)}h ${Math.round((chunkItem.total % 3600) / 60)}m`
-                            : `${Math.round(chunkItem.total / 60)}m`}
-                        </p>
+                        <p>{formatDuration(chunkItem.total)}</p>
                       </div>
                     </div>
                     {chunkItem.categories && chunkItem.categories.length > 0 ? (
                       <div className="flex flex-col gap-1">
                         <p className="text-xs font-semibold">Categories</p>
                         <ul>
-                          {chunkItem.categories
-                            .filter(category => category.total > 60)
-                            .map(category => (
+                          {visibleCategories.map(category => (
                               <li
                                 key={category.name}
                                 className="flex justify-between gap-4 text-xs text-gray-500"
                               >
                                 <p>{category.name}:</p>
-                                <p>
-                                  {category.total >= 3600
-                                    ? `${Math.floor(category.total / 3600)}h ${Math.round((category.total % 3600) / 60)}m`
-                                    : `${Math.round(category.total / 60)}m`}
-                                </p>
+                                <p>{formatDuration(category.total)}</p>
                               </li>
                             ))}
                         </ul>
@@ -165,12 +195,9 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
                 )
               : null}
             <div
-              className={`h-[10px] w-[10px] flex-shrink-0 cursor-pointer rounded-sm ${chunkItem.date === today ? "border-[1px]" : "border-[0.3px]"}`}
+              className={`h-[10px] w-[10px] flex-shrink-0 cursor-pointer rounded-sm border-gray-200 ${chunkItem.date === today ? "border-[1px]" : "border-[0.3px]"}`}
               style={{
-                backgroundColor:
-                  chunkItem.total < 60
-                    ? defaultColor
-                    : `rgba(${red}, ${green}, ${blue}, ${opacity})`,
+                backgroundColor,
                 borderColor
               }}
               onMouseEnter={event => {
