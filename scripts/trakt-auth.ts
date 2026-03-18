@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { envEntriesToObject, readEnvEntries, updateEnvFile } from "../src/lib/envFile";
+import { envEntriesToObject, readEnvEntries, updateEnvFile } from "../packages/config/src/envFile";
 
 type TokenResponse = {
   access_token: string;

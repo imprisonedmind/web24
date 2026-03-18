@@ -1,21 +1,13 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "web24",
-  "main": ".open-next/worker.js",
-  "compatibility_date": "2026-02-20",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "vars": {
-    "NEXT_PUBLIC_SITE_URL": "https://lukestephens.co.za",
-    "SITE_URL": "https://lukestephens.co.za"
-  },
+  "main": "./apps/api/src/worker.ts",
+  "compatibility_date": "2026-03-18",
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
-  },
-  "observability": {
-    "logs": {
-      "enabled": false,
-      "invocation_logs": true
-    }
+    "directory": "./apps/web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
   }
 }
