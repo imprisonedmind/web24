@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { Breadcrumbs } from "../components/breadcrumbs";
 import { MediaCard } from "../components/legacy";
-import { WatchCarouselSection, WatchCarouselSkeleton } from "../components/watched";
+import { WatchCarouselSection } from "../components/watched";
 import { watchedOverviewQueryOptions } from "../lib/api";
+import { queryClient } from "../lib/query-client";
 
 export function WatchedPage() {
   const {
@@ -12,8 +13,7 @@ export function WatchedPage() {
       monthItems: [],
       allTimeItems: [],
     },
-    isLoading,
-  } = useQuery(watchedOverviewQueryOptions);
+  } = useSuspenseQuery(watchedOverviewQueryOptions);
 
   const { recentItems, monthItems, allTimeItems } = data;
 
@@ -21,13 +21,7 @@ export function WatchedPage() {
     <section className="mb-8 flex flex-col gap-8 pb-4">
       <Breadcrumbs />
 
-      {isLoading && !recentItems.length && !monthItems.length && !allTimeItems.length ? (
-        <div className="flex flex-col gap-8">
-          <WatchCarouselSkeleton title="recently watched" />
-          <WatchCarouselSkeleton title="most watched this month" />
-          <WatchCarouselSkeleton title="most watched all time" />
-        </div>
-      ) : recentItems.length || monthItems.length || allTimeItems.length ? (
+      {recentItems.length || monthItems.length || allTimeItems.length ? (
         <div className="flex flex-col gap-8">
           <WatchCarouselSection
             title="recently watched"
@@ -58,4 +52,8 @@ export function WatchedPage() {
       )}
     </section>
   );
+}
+
+export async function preloadWatchedPage() {
+  await queryClient.ensureQueryData(watchedOverviewQueryOptions);
 }

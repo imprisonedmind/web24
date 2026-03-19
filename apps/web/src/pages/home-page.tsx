@@ -14,6 +14,12 @@ import { HomeWorkSection } from "../components/home-work";
 import { SectionHeader, SmallLink } from "../components/legacy";
 import { WritingPreviewLink } from "../components/previews";
 import { MusicWidgetCard, TvWidgetCard } from "../components/widgets";
+import {
+  homeActivityQueryOptions,
+  musicQueryOptions,
+  tvStatusQueryOptions,
+} from "../lib/api";
+import { queryClient } from "../lib/query-client";
 
 export function HomePage() {
   const featuredWork = getFeaturedWorkItems(6);
@@ -62,4 +68,12 @@ export function HomePage() {
       </section>
     </section>
   );
+}
+
+export async function preloadHomePage() {
+  await Promise.all([
+    queryClient.ensureQueryData(homeActivityQueryOptions),
+    queryClient.ensureQueryData(tvStatusQueryOptions),
+    queryClient.ensureQueryData(musicQueryOptions),
+  ]);
 }
