@@ -102,10 +102,12 @@ export function TechSection() {
               aria-label={item.label}
               title={item.label}
             >
-              <img
+              <CFImage
                 src={item.src}
                 alt={item.label}
                 className="h-10 w-auto max-w-[104px] object-contain"
+                widths={[120, 240]}
+                sizes="104px"
               />
             </a>
           ))}

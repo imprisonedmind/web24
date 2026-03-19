@@ -1,4 +1,5 @@
 import type { WatchedItem } from "../types";
+import { CFImage } from "./cf-image";
 import { SmallLink } from "./legacy";
 import {
   Carousel,
@@ -18,10 +19,11 @@ export function WatchCard({ item }: { item: WatchedItem }) {
         className="group block overflow-hidden rounded-lg bg-neutral-100"
       >
         <div className="relative aspect-[2/3] w-full">
-          <img
+          <CFImage
             src={item.posterUrl}
             alt={item.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            unoptimized
           />
         </div>
       </a>

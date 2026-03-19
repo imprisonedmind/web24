@@ -7,6 +7,7 @@ import {
   type SongData,
   type TvEntry,
 } from "../lib/api";
+import { CFImage } from "./cf-image";
 import { SectionHeader, SmallLink } from "./legacy";
 import { IPodContainer } from "./music-ipod-container";
 import { IpodScreen } from "./music-ipod-screen";
@@ -73,10 +74,11 @@ export function TvWidgetCard() {
         <div className="relative h-full w-full overflow-hidden rounded-lg md:h-72">
           {activeEntry ? (
             <a href={activeEntry.url} target="_blank" rel="noreferrer" className="block h-full w-full">
-              <img
+              <CFImage
                 src={activeEntry.posterUrl}
                 alt={activeEntry.title}
                 className="h-full w-full object-cover"
+                unoptimized
               />
             </a>
           ) : (
