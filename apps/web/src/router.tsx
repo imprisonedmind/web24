@@ -1,32 +1,31 @@
+import { lazy } from "react";
 import type { RouterHistory } from "@tanstack/react-router";
 import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
 
 import { AppFrame } from "./components/app-frame";
-import { ActivityPage, preloadActivityPage } from "./pages/activity-page";
-import { HomePage, preloadHomePage } from "./pages/home-page";
-import { TechPage } from "./pages/tech-page";
 import { RoutePage } from "./pages/route-page";
-import {
-  WatchedListPage,
-  preloadWatchedListPage,
-} from "./pages/watched-list-page";
-import { WatchedMonthsPage, preloadWatchedMonthsPage } from "./pages/watched-months-page";
-import { WatchedPage, preloadWatchedPage } from "./pages/watched-page";
-import { WorkPage } from "./pages/work-page";
-import { WritingDetailPage, preloadWritingDetailPage } from "./pages/writing-detail-page";
-import { WritingPage } from "./pages/writing-page";
 
-function WatchedRecentPage() {
-  return <WatchedListPage scope="recent" />;
-}
-
-function WatchedMonthPage() {
-  return <WatchedListPage scope="month" />;
-}
-
-function WatchedAllTimePage() {
-  return <WatchedListPage scope="all-time" />;
-}
+const HomePage = lazy(() => import("./pages/home-page").then((module) => ({ default: module.HomePage })));
+const WorkPage = lazy(() => import("./pages/work-page").then((module) => ({ default: module.WorkPage })));
+const WritingPage = lazy(() =>
+  import("./pages/writing-page").then((module) => ({ default: module.WritingPage }))
+);
+const WritingDetailPage = lazy(() =>
+  import("./pages/writing-detail-page").then((module) => ({ default: module.WritingDetailPage }))
+);
+const ActivityPage = lazy(() =>
+  import("./pages/activity-page").then((module) => ({ default: module.ActivityPage }))
+);
+const WatchedPage = lazy(() =>
+  import("./pages/watched-page").then((module) => ({ default: module.WatchedPage }))
+);
+const WatchedListPage = lazy(() =>
+  import("./pages/watched-list-page").then((module) => ({ default: module.WatchedListPage }))
+);
+const WatchedMonthsPage = lazy(() =>
+  import("./pages/watched-months-page").then((module) => ({ default: module.WatchedMonthsPage }))
+);
+const TechPage = lazy(() => import("./pages/tech-page").then((module) => ({ default: module.TechPage })));
 
 const rootRoute = createRootRoute({
   component: AppFrame,
@@ -35,7 +34,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  loader: preloadHomePage,
+  loader: () => import("./pages/home-page").then((module) => module.preloadHomePage()),
   component: HomePage,
 });
 
@@ -54,49 +53,51 @@ const writingRoute = createRoute({
 const writingDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/writing/$slug/$id",
-  loader: ({ params }) => preloadWritingDetailPage(params.id),
+  loader: ({ params }) =>
+    import("./pages/writing-detail-page").then((module) => module.preloadWritingDetailPage(params.id)),
   component: WritingDetailPage,
 });
 
 const activityRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/activity",
-  loader: preloadActivityPage,
+  loader: () => import("./pages/activity-page").then((module) => module.preloadActivityPage()),
   component: ActivityPage,
 });
 
 const watchedRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/watched",
-  loader: preloadWatchedPage,
+  loader: () => import("./pages/watched-page").then((module) => module.preloadWatchedPage()),
   component: WatchedPage,
 });
 
 const watchedRecentRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/watched/recent",
-  loader: () => preloadWatchedListPage("recent"),
-  component: WatchedRecentPage,
+  loader: () => import("./pages/watched-list-page").then((module) => module.preloadWatchedListPage("recent")),
+  component: () => <WatchedListPage scope="recent" />,
 });
 
 const watchedMonthRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/watched/month",
-  loader: () => preloadWatchedListPage("month"),
-  component: WatchedMonthPage,
+  loader: () => import("./pages/watched-list-page").then((module) => module.preloadWatchedListPage("month")),
+  component: () => <WatchedListPage scope="month" />,
 });
 
 const watchedAllTimeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/watched/all-time",
-  loader: () => preloadWatchedListPage("all-time"),
-  component: WatchedAllTimePage,
+  loader: () =>
+    import("./pages/watched-list-page").then((module) => module.preloadWatchedListPage("all-time")),
+  component: () => <WatchedListPage scope="all-time" />,
 });
 
 const watchedMonthsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/watched/months",
-  loader: preloadWatchedMonthsPage,
+  loader: () => import("./pages/watched-months-page").then((module) => module.preloadWatchedMonthsPage()),
   component: WatchedMonthsPage,
 });
 
