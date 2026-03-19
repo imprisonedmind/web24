@@ -3,7 +3,6 @@ import type { RouterHistory } from "@tanstack/react-router";
 import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
 
 import { AppFrame } from "./components/app-frame";
-import { RoutePage } from "./pages/route-page";
 
 const HomePage = lazy(() => import("./pages/home-page").then((module) => ({ default: module.HomePage })));
 const WorkPage = lazy(() => import("./pages/work-page").then((module) => ({ default: module.WorkPage })));
@@ -107,12 +106,6 @@ const techRoute = createRoute({
   component: TechPage,
 });
 
-const fallbackRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/$",
-  component: RoutePage,
-});
-
 const routeTree = rootRoute.addChildren([
   indexRoute,
   workRoute,
@@ -125,7 +118,6 @@ const routeTree = rootRoute.addChildren([
   watchedAllTimeRoute,
   watchedMonthsRoute,
   techRoute,
-  fallbackRoute,
 ]);
 
 export function createAppRouter({ history }: { history: RouterHistory }) {
