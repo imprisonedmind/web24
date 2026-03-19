@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Navigate, useParams } from "@tanstack/react-router";
 
 import { getWritingPostBySlugParts } from "@web24/content";
@@ -7,11 +7,12 @@ import { Breadcrumbs } from "../components/breadcrumbs";
 import { NotionPage } from "../components/notion-page";
 import { ReviewScore } from "../components/review-score";
 import { writingRecordMapQueryOptions } from "../lib/api";
+import { queryClient } from "../lib/query-client";
 
 export function WritingDetailPage() {
   const params = useParams({ from: "/writing/$slug/$id" });
   const post = getWritingPostBySlugParts(params.slug, params.id);
-  const { data: recordMap } = useQuery(writingRecordMapQueryOptions(params.id));
+  const { data: recordMap } = useSuspenseQuery(writingRecordMapQueryOptions(params.id));
 
   if (!post) {
     return <Navigate to="/writing" />;
@@ -32,4 +33,8 @@ export function WritingDetailPage() {
       {recordMap ? <NotionPage recordMap={recordMap} /> : null}
     </section>
   );
+}
+
+export async function preloadWritingDetailPage(id: string) {
+  await queryClient.ensureQueryData(writingRecordMapQueryOptions(id));
 }

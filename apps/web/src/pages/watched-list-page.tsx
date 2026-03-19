@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { Breadcrumbs } from "../components/breadcrumbs";
-import { WatchGrid, WatchGridSkeleton } from "../components/watched";
+import { WatchGrid } from "../components/watched";
 import { watchedListQueryOptions } from "../lib/api";
+import { queryClient } from "../lib/query-client";
 
 const WATCHED_PAGE_CONFIG = {
   recent: {
@@ -28,17 +29,17 @@ export function WatchedListPage({
   scope: keyof typeof WATCHED_PAGE_CONFIG;
 }) {
   const config = WATCHED_PAGE_CONFIG[scope];
-  const { data = [], isLoading } = useQuery(watchedListQueryOptions(scope, config.limit));
+  const { data = [] } = useSuspenseQuery(watchedListQueryOptions(scope, config.limit));
 
   return (
     <section className="mb-8 flex flex-col gap-8 pb-4">
       <Breadcrumbs />
-
-      {isLoading && !data.length ? (
-        <WatchGridSkeleton total={scope === "all-time" ? 12 : 12} />
-      ) : (
-        <WatchGrid items={data} emptyMessage={config.emptyMessage} />
-      )}
+      <WatchGrid items={data} emptyMessage={config.emptyMessage} />
     </section>
   );
+}
+
+export async function preloadWatchedListPage(scope: keyof typeof WATCHED_PAGE_CONFIG) {
+  const config = WATCHED_PAGE_CONFIG[scope];
+  await queryClient.ensureQueryData(watchedListQueryOptions(scope, config.limit));
 }

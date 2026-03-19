@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
   RouterProvider,
   createBrowserHistory,
   createMemoryHistory,
 } from "@tanstack/react-router";
 
+import { queryClient } from "./lib/query-client";
 import { createAppRouter } from "./router";
 
 export function App({
@@ -15,18 +16,6 @@ export function App({
   initialPath?: string;
   staticMode?: boolean;
 }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 30_000,
-            refetchOnWindowFocus: false,
-          },
-        },
-      }),
-  );
-
   const router = useMemo(
     () =>
       createAppRouter({
