@@ -112,6 +112,12 @@ function formatError(message: string): never {
   process.exit(1);
 }
 
+function parseOptionalNumber(value?: string) {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 async function loadEnv() {
   const entries = await readEnvEntries(ENV_PATH);
   return envEntriesToObject(entries);
@@ -233,6 +239,22 @@ async function loginWithDeviceCode(env: EnvRecord) {
   }
 
   formatError("Timed out waiting for Trakt device authorization.");
+}
+
+function getStoredTokenData(env: EnvRecord): TokenResponse | null {
+  const accessToken = pickEnv(env, "TRAKT_ACCESS_TOKEN");
+  const refreshToken = pickEnv(env, "TRAKT_REFRESH_TOKEN");
+
+  if (!accessToken || !refreshToken) return null;
+
+  return {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    token_type: pickEnv(env, "TRAKT_TOKEN_TYPE"),
+    scope: pickEnv(env, "TRAKT_TOKEN_SCOPE"),
+    created_at: parseOptionalNumber(pickEnv(env, "TRAKT_TOKEN_CREATED_AT")),
+    expires_in: parseOptionalNumber(pickEnv(env, "TRAKT_TOKEN_EXPIRES_IN")),
+  };
 }
 
 function traktHeaders(accessToken: string, clientId: string) {
@@ -496,14 +518,20 @@ async function fetchCurrentlyWatching(
 
 async function main() {
   const env = await loadEnv();
+  const convexUrlArgIndex = process.argv.indexOf("--convex-url");
   const convexUrl =
+    (convexUrlArgIndex >= 0 ? process.argv[convexUrlArgIndex + 1] : undefined) ??
     pickEnv(env, "VITE_CONVEX_URL") ??
     pickEnv(env, "CONVEX_URL");
 
   if (!convexUrl) formatError("Missing VITE_CONVEX_URL or CONVEX_URL in .env.local");
 
-  const tokenData = await loginWithDeviceCode(env);
+  const tokenData = getStoredTokenData(env) ?? (await loginWithDeviceCode(env));
   const convex = new ConvexHttpClient(convexUrl);
+  const clientId = pickEnv(env, "TRAKT_CLIENT_ID");
+  const tmdbKey = pickEnv(env, "TMDB_KEY");
+
+  if (!clientId) formatError("Missing TRAKT_CLIENT_ID in .env.local");
 
   const createdAtSeconds = tokenData.created_at ?? Math.floor(Date.now() / 1000);
   const expiresInSeconds = tokenData.expires_in ?? 7 * 24 * 60 * 60;
@@ -520,10 +548,33 @@ async function main() {
     expiresAtMs,
   });
 
-  logStep("Running initial 72-hour Convex sync");
+  logStep(`Starting full Trakt history backfill into ${convexUrl}`);
+  const historyResult = await syncHistoryPages(
+    convex,
+    tokenData.access_token,
+    clientId,
+    tmdbKey,
+  );
+
+  const currentWatching = await fetchCurrentlyWatching(
+    tokenData.access_token,
+    clientId,
+    tmdbKey,
+  );
+
+  await convex.mutation(api.trakt.setCurrentWatching, {
+    currentWatching,
+    syncedAtMs: Date.now(),
+  });
+
+  logStep("Running trailing 72-hour Convex sync");
   const syncResult = await convex.action(api.trakt.runRecentSync, { windowHours: 72 });
 
   console.log("\n✅ Trakt sync complete");
+  console.log(`Backfilled history entries: ${historyResult.totalEntries}`);
+  console.log(`Backfill inserted: ${historyResult.totalInserted}`);
+  console.log(`Backfill updated: ${historyResult.totalUpdated}`);
+  console.log(`Backfill unchanged: ${historyResult.totalSkipped}`);
   console.log(`History entries processed: ${syncResult.processed}`);
   console.log(`Inserted: ${syncResult.inserted}`);
   console.log(`Updated: ${syncResult.updated}`);
