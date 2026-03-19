@@ -72,3 +72,9 @@ export async function listSyncedHistoryEntries(args?: {
 }) {
   return (await getClient().query(api.trakt.listHistoryEntries, args ?? {})) as SyncedHistoryEntry[];
 }
+
+export async function getSyncedHistoryVersion() {
+  const [latest] = await listSyncedHistoryEntries({ limit: 1, order: "desc" });
+  if (!latest) return "empty";
+  return `${latest.historyId}:${latest.watchedAtMs}`;
+}

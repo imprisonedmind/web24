@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 
 import { AsyncCache } from "../lib/cache";
+import { getSyncedHistoryVersion } from "../lib/convex";
 import { getFullActivityDays, getHomeActivityDays } from "../services/activity";
 
 const activityRoutes = new Hono();
@@ -11,8 +12,9 @@ const activityFullCache = new AsyncCache<Awaited<ReturnType<typeof getFullActivi
 
 activityRoutes.get("/home", async c => {
   try {
+    const version = await getSyncedHistoryVersion();
     const payload = await activityHomeCache.getOrRefresh({
-      key: "activity:home",
+      key: `activity:home:${version}`,
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => ({
@@ -28,8 +30,9 @@ activityRoutes.get("/home", async c => {
 
 activityRoutes.get("/full", async c => {
   try {
+    const version = await getSyncedHistoryVersion();
     const payload = await activityFullCache.getOrRefresh({
-      key: "activity:full",
+      key: `activity:full:${version}`,
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => getFullActivityDays(),
