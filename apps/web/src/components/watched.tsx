@@ -1,4 +1,5 @@
 import type { WatchedItem } from "../types";
+import { withTmdbPosterSize } from "../lib/media-image";
 import { CFImage } from "./cf-image";
 import { SmallLink } from "./legacy";
 import {
@@ -20,7 +21,7 @@ export function WatchCard({ item }: { item: WatchedItem }) {
       >
         <div className="relative aspect-[2/3] w-full">
           <CFImage
-            src={item.posterUrl}
+            src={withTmdbPosterSize(item.posterUrl, "w342")}
             alt={item.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             unoptimized
