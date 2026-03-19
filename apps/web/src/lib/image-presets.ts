@@ -54,6 +54,7 @@ export const imagePresets: Record<ImagePresetName, ImagePreset> = {
     sizes: "(max-width: 640px) 100vw, 33vw",
   },
   techLogo: {
+    width: 104,
     widths: [120, 240],
     sizes: "104px",
     fit: "contain",

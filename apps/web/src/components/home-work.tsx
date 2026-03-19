@@ -23,7 +23,7 @@ export function HomeWorkSection({ items }: { items: WorkItem[] }) {
 function HomeWorkCardStrip({ items }: { items: WorkItem[] }) {
   return (
     <div className="flex flex-row gap-2 overflow-x-auto pb-4">
-      {items.map((item) => (
+      {items.map((item, index) => (
         <a
           key={item.link}
           className="flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 text-inherit no-underline shadow-sm transition duration-150 ease-in-out hover:shadow-md"
@@ -37,6 +37,8 @@ function HomeWorkCardStrip({ items }: { items: WorkItem[] }) {
               src={item.image}
               alt={item.alt}
               preset="workCard"
+              fetchPriority={index === 0 ? "high" : undefined}
+              loading={index === 0 ? "eager" : undefined}
             />
           </div>
           <div className="flex justify-between gap-2">

@@ -24,7 +24,7 @@ export function WorkPreviewLink({ item }: { item: WorkItem }) {
         <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs tracking-wide text-neutral-600">
           {item.tag}
         </span>
-        {item.year ? <span className="text-xs text-neutral-400">{item.year}</span> : null}
+        {item.year ? <span className="text-xs text-neutral-500">{item.year}</span> : null}
       </div>
 
       <HoverPreviewPortal
@@ -55,7 +55,7 @@ export function WritingPreviewLink({ item }: { item: WritingPost }) {
     >
       <SmallLink href={getWritingRoutePath(item)} label={item.title} />
       <div className="flex items-center gap-3">
-        <span className="text-xs text-neutral-400">{item.date}</span>
+        <span className="text-xs text-neutral-500">{item.date}</span>
         {item.score !== undefined ? <ReviewScoreBadge score={item.score} /> : null}
       </div>
 
