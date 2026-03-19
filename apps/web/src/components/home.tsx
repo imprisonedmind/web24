@@ -88,7 +88,10 @@ export function TechSection() {
 
   return (
     <div className="px-4 md:px-0">
-      <SectionHeader title="tech" action={<SmallLink href="/tech" label="more" />} />
+      <SectionHeader
+        title="tech"
+        action={<SmallLink href="/tech" label="more" ariaLabel="More tech" srSuffix=" tech" />}
+      />
       <div className="tech-marquee relative overflow-hidden py-4">
         <div className="tech-marquee-track flex w-max items-center gap-4 px-4">
           {marqueeItems.map((item, index) => (
