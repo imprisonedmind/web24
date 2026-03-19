@@ -76,7 +76,7 @@ export function TvWidgetCard() {
           {activeEntry ? (
             <a href={activeEntry.url} target="_blank" rel="noreferrer" className="block h-full w-full">
               <CFImage
-                src={withTmdbPosterSize(activeEntry.posterUrl, "w500")}
+                src={withTmdbPosterSize(activeEntry.posterUrl, "w342")}
                 alt={activeEntry.title}
                 className="h-full w-full object-cover"
                 unoptimized

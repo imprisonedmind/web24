@@ -58,7 +58,8 @@ export const imagePresets: Record<ImagePresetName, ImagePreset> = {
   locationMap: {
     width: 640,
     height: 485,
-    widths: [320, 480, 640, 828],
+    quality: 75,
+    widths: [240, 320, 480, 640],
     sizes: "(max-width: 640px) 100vw, 33vw",
   },
   techLogo: {
