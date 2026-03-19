@@ -11,6 +11,7 @@
     "dev:web": "bun run --cwd apps/web dev",
     "dev:api": "bun run --cwd apps/api dev",
     "dev:edge": "bun run build:web && bunx wrangler dev",
+    "cf:build": "bun run build:web",
     "build": "bun run build:web && bun run build:api",
     "build:web": "bun run --cwd apps/web build",
     "build:api": "bun run --cwd apps/api build",
