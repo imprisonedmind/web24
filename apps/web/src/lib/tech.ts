@@ -1,5 +1,6 @@
 export const techItems = [
   { label: "Next.js", href: "https://nextjs.org/", src: "/logos/Nextjs-logo.svg", tag: "web" },
+  { label: "TanStack", href: "https://tanstack.com/", src: "/logos/tanstack-logo-wordmark.svg", tag: "web" },
   { label: "Vite", href: "https://vite.dev/", src: "/logos/Vite_Logo_2026.svg", tag: "build" },
   { label: "Convex", href: "https://www.convex.dev/", src: "/logos/logo-color.svg", tag: "backend" },
   { label: "Tauri", href: "https://tauri.app/", src: "/logos/TauriAppLogo.svg", tag: "desktop" },
