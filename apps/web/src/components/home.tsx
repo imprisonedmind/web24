@@ -68,8 +68,7 @@ export function LocationSection() {
             className="h-full w-full scale-[1.2] object-cover"
             src="/images/location/map.png"
             alt="Cape Town map"
-            widths={[320, 640, 960]}
-            sizes="(max-width: 640px) 100vw, 33vw"
+            preset="locationMap"
           />
         </div>
         <div className="flex items-center justify-between">
@@ -106,8 +105,7 @@ export function TechSection() {
                 src={item.src}
                 alt={item.label}
                 className="h-10 w-auto max-w-[104px] object-contain"
-                widths={[120, 240]}
-                sizes="104px"
+                preset="techLogo"
               />
             </a>
           ))}

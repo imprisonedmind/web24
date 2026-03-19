@@ -40,8 +40,7 @@ function HomeAppLogo({ item }: { item: AppItem }) {
           className="h-full w-full object-cover"
           src={item.image}
           alt={item.alt}
-          widths={[96, 192]}
-          sizes="82px"
+          preset="appLogo"
         />
       </a>
 
@@ -58,8 +57,7 @@ function HomeAppLogo({ item }: { item: AppItem }) {
               className="h-full w-full object-cover object-top"
               src={item.previewImage}
               alt={item.alt}
-              widths={[220, 440]}
-              sizes="220px"
+              preset="appPreview"
             />
           </div>
           <div className="flex items-center justify-between gap-2 px-1">

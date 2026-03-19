@@ -93,8 +93,7 @@ function IpodScreenComponent({
                 src={track.albumImageUrl || "/images/profile/lukeOG.jpg"}
                 alt={track.title}
                 className="block h-full w-full object-cover"
-                widths={[96, 192]}
-                sizes="96px"
+                preset="musicArtwork"
                 unoptimized={Boolean(track.albumImageUrl)}
               />
             </div>

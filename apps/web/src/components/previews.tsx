@@ -81,8 +81,7 @@ function WorkPreviewCard({ item }: { item: WorkItem }) {
           className="h-full w-full bg-gray-200 object-cover"
           src={item.image}
           alt={item.alt}
-          widths={[360, 720]}
-          sizes="360px"
+          preset="previewCard"
         />
       </div>
       <div className="flex items-center justify-between gap-3 text-sm">
@@ -105,8 +104,7 @@ function WritingPreviewCard({ item }: { item: WritingPost }) {
         className="max-h-[160px] w-full rounded-lg bg-gray-200 object-cover"
         src={`/${item.openGraph}`}
         alt={item.title}
-        widths={[320, 640, 960]}
-        sizes="360px"
+        preset="previewCard"
       />
 
       <div className="flex flex-col gap-1 px-1 pb-2">
