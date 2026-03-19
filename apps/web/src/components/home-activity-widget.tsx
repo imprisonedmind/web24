@@ -11,7 +11,12 @@ export function HomeActivityWidget() {
     <ActivitySection
       title="activity"
       days={days}
-      header={<SectionHeader title="activity" action={<SmallLink href="/activity" label="more" />} />}
+      header={
+        <SectionHeader
+          title="activity"
+          action={<SmallLink href="/activity" label="more" ariaLabel="More activity" srSuffix=" activity" />}
+        />
+      }
       emptyMessage="No activity available."
     />
   );

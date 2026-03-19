@@ -7,7 +7,10 @@ import { WorkPreviewLink } from "./previews";
 export function HomeWorkSection({ items }: { items: WorkItem[] }) {
   return (
     <section className="-mt-4 flex w-full flex-col gap-1 md:mt-0">
-      <SectionHeader title="work" action={<SmallLink href="/work" label="more" />} />
+      <SectionHeader
+        title="work"
+        action={<SmallLink href="/work" label="more" ariaLabel="More work" srSuffix=" work" />}
+      />
       <div className="hidden flex-col gap-1 md:flex">
         {items.map((item) => (
           <WorkPreviewLink key={item.link} item={item} />

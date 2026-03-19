@@ -70,7 +70,10 @@ export function TvWidgetCard() {
 
   return (
     <div className="flex w-full flex-col gap-1">
-      <SectionHeader title={label} action={<SmallLink href="/watched" label="more" />} />
+      <SectionHeader
+        title={label}
+        action={<SmallLink href="/watched" label="more" ariaLabel="More watched" srSuffix=" watched" />}
+      />
       <div className="flex min-h-[32rem] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
         <div className="relative h-full w-full overflow-hidden rounded-lg md:h-72">
           {activeEntry ? (

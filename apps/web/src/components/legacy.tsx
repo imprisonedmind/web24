@@ -35,26 +35,32 @@ export function BulletPoint({
 export function SmallLink({
   href,
   label,
-  external = false
+  external = false,
+  srSuffix,
+  ariaLabel
 }: {
   href: string;
   label: string;
   external?: boolean;
+  srSuffix?: string;
+  ariaLabel?: string;
 }) {
   const className =
     "flex w-max text-sm text-neutral-500 underline-offset-4 hover:underline";
 
   if (external) {
     return (
-      <a className={className} href={href} target="_blank" rel="noreferrer">
+      <a className={className} href={href} target="_blank" rel="noreferrer" aria-label={ariaLabel}>
         {label}
+        {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
       </a>
     );
   }
 
   return (
-    <Link className={className} to={href}>
+    <Link className={className} to={href} aria-label={ariaLabel}>
       {label}
+      {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
     </Link>
   );
 }

@@ -50,7 +50,12 @@ export function HomePage() {
         <HomeAppsSection />
 
         <section className="-mt-4 flex w-full flex-col gap-1 md:mt-0">
-          <SectionHeader title="writing" action={<SmallLink href="/writing" label="more" />} />
+          <SectionHeader
+            title="writing"
+            action={
+              <SmallLink href="/writing" label="more" ariaLabel="More writing" srSuffix=" writing" />
+            }
+          />
           <section className="grid gap-1">
             {topWriting.map((post) => (
               <WritingPreviewLink key={post.id} item={post} />
