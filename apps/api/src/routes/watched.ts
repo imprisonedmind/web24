@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 
 import { AsyncCache } from "../lib/cache";
+import { getSyncedHistoryVersion } from "../lib/convex";
 import {
   getMostWatchedAllTime,
   getMostWatchedForMonth,
@@ -18,8 +19,9 @@ const watchedDaysCache = new AsyncCache<{ days: Awaited<ReturnType<typeof getWat
 watchedRoutes.get("/recent", async c => {
   try {
     const limit = Number(c.req.query("limit") ?? "12");
+    const version = await getSyncedHistoryVersion();
     const payload = await watchedItemsCache.getOrRefresh({
-      key: `watched:recent:${limit}`,
+      key: `watched:recent:${limit}:${version}`,
       ttlMs: WATCHED_TTL_MS,
       staleWhileRevalidateMs: WATCHED_STALE_MS,
       loader: async () => ({
@@ -37,8 +39,9 @@ watchedRoutes.get("/recent", async c => {
 watchedRoutes.get("/month", async c => {
   try {
     const limit = Number(c.req.query("limit") ?? "12");
+    const version = await getSyncedHistoryVersion();
     const payload = await watchedItemsCache.getOrRefresh({
-      key: `watched:month:${limit}`,
+      key: `watched:month:${limit}:${version}`,
       ttlMs: WATCHED_TTL_MS,
       staleWhileRevalidateMs: WATCHED_STALE_MS,
       loader: async () => ({
@@ -55,8 +58,9 @@ watchedRoutes.get("/month", async c => {
 watchedRoutes.get("/all-time", async c => {
   try {
     const limit = Number(c.req.query("limit") ?? "12");
+    const version = await getSyncedHistoryVersion();
     const payload = await watchedItemsCache.getOrRefresh({
-      key: `watched:all-time:${limit}`,
+      key: `watched:all-time:${limit}:${version}`,
       ttlMs: WATCHED_TTL_MS,
       staleWhileRevalidateMs: WATCHED_STALE_MS,
       loader: async () => ({
@@ -76,8 +80,9 @@ watchedRoutes.get("/monthly", async c => {
     if (!monthIso) return c.json({ items: [] }, 400);
 
     const limit = Number(c.req.query("limit") ?? "12");
+    const version = await getSyncedHistoryVersion();
     const payload = await watchedItemsCache.getOrRefresh({
-      key: `watched:monthly:${monthIso}:${limit}`,
+      key: `watched:monthly:${monthIso}:${limit}:${version}`,
       ttlMs: WATCHED_TTL_MS,
       staleWhileRevalidateMs: WATCHED_STALE_MS,
       loader: async () => ({
@@ -93,8 +98,9 @@ watchedRoutes.get("/monthly", async c => {
 
 watchedRoutes.get("/days-last-year", async c => {
   try {
+    const version = await getSyncedHistoryVersion();
     const payload = await watchedDaysCache.getOrRefresh({
-      key: "watched:days-last-year",
+      key: `watched:days-last-year:${version}`,
       ttlMs: WATCHED_TTL_MS,
       staleWhileRevalidateMs: WATCHED_STALE_MS,
       loader: async () => ({
