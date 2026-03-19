@@ -30,12 +30,14 @@ export function CFImage({
   const resolvedWidths = widths ?? presetConfig?.widths;
   const resolvedSizes = sizes ?? presetConfig?.sizes;
   const resolvedWidth = width ?? presetConfig?.width;
+  const fallbackWidth =
+    resolvedWidth ?? (resolvedWidths?.length ? resolvedWidths[resolvedWidths.length - 1] : undefined);
   const resolvedQuality = quality ?? presetConfig?.quality ?? 85;
   const resolvedFit = fit ?? presetConfig?.fit;
   const resolvedFetchPriority = fetchPriority ?? presetConfig?.fetchPriority;
   const shouldTransform = !unoptimized && canTransformCfImage(src);
   const resolvedSrc = shouldTransform
-    ? cfImage(src, { width: resolvedWidth, quality: resolvedQuality, fit: resolvedFit })
+    ? cfImage(src, { width: fallbackWidth, quality: resolvedQuality, fit: resolvedFit })
     : src;
   const srcSet =
     shouldTransform && resolvedWidths?.length
