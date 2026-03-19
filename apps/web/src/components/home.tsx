@@ -1,5 +1,6 @@
 import { BlueDot } from "./blue-dot";
 import { orderedTechItems } from "../lib/tech";
+import { CFImage } from "./cf-image";
 import { BulletPoint, SectionHeader, SmallLink } from "./legacy";
 
 export function BioSection() {
@@ -63,7 +64,13 @@ export function LocationSection() {
       <div className="flex w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm">
         <div className="relative h-72 w-full overflow-hidden rounded-lg">
           <BlueDot />
-          <img className="h-full w-full scale-[1.2] object-cover" src="/map.png" alt="Cape Town map" />
+          <CFImage
+            className="h-full w-full scale-[1.2] object-cover"
+            src="/map.png"
+            alt="Cape Town map"
+            widths={[320, 640, 960]}
+            sizes="(max-width: 640px) 100vw, 33vw"
+          />
         </div>
         <div className="flex items-center justify-between">
           <p className="text-sm lowercase text-neutral-800">Cape Town</p>

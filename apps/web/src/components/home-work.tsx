@@ -1,5 +1,6 @@
 import type { WorkItem } from "@web24/content";
 
+import { CFImage } from "./cf-image";
 import { SectionHeader, SmallLink } from "./legacy";
 import { WorkPreviewLink } from "./previews";
 
@@ -31,7 +32,13 @@ function HomeWorkCardStrip({ items }: { items: WorkItem[] }) {
           rel={item.internal ? undefined : "noreferrer"}
         >
           <div className="relative h-36 w-full overflow-hidden rounded-lg">
-            <img className="h-full w-full bg-gray-200 object-cover" src={item.image} alt={item.alt} />
+            <CFImage
+              className="h-full w-full bg-gray-200 object-cover"
+              src={item.image}
+              alt={item.alt}
+              widths={[240, 370]}
+              sizes="185px"
+            />
           </div>
           <div className="flex justify-between gap-2">
             <p className="text-sm">{item.title}</p>

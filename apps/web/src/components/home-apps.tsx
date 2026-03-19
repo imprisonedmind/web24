@@ -1,5 +1,6 @@
 import { appItems, type AppItem } from "@web24/content";
 
+import { CFImage } from "./cf-image";
 import { HoverPreviewPortal, useHoverPreview } from "./hover-preview";
 import { SectionHeader } from "./legacy";
 
@@ -35,7 +36,13 @@ function HomeAppLogo({ item }: { item: AppItem }) {
         className="flex h-[82px] w-[82px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-white text-inherit no-underline shadow-sm transition duration-150 ease-in-out hover:shadow-md"
         aria-label={item.title}
       >
-        <img className="h-full w-full object-cover" src={item.image} alt={item.alt} />
+        <CFImage
+          className="h-full w-full object-cover"
+          src={item.image}
+          alt={item.alt}
+          widths={[96, 192]}
+          sizes="82px"
+        />
       </a>
 
       <HoverPreviewPortal
@@ -47,10 +54,12 @@ function HomeAppLogo({ item }: { item: AppItem }) {
       >
         <div className="flex w-full flex-col gap-2 rounded-[1.2rem] bg-white p-2 shadow-sm">
           <div className="relative h-[176px] w-full overflow-hidden rounded-[0.95rem] bg-neutral-100">
-            <img
+            <CFImage
               className="h-full w-full object-cover object-top"
               src={item.previewImage}
               alt={item.alt}
+              widths={[220, 440]}
+              sizes="220px"
             />
           </div>
           <div className="flex items-center justify-between gap-2 px-1">

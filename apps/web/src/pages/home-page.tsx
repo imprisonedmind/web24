@@ -20,6 +20,7 @@ import {
   tvStatusQueryOptions,
 } from "../lib/api";
 import { queryClient } from "../lib/query-client";
+import { CFImage } from "../components/cf-image";
 
 export function HomePage() {
   const featuredWork = getFeaturedWorkItems(6);
@@ -28,10 +29,14 @@ export function HomePage() {
   return (
     <section className="mb-8 flex flex-col gap-8">
       <section className="mt-8 flex flex-col justify-between gap-4 md:flex-row">
-        <img
+        <CFImage
           className="mx-auto hidden max-h-[400px] max-w-[300px] rounded-2xl object-cover md:flex"
           src="/luke2.jpg"
           alt="Luke Stephens"
+          widths={[320, 480, 640]}
+          sizes="300px"
+          width={640}
+          fetchPriority="high"
         />
 
         <div className="flex flex-col justify-between gap-4 md:gap-0">

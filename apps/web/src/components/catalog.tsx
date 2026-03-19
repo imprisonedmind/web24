@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import type { WorkItem, WritingPost } from "@web24/content";
 import { getWritingRoutePath } from "@web24/content";
 
+import { CFImage } from "./cf-image";
 import { ReviewScoreBadge, SectionHeader } from "./legacy";
 
 export function WorkSection({
@@ -28,11 +29,12 @@ export function WorkSection({
             rel={item.internal ? undefined : "noreferrer"}
           >
             <div className="relative h-64 w-full overflow-hidden rounded-lg">
-              <img
+              <CFImage
                 className="h-full w-full bg-gray-200 object-cover"
                 src={item.image}
                 alt={item.alt}
-                loading="lazy"
+                widths={[320, 640, 960]}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
             </div>
 
@@ -65,11 +67,12 @@ export function WritingCard({ post }: { post: WritingPost }) {
       className="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-white p-2 text-inherit no-underline shadow-sm transition duration-300 ease-in-out hover:shadow-md"
       to={getWritingRoutePath(post)}
     >
-      <img
+      <CFImage
         className="max-h-[160px] w-full rounded-lg bg-gray-200 object-cover"
         src={`/${post.openGraph}`}
         alt={post.title}
-        loading="lazy"
+        widths={[320, 640, 960]}
+        sizes="(max-width: 768px) 100vw, 640px"
       />
       <div className="flex flex-col gap-1 px-1 pb-2">
         <div className="flex flex-row items-center justify-between gap-3">

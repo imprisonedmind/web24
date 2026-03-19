@@ -2,6 +2,7 @@ import type { WorkItem, WritingPost } from "@web24/content";
 import { getWritingRoutePath } from "@web24/content";
 import { Link } from "@tanstack/react-router";
 
+import { CFImage } from "./cf-image";
 import { HoverPreviewPortal, useHoverPreview } from "./hover-preview";
 import { ReviewScoreBadge, SmallLink } from "./legacy";
 
@@ -76,7 +77,13 @@ function WorkPreviewCard({ item }: { item: WorkItem }) {
   return (
     <div className="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-white p-2 shadow-sm transition duration-300 ease-in-out hover:shadow-md">
       <div className="relative h-64 w-full overflow-hidden rounded-lg">
-        <img className="h-full w-full bg-gray-200 object-cover" src={item.image} alt={item.alt} />
+        <CFImage
+          className="h-full w-full bg-gray-200 object-cover"
+          src={item.image}
+          alt={item.alt}
+          widths={[360, 720]}
+          sizes="360px"
+        />
       </div>
       <div className="flex items-center justify-between gap-3 text-sm">
         <p className="font-medium text-neutral-900">{item.title}</p>
@@ -94,10 +101,12 @@ function WritingPreviewCard({ item }: { item: WritingPost }) {
       className="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-white p-2 text-inherit no-underline shadow-sm transition duration-300 ease-in-out hover:shadow-md"
       to={getWritingRoutePath(item)}
     >
-      <img
+      <CFImage
         className="max-h-[160px] w-full rounded-lg bg-gray-200 object-cover"
         src={`/${item.openGraph}`}
         alt={item.title}
+        widths={[320, 640, 960]}
+        sizes="360px"
       />
 
       <div className="flex flex-col gap-1 px-1 pb-2">
