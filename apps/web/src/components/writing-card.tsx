@@ -15,8 +15,7 @@ export function WritingCard({ item }: { item: WritingPost }) {
         src={`/${item.openGraph}`}
         alt={item.title}
         className="max-h-[160px] w-full rounded-lg bg-gray-200 object-cover"
-        widths={[320, 640, 960]}
-        sizes="(max-width: 768px) 100vw, 640px"
+        preset="writingCard"
       />
 
       <div className="flex flex-col gap-1 px-1 pb-2 !pt-0">

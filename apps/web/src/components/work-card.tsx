@@ -15,8 +15,7 @@ export function WorkCard({ item }: { item: WorkItem }) {
           src={item.image}
           alt={item.alt}
           className="h-full w-full bg-gray-200 object-cover"
-          widths={[240, 370]}
-          sizes="185px"
+          preset="workCard"
         />
       </div>
       <div className="flex justify-between gap-2">

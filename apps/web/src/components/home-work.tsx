@@ -36,8 +36,7 @@ function HomeWorkCardStrip({ items }: { items: WorkItem[] }) {
               className="h-full w-full bg-gray-200 object-cover"
               src={item.image}
               alt={item.alt}
-              widths={[240, 370]}
-              sizes="185px"
+              preset="workCard"
             />
           </div>
           <div className="flex justify-between gap-2">

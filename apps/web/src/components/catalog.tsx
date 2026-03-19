@@ -33,8 +33,7 @@ export function WorkSection({
                 className="h-full w-full bg-gray-200 object-cover"
                 src={item.image}
                 alt={item.alt}
-                widths={[320, 640, 960]}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                preset="catalogWork"
               />
             </div>
 
@@ -71,8 +70,7 @@ export function WritingCard({ post }: { post: WritingPost }) {
         className="max-h-[160px] w-full rounded-lg bg-gray-200 object-cover"
         src={`/${post.openGraph}`}
         alt={post.title}
-        widths={[320, 640, 960]}
-        sizes="(max-width: 768px) 100vw, 640px"
+        preset="writingCard"
       />
       <div className="flex flex-col gap-1 px-1 pb-2">
         <div className="flex flex-row items-center justify-between gap-3">
