@@ -66,7 +66,7 @@ export function LocationSection() {
           <BlueDot />
           <CFImage
             className="h-full w-full scale-[1.2] object-cover"
-            src="/map.png"
+            src="/images/location/map.png"
             alt="Cape Town map"
             widths={[320, 640, 960]}
             sizes="(max-width: 640px) 100vw, 33vw"

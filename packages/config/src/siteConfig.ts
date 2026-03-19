@@ -36,7 +36,7 @@ export const siteConfig = {
   description:
     "Luke Stephens — software designer and persistent tinkerer sharing work, writing, and activity logs.",
   url: normalizedSiteUrl,
-  defaultOgImage: "/luke2.jpg",
+  defaultOgImage: "/images/profile/luke2.jpg",
   openGraphLogo: "/faviconX167.svg",
   twitterSite: "@site",
   twitterCreator: "@lukey_stephens"

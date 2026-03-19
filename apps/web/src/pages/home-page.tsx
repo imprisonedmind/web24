@@ -31,7 +31,7 @@ export function HomePage() {
       <section className="mt-8 flex flex-col justify-between gap-4 md:flex-row">
         <CFImage
           className="mx-auto hidden max-h-[400px] max-w-[300px] rounded-2xl object-cover md:flex"
-          src="/luke2.jpg"
+          src="/images/profile/luke2.jpg"
           alt="Luke Stephens"
           widths={[320, 480, 640]}
           sizes="300px"

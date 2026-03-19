@@ -16,7 +16,7 @@ export const publicRoutes: PublicRoute[] = [
       title: "Luke Stephens — software designer",
       description:
         "Personal site of Luke Stephens featuring work, activity, and the latest writing, music, and television tracking.",
-      image: "/lukeOG.jpg"
+      image: "/images/profile/lukeOG.jpg"
     }
   },
   {
