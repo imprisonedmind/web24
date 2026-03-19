@@ -90,7 +90,7 @@ function IpodScreenComponent({
           <div className="flex w-full min-h-0 grow gap-2 overflow-hidden">
             <div className="relative aspect-square h-full max-w-[96px] flex-shrink-0 overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
               <CFImage
-                src={track.albumImageUrl || "/lukeOG.jpg"}
+                src={track.albumImageUrl || "/images/profile/lukeOG.jpg"}
                 alt={track.title}
                 className="block h-full w-full object-cover"
                 widths={[96, 192]}
