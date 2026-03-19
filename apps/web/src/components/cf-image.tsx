@@ -18,6 +18,7 @@ export function CFImage({
   widths,
   sizes,
   width,
+  height,
   quality = 85,
   fit,
   loading,
@@ -30,6 +31,7 @@ export function CFImage({
   const resolvedWidths = widths ?? presetConfig?.widths;
   const resolvedSizes = sizes ?? presetConfig?.sizes;
   const resolvedWidth = width ?? presetConfig?.width;
+  const resolvedHeight = height ?? presetConfig?.height;
   const fallbackWidth =
     resolvedWidth ?? (resolvedWidths?.length ? resolvedWidths[resolvedWidths.length - 1] : undefined);
   const resolvedQuality = quality ?? presetConfig?.quality ?? 85;
@@ -59,6 +61,8 @@ export function CFImage({
       src={resolvedSrc}
       srcSet={srcSet}
       sizes={srcSet ? resolvedSizes : undefined}
+      width={resolvedWidth}
+      height={resolvedHeight}
       alt={alt}
       loading={loading ?? (resolvedFetchPriority === "high" ? "eager" : "lazy")}
       decoding={decoding ?? "async"}

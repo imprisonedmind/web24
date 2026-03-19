@@ -13,6 +13,7 @@ export type ImagePresetName =
   | "musicArtwork";
 
 export type ImagePreset = CfImageOptions & {
+  height?: number;
   widths?: number[];
   sizes?: string;
   fetchPriority?: "high" | "low" | "auto";
@@ -21,6 +22,7 @@ export type ImagePreset = CfImageOptions & {
 export const imagePresets: Record<ImagePresetName, ImagePreset> = {
   heroPortrait: {
     width: 640,
+    height: 853,
     widths: [320, 480, 640],
     sizes: "300px",
     fetchPriority: "high",
@@ -42,24 +44,33 @@ export const imagePresets: Record<ImagePresetName, ImagePreset> = {
     sizes: "360px",
   },
   appLogo: {
+    width: 82,
+    height: 82,
     widths: [96, 192],
     sizes: "82px",
   },
   appPreview: {
+    width: 220,
+    height: 176,
     widths: [220, 440],
     sizes: "220px",
   },
   locationMap: {
-    widths: [320, 640, 960],
+    width: 640,
+    height: 485,
+    widths: [320, 480, 640, 828],
     sizes: "(max-width: 640px) 100vw, 33vw",
   },
   techLogo: {
     width: 104,
+    height: 40,
     widths: [120, 240],
     sizes: "104px",
     fit: "contain",
   },
   musicArtwork: {
+    width: 96,
+    height: 96,
     widths: [96, 192],
     sizes: "96px",
   },

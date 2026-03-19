@@ -7,6 +7,7 @@ import {
   type SongData,
   type TvEntry,
 } from "../lib/api";
+import { withTmdbPosterSize } from "../lib/media-image";
 import { CFImage } from "./cf-image";
 import { SectionHeader, SmallLink } from "./legacy";
 import { IPodContainer } from "./music-ipod-container";
@@ -75,7 +76,7 @@ export function TvWidgetCard() {
           {activeEntry ? (
             <a href={activeEntry.url} target="_blank" rel="noreferrer" className="block h-full w-full">
               <CFImage
-                src={activeEntry.posterUrl}
+                src={withTmdbPosterSize(activeEntry.posterUrl, "w500")}
                 alt={activeEntry.title}
                 className="h-full w-full object-cover"
                 unoptimized
