@@ -54,5 +54,50 @@ export const publicRoutes: PublicRoute[] = [
       description:
         "Television and movie tracking views backed by the new Hono API."
     }
+  },
+  {
+    path: "/watched/recent",
+    label: "Recently Watched",
+    seo: {
+      title: "Recently Watched — Luke Stephens",
+      description:
+        "Recent television and movie watching activity by Luke Stephens."
+    }
+  },
+  {
+    path: "/watched/month",
+    label: "Most Watched This Month",
+    seo: {
+      title: "Most Watched This Month — Luke Stephens",
+      description:
+        "Monthly television and movie watching stats and rankings by Luke Stephens."
+    }
+  },
+  {
+    path: "/watched/all-time",
+    label: "Most Watched All Time",
+    seo: {
+      title: "Most Watched All Time — Luke Stephens",
+      description:
+        "All-time television and movie watching stats and rankings by Luke Stephens."
+    }
+  },
+  {
+    path: "/watched/months",
+    label: "Watched by Month",
+    seo: {
+      title: "Watched by Month — Luke Stephens",
+      description:
+        "Monthly archive of television and movie watching activity by Luke Stephens."
+    }
+  },
+  {
+    path: "/tech",
+    label: "Tech",
+    seo: {
+      title: "Tech — Luke Stephens",
+      description:
+        "Tools, frameworks, and technology used by Luke Stephens."
+    }
   }
 ];
