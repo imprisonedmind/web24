@@ -66,7 +66,7 @@ export function CFImage({
       alt={alt}
       loading={loading ?? (resolvedFetchPriority === "high" ? "eager" : "lazy")}
       decoding={decoding ?? "async"}
-      fetchPriority={resolvedFetchPriority}
+      {...(resolvedFetchPriority ? ({ fetchpriority: resolvedFetchPriority } as Record<string, string>) : {})}
     />
   );
 }
