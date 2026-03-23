@@ -75,6 +75,26 @@ export const fullActivityQueryOptions = queryOptions({
   refetchInterval: 30_000,
 });
 
+export const activityWatchingQueryOptions = queryOptions({
+  queryKey: ["activity", "watching"],
+  queryFn: async () => {
+    const payload = await fetchJson<{ watchingDays?: WatchDay[] }>("/api/activity/watching");
+    return payload.watchingDays ?? [];
+  },
+  refetchInterval: 30_000,
+});
+
+export const activityWorkQueryOptions = queryOptions({
+  queryKey: ["activity", "work"],
+  queryFn: async () => {
+    const payload = await fetchJson<{ workSections?: { label: string; days: WatchDay[] }[] }>(
+      "/api/activity/work",
+    );
+    return payload.workSections ?? [];
+  },
+  refetchInterval: 30_000,
+});
+
 export const watchedOverviewQueryOptions = queryOptions({
   queryKey: ["watched", "overview"],
   queryFn: async () => {
