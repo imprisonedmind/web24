@@ -1,4 +1,8 @@
-import { listSyncedHistoryEntries, type SyncedHistoryEntry } from "../lib/convex";
+import {
+  listSyncedDailyActivity,
+  listSyncedHistoryEntries,
+  type SyncedHistoryEntry
+} from "../lib/convex";
 
 const FALLBACK_POSTER = "/fallback-poster.jpg";
 
@@ -153,25 +157,25 @@ export async function getMostWatchedForMonth(
 
 export async function getWatchDaysLastYear(_cookieHeader?: string | null) {
   const sinceMs = Date.now() - 364 * 24 * 60 * 60 * 1000;
-  const entries = await listSyncedHistoryEntries({ startMs: sinceMs, order: "asc" });
+  const startDate = new Date(sinceMs).toISOString().slice(0, 10);
+  const endDate = new Date().toISOString().slice(0, 10);
+  const entries = await listSyncedDailyActivity({ startDate, endDate });
   const map: Record<string, WatchDay> = {};
 
   for (const entry of entries) {
-    const day = new Date(entry.watchedAtMs).toISOString().slice(0, 10);
-    const seconds = (entry.runtimeMinutes || 0) * 60;
-    const key = entry.entryType === "movie" ? "Movie" : "Episode";
-
-    if (!map[day]) {
-      map[day] = { date: day, total: 0, categories: [] };
+    const categories = [];
+    if (entry.movieSeconds > 0) {
+      categories.push({ name: "Movie", total: entry.movieSeconds });
+    }
+    if (entry.episodeSeconds > 0) {
+      categories.push({ name: "Episode", total: entry.episodeSeconds });
     }
 
-    map[day].total += seconds;
-    const category = map[day].categories.find((item) => item.name === key);
-    if (category) {
-      category.total += seconds;
-    } else {
-      map[day].categories.push({ name: key, total: seconds });
-    }
+    map[entry.date] = {
+      date: entry.date,
+      total: entry.totalSeconds,
+      categories,
+    };
   }
 
   const days: WatchDay[] = [];

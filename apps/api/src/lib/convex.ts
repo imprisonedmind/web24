@@ -38,6 +38,14 @@ export type SyncedCurrentlyWatching = {
   expiresAt?: string;
 };
 
+export type SyncedDailyActivity = {
+  date: string;
+  totalSeconds: number;
+  movieSeconds: number;
+  episodeSeconds: number;
+  updatedAtMs: number;
+};
+
 let client: ConvexHttpClient | null = null;
 
 function getConvexUrl() {
@@ -77,4 +85,11 @@ export async function getSyncedHistoryVersion() {
   const [latest] = await listSyncedHistoryEntries({ limit: 1, order: "desc" });
   if (!latest) return "empty";
   return `${latest.historyId}:${latest.watchedAtMs}`;
+}
+
+export async function listSyncedDailyActivity(args?: {
+  startDate?: string;
+  endDate?: string;
+}) {
+  return (await getClient().query(api.trakt.listDailyActivity, args ?? {})) as SyncedDailyActivity[];
 }
