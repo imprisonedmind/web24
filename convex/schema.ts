@@ -25,6 +25,13 @@ export default defineSchema({
   })
     .index("by_historyId", ["historyId"])
     .index("by_watchedAtMs", ["watchedAtMs"]),
+  traktDailyActivity: defineTable({
+    date: v.string(),
+    totalSeconds: v.number(),
+    movieSeconds: v.number(),
+    episodeSeconds: v.number(),
+    updatedAtMs: v.number(),
+  }).index("by_date", ["date"]),
   traktState: defineTable({
     key: v.string(),
     syncedAtMs: v.number(),

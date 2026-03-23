@@ -8,7 +8,7 @@ import {
   mutation,
   query,
 } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 const FALLBACK_POSTER = "/fallback-poster.jpg";
 const RECENT_SYNC_WINDOW_MS = 72 * 60 * 60 * 1000;
@@ -59,6 +59,14 @@ const authStateValidator = v.object({
   createdAtSeconds: v.optional(v.number()),
   expiresInSeconds: v.optional(v.number()),
   expiresAtMs: v.number(),
+});
+
+const dailyActivityValidator = v.object({
+  date: v.string(),
+  totalSeconds: v.number(),
+  movieSeconds: v.number(),
+  episodeSeconds: v.number(),
+  updatedAtMs: v.number(),
 });
 
 type HistoryEntry = {
@@ -114,6 +122,21 @@ type RecentSyncResult = {
   updated: number;
   skipped: number;
   currentWatching: string | null;
+};
+
+type DailyActivity = {
+  date: string;
+  totalSeconds: number;
+  movieSeconds: number;
+  episodeSeconds: number;
+  updatedAtMs: number;
+};
+
+type DailyActivityDelta = {
+  date: string;
+  totalSeconds: number;
+  movieSeconds: number;
+  episodeSeconds: number;
 };
 
 type TraktIds = {
@@ -199,6 +222,87 @@ function entriesEqual(left: Record<string, unknown>, right: Record<string, unkno
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function getActivityDate(watchedAtMs: number) {
+  return new Date(watchedAtMs).toISOString().slice(0, 10);
+}
+
+function toDailyActivityDelta(entry: HistoryEntry): DailyActivityDelta {
+  const seconds = Math.max(0, (entry.runtimeMinutes || 0) * 60);
+  const isMovie = entry.entryType === "movie";
+
+  return {
+    date: getActivityDate(entry.watchedAtMs),
+    totalSeconds: seconds,
+    movieSeconds: isMovie ? seconds : 0,
+    episodeSeconds: isMovie ? 0 : seconds,
+  };
+}
+
+function addDailyActivityDelta(
+  totals: Map<string, DailyActivityDelta>,
+  delta: DailyActivityDelta,
+  multiplier = 1,
+) {
+  if (!delta.totalSeconds && !delta.movieSeconds && !delta.episodeSeconds) return;
+
+  const current = totals.get(delta.date) ?? {
+    date: delta.date,
+    totalSeconds: 0,
+    movieSeconds: 0,
+    episodeSeconds: 0,
+  };
+
+  current.totalSeconds += delta.totalSeconds * multiplier;
+  current.movieSeconds += delta.movieSeconds * multiplier;
+  current.episodeSeconds += delta.episodeSeconds * multiplier;
+  totals.set(delta.date, current);
+}
+
+async function applyDailyActivityDelta(ctx: any, delta: DailyActivityDelta) {
+  if (!delta.totalSeconds && !delta.movieSeconds && !delta.episodeSeconds) return;
+
+  const existing = await ctx.db
+    .query("traktDailyActivity")
+    .withIndex("by_date", (q: any) => q.eq("date", delta.date))
+    .unique();
+
+  const nextTotalSeconds = Math.max(0, (existing?.totalSeconds ?? 0) + delta.totalSeconds);
+  const nextMovieSeconds = Math.max(0, (existing?.movieSeconds ?? 0) + delta.movieSeconds);
+  const nextEpisodeSeconds = Math.max(0, (existing?.episodeSeconds ?? 0) + delta.episodeSeconds);
+
+  if (!nextTotalSeconds && !nextMovieSeconds && !nextEpisodeSeconds) {
+    if (existing) {
+      await ctx.db.delete(existing._id);
+    }
+    return;
+  }
+
+  const patch: DailyActivity = {
+    date: delta.date,
+    totalSeconds: nextTotalSeconds,
+    movieSeconds: nextMovieSeconds,
+    episodeSeconds: nextEpisodeSeconds,
+    updatedAtMs: Date.now(),
+  };
+
+  if (existing) {
+    await ctx.db.patch(existing._id, patch);
+    return;
+  }
+
+  await ctx.db.insert("traktDailyActivity", patch);
+}
+
+async function replaceDailyActivity(ctx: any, rows: DailyActivity[]) {
+  const existing = await ctx.db.query("traktDailyActivity").collect();
+  await Promise.all(existing.map((doc: any) => ctx.db.delete(doc._id)));
+
+  for (const row of rows) {
+    if (!row.totalSeconds && !row.movieSeconds && !row.episodeSeconds) continue;
+    await ctx.db.insert("traktDailyActivity", row);
+  }
+}
+
 async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
   let inserted = 0;
   let updated = 0;
@@ -212,6 +316,7 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
 
     if (!existing.length) {
       await ctx.db.insert("traktHistoryEntries", entry);
+      await applyDailyActivityDelta(ctx, toDailyActivityDelta(entry));
       inserted += 1;
       continue;
     }
@@ -228,7 +333,16 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
       continue;
     }
 
+    const currentDelta = toDailyActivityDelta(currentData as HistoryEntry);
+    const nextDelta = toDailyActivityDelta(entry);
     await ctx.db.patch(current._id, entry);
+    await applyDailyActivityDelta(ctx, {
+      date: currentDelta.date,
+      totalSeconds: -currentDelta.totalSeconds,
+      movieSeconds: -currentDelta.movieSeconds,
+      episodeSeconds: -currentDelta.episodeSeconds,
+    });
+    await applyDailyActivityDelta(ctx, nextDelta);
     updated += 1;
   }
 
@@ -525,8 +639,10 @@ export const clearHistory = mutation({
   args: {},
   handler: async (ctx) => {
     const existing = await ctx.db.query("traktHistoryEntries").collect();
+    const dailyActivity = await ctx.db.query("traktDailyActivity").collect();
     await Promise.all(existing.map((doc) => ctx.db.delete(doc._id)));
-    return { deleted: existing.length };
+    await Promise.all(dailyActivity.map((doc) => ctx.db.delete(doc._id)));
+    return { deleted: existing.length, deletedActivityDays: dailyActivity.length };
   },
 });
 
@@ -587,6 +703,25 @@ export const listHistoryEntries = query({
     }
 
     return results;
+  },
+});
+
+export const listDailyActivity = query({
+  args: {
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const rows = await ctx.db.query("traktDailyActivity").withIndex("by_date").collect();
+
+    return rows
+      .filter((row) => {
+        if (args.startDate && row.date < args.startDate) return false;
+        if (args.endDate && row.date > args.endDate) return false;
+        return true;
+      })
+      .sort((left, right) => left.date.localeCompare(right.date))
+      .map(({ _id: _rowId, _creationTime: _rowCreationTime, ...row }) => row);
   },
 });
 
@@ -751,6 +886,41 @@ export const runRecentSync = action({
   },
 });
 
+export const rebuildDailyActivity = action({
+  args: {},
+  handler: async (ctx) => {
+    const entries = (await ctx.runQuery(api.trakt.listHistoryEntries, {
+      order: "asc",
+    })) as (HistoryEntry & { historyId: string })[];
+    const dedupedEntries = new Map<string, HistoryEntry>();
+
+    for (const entry of entries) {
+      dedupedEntries.set(entry.historyId, entry);
+    }
+
+    const totals = new Map<string, DailyActivityDelta>();
+    for (const entry of dedupedEntries.values()) {
+      addDailyActivityDelta(totals, toDailyActivityDelta(entry));
+    }
+
+    const updatedAtMs = Date.now();
+    const rows = Array.from(totals.values())
+      .filter((row) => row.totalSeconds > 0)
+      .sort((left, right) => left.date.localeCompare(right.date))
+      .map((row) => ({
+        ...row,
+        updatedAtMs,
+      }));
+
+    await ctx.runMutation(internal.trakt.replaceDailyActivityInternal, { rows });
+
+    return {
+      historyEntries: dedupedEntries.size,
+      days: rows.length,
+    };
+  },
+});
+
 export const upsertHistoryBatchInternal = internalMutation({
   args: {
     entries: v.array(historyEntryValidator),
@@ -767,6 +937,16 @@ export const setCurrentWatchingInternal = internalMutation({
   },
   handler: async (ctx, args) => {
     return await setCurrentWatchingState(ctx, args.currentWatching, args.syncedAtMs);
+  },
+});
+
+export const replaceDailyActivityInternal = internalMutation({
+  args: {
+    rows: v.array(dailyActivityValidator),
+  },
+  handler: async (ctx, args) => {
+    await replaceDailyActivity(ctx, args.rows);
+    return { replaced: args.rows.length };
   },
 });
 
