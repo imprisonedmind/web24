@@ -60,7 +60,6 @@ const writingDetailRoute = createRoute({
 const activityRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/activity",
-  loader: () => import("./pages/activity-page").then((module) => module.preloadActivityPage()),
   component: ActivityPage,
 });
 

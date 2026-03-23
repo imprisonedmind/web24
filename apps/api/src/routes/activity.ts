@@ -2,13 +2,20 @@ import { Hono } from "hono";
 
 import { AsyncCache } from "../lib/cache";
 import { getSyncedHistoryVersion } from "../lib/convex";
-import { getFullActivityDays, getHomeActivityDays } from "../services/activity";
+import {
+  getFullActivityDays,
+  getHomeActivityDays,
+  getWatchingActivityDays,
+  getWorkActivitySections
+} from "../services/activity";
 
 const activityRoutes = new Hono();
 const ACTIVITY_TTL_MS = 60 * 60 * 1000;
 const ACTIVITY_STALE_MS = 6 * 60 * 60 * 1000;
 const activityHomeCache = new AsyncCache<{ days: Awaited<ReturnType<typeof getHomeActivityDays>> }>();
 const activityFullCache = new AsyncCache<Awaited<ReturnType<typeof getFullActivityDays>>>();
+const activityWatchingCache = new AsyncCache<{ watchingDays: Awaited<ReturnType<typeof getWatchingActivityDays>> }>();
+const activityWorkCache = new AsyncCache<{ workSections: Awaited<ReturnType<typeof getWorkActivitySections>> }>();
 
 activityRoutes.get("/home", async c => {
   try {
@@ -41,6 +48,41 @@ activityRoutes.get("/full", async c => {
   } catch (error) {
     console.error("[api/activity/full] failed", error);
     return c.json({ watchingDays: [], workSections: [] }, 500);
+  }
+});
+
+activityRoutes.get("/watching", async c => {
+  try {
+    const version = await getSyncedHistoryVersion();
+    const payload = await activityWatchingCache.getOrRefresh({
+      key: `activity:watching:${version}`,
+      ttlMs: ACTIVITY_TTL_MS,
+      staleWhileRevalidateMs: ACTIVITY_STALE_MS,
+      loader: async () => ({
+        watchingDays: await getWatchingActivityDays(),
+      }),
+    });
+    return c.json(payload, 200);
+  } catch (error) {
+    console.error("[api/activity/watching] failed", error);
+    return c.json({ watchingDays: [] }, 500);
+  }
+});
+
+activityRoutes.get("/work", async c => {
+  try {
+    const payload = await activityWorkCache.getOrRefresh({
+      key: "activity:work",
+      ttlMs: ACTIVITY_TTL_MS,
+      staleWhileRevalidateMs: ACTIVITY_STALE_MS,
+      loader: async () => ({
+        workSections: await getWorkActivitySections(),
+      }),
+    });
+    return c.json(payload, 200);
+  } catch (error) {
+    console.error("[api/activity/work] failed", error);
+    return c.json({ workSections: [] }, 500);
   }
 });
 

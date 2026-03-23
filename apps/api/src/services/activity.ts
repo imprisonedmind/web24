@@ -127,18 +127,27 @@ function sumTotals(days: { total: number }[]) {
   return days.reduce((acc, curr) => acc + (curr.total ?? 0), 0);
 }
 
-export async function getFullActivityDays(cookieHeader?: string | null) {
-  const [codingDays, watchingDays] = await Promise.all([
-    getCodingActivityDays(),
-    getWatchDaysLastYear(cookieHeader)
-  ]);
+export async function getWatchingActivityDays(cookieHeader?: string | null) {
+  return getWatchDaysLastYear(cookieHeader);
+}
 
-  const workSections = Object.entries(CATEGORY_LABELS)
+export async function getWorkActivitySections() {
+  const codingDays = await getCodingActivityDays();
+
+  return Object.entries(CATEGORY_LABELS)
     .map(([sourceName, label]) => {
       const days = mapDaysToCategory(codingDays, sourceName);
       return { label, days, total: sumTotals(days) };
     })
-    .filter(section => section.total > 0);
+    .filter(section => section.total > 0)
+    .map(({ label, days }) => ({ label, days }));
+}
+
+export async function getFullActivityDays(cookieHeader?: string | null) {
+  const [watchingDays, workSections] = await Promise.all([
+    getWatchingActivityDays(cookieHeader),
+    getWorkActivitySections()
+  ]);
 
   return {
     watchingDays,
