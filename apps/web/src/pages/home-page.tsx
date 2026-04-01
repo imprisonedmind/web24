@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getFeaturedWorkItems, getTopWritingPosts } from "@web24/content";
 
 import {
@@ -9,7 +10,11 @@ import {
   TechSection,
 } from "../components/home";
 import { HomeAppsSection } from "../components/home-apps";
-import { HomeActivityWidget } from "../components/home-activity-widget";
+import {
+  HomeActivityWidget,
+  HomeActivityWidgetErrorBoundary,
+  HomeActivityWidgetLoading,
+} from "../components/home-activity-widget";
 import { HomeWorkSection } from "../components/home-work";
 import { SectionHeader, SmallLink } from "../components/legacy";
 import { WritingPreviewLink } from "../components/previews";
@@ -63,7 +68,11 @@ export function HomePage() {
           </section>
         </section>
 
-        <HomeActivityWidget />
+        <HomeActivityWidgetErrorBoundary>
+          <Suspense fallback={<HomeActivityWidgetLoading />}>
+            <HomeActivityWidget />
+          </Suspense>
+        </HomeActivityWidgetErrorBoundary>
 
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <LocationSection />
@@ -78,9 +87,7 @@ export function HomePage() {
 }
 
 export async function preloadHomePage() {
-  await Promise.all([
-    queryClient.ensureQueryData(homeActivityQueryOptions),
-    queryClient.ensureQueryData(tvStatusQueryOptions),
-    queryClient.ensureQueryData(musicQueryOptions),
-  ]);
+  queryClient.prefetchQuery(homeActivityQueryOptions).catch(() => undefined);
+  queryClient.prefetchQuery(tvStatusQueryOptions).catch(() => undefined);
+  queryClient.prefetchQuery(musicQueryOptions).catch(() => undefined);
 }

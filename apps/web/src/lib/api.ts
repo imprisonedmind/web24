@@ -59,9 +59,15 @@ async function fetchJson<T>(input: string) {
 export const homeActivityQueryOptions = queryOptions({
   queryKey: ["activity", "home"],
   queryFn: async () => {
-    const payload = await fetchJson<{ days?: WatchDay[] }>("/api/activity/home");
-    return payload.days ?? [];
+    try {
+      const payload = await fetchJson<{ days?: WatchDay[] }>("/api/activity/home");
+      return payload.days ?? [];
+    } catch (error) {
+      console.warn("[home-activity] request failed; rendering unavailable state", error);
+      return null as WatchDay[] | null;
+    }
   },
+  retry: false,
 });
 
 export const fullActivityQueryOptions = queryOptions({

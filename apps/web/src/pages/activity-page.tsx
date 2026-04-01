@@ -1,26 +1,12 @@
-import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { ActivitySection, TelevisionActivityHeader } from "../components/activity";
+import {
+  ActivitySection,
+  ActivitySectionLoading,
+  TelevisionActivityHeader,
+} from "../components/activity";
 import { Breadcrumbs } from "../components/breadcrumbs";
 import { activityWatchingQueryOptions, activityWorkQueryOptions } from "../lib/api";
-
-function ActivitySectionLoading({
-  title,
-  header,
-}: {
-  title: string;
-  header?: ReactNode;
-}) {
-  return (
-    <section className="flex flex-col gap-1">
-      {header ?? <div className="text-sm lowercase text-neutral-500">{title}</div>}
-      <div className="flex min-h-[108px] items-center rounded-lg bg-white p-4 text-sm text-neutral-500 shadow-sm">
-        Loading…
-      </div>
-    </section>
-  );
-}
 
 export function ActivityPage() {
   const {

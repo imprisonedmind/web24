@@ -4,6 +4,9 @@ import { useEffect, useState, type ReactNode } from "react";
 import type { WatchDay } from "../types";
 import { SectionHeader, SmallLink } from "./legacy";
 
+const ACTIVITY_DEFAULT_COLOR = "#f3f4f6";
+const ACTIVITY_DEFAULT_BORDER_COLOR = "#e5e7eb";
+
 function chunkArray(days: WatchDay[], chunkSize: number) {
   const chunks: WatchDay[][] = [];
   let currentChunk: WatchDay[] = [];
@@ -65,6 +68,27 @@ function HeatMapDates() {
   );
 }
 
+function ActivitySkeletonGrid({ columns = 44 }: { columns?: number }) {
+  return (
+    <>
+      {Array.from({ length: columns }, (_, columnIndex) => (
+        <div key={columnIndex} className="flex flex-col gap-[3px] p-[2px]">
+          {Array.from({ length: 7 }, (_, rowIndex) => (
+            <div
+              key={`${columnIndex}-${rowIndex}`}
+              className="h-[10px] w-[10px] flex-shrink-0 rounded-sm border-[0.3px]"
+              style={{
+                backgroundColor: ACTIVITY_DEFAULT_COLOR,
+                borderColor: ACTIVITY_DEFAULT_BORDER_COLOR,
+              }}
+            />
+          ))}
+        </div>
+      ))}
+    </>
+  );
+}
+
 function formatDateLabel(dateString: string) {
   const months = [
     "Jan",
@@ -111,8 +135,8 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
   };
 
   const today = new Date().toISOString().split("T")[0];
-  const defaultColor = "#f3f4f6";
-  const defaultBorderColor = "#e5e7eb";
+  const defaultColor = ACTIVITY_DEFAULT_COLOR;
+  const defaultBorderColor = ACTIVITY_DEFAULT_BORDER_COLOR;
   const todayBorderColor = "#0ea5e9";
   const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
@@ -250,6 +274,26 @@ export function ActivitySection({
           {chunkArray(days, 7).map((chunk, index) => (
             <Chunk key={index} chunk={chunk} />
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function ActivitySectionLoading({
+  title,
+  header,
+}: {
+  title: string;
+  header?: ReactNode;
+}) {
+  return (
+    <section className="flex flex-col gap-1">
+      {header ?? <div className="text-sm lowercase text-neutral-500">{title}</div>}
+      <div className="flex flex-row rounded-lg bg-white p-2 pl-1 shadow-sm animate-pulse">
+        <HeatMapDates />
+        <div className="flex w-full flex-nowrap justify-end overflow-x-clip pr-[16px] sm:pr-[14px]">
+          <ActivitySkeletonGrid />
         </div>
       </div>
     </section>
