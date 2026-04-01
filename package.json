@@ -20,6 +20,7 @@
     "typecheck": "bun run typecheck:web && bun run typecheck:api",
     "typecheck:web": "bun run --cwd apps/web typecheck",
     "typecheck:api": "bun run --cwd apps/api typecheck",
+    "test:api:latency": "bun run --cwd apps/api test:latency",
     "lint": "bun run lint:web && bun run lint:api",
     "lint:web": "bun run --cwd apps/web lint",
     "lint:api": "bun run --cwd apps/api lint",

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "build": "tsc -p tsconfig.json --noEmit",
+    "test:latency": "bun test src/request-latency.test.ts --timeout 120000",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
