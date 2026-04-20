@@ -404,6 +404,7 @@ async function syncHistoryPages(
   let totalInserted = 0;
   let totalUpdated = 0;
   let totalSkipped = 0;
+  let totalDeduped = 0;
 
   for (let page = 1; page <= 100; page++) {
     logStep(`Fetching Trakt history page ${page}`);
@@ -434,8 +435,9 @@ async function syncHistoryPages(
       totalInserted += result.inserted;
       totalUpdated += result.updated;
       totalSkipped += result.skipped;
+      totalDeduped += result.deduped;
       logStep(
-        `Synced ${totalEntries} total history entries so far (${totalInserted} inserted, ${totalUpdated} updated, ${totalSkipped} unchanged)`,
+        `Synced ${totalEntries} total history entries so far (${totalInserted} inserted, ${totalUpdated} updated, ${totalSkipped} unchanged, ${totalDeduped} deduped)`,
       );
     }
 
@@ -447,6 +449,7 @@ async function syncHistoryPages(
     totalInserted,
     totalUpdated,
     totalSkipped,
+    totalDeduped,
   };
 }
 
@@ -575,10 +578,12 @@ async function main() {
   console.log(`Backfill inserted: ${historyResult.totalInserted}`);
   console.log(`Backfill updated: ${historyResult.totalUpdated}`);
   console.log(`Backfill unchanged: ${historyResult.totalSkipped}`);
+  console.log(`Backfill deduped: ${historyResult.totalDeduped}`);
   console.log(`History entries processed: ${syncResult.processed}`);
   console.log(`Inserted: ${syncResult.inserted}`);
   console.log(`Updated: ${syncResult.updated}`);
   console.log(`Unchanged: ${syncResult.skipped}`);
+  console.log(`Deduped: ${syncResult.deduped}`);
   console.log(`Currently watching: ${syncResult.currentWatching ?? "none"}`);
 }
 
