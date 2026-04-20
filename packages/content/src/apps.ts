@@ -30,7 +30,7 @@ export const appItems: AppItem[] = [
   },
   {
     title: "finchy",
-    link: "https://finchy-website.vercel.app/",
+    link: "https://finchy.lukestephens.co.za/",
     tag: "mobile",
     image: "/images/apps/logos/finchy.jpg",
     previewImage: "/images/apps/previews/finchy.jpg",

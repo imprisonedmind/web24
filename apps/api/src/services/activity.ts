@@ -20,6 +20,24 @@ const CATEGORY_LABELS: Record<string, string> = {
   Browsing: "browsing"
 };
 
+function normalizeCategoryName(name: string) {
+  return name.trim().toLowerCase() === "ai coding" ? "Coding" : name;
+}
+
+function normalizeWakaDay(day: ActivityDay) {
+  const categoryTotals = new Map<string, number>();
+
+  for (const category of day.categories ?? []) {
+    const name = normalizeCategoryName(category.name);
+    categoryTotals.set(name, (categoryTotals.get(name) ?? 0) + category.total);
+  }
+
+  return {
+    ...day,
+    categories: Array.from(categoryTotals, ([name, total]) => ({ name, total }))
+  } satisfies ActivityDay;
+}
+
 function mergeDays(wakaDays: ActivityDay[], traktDays: ActivityDay[]) {
   const map: Record<string, ActivityDay> = {};
 
@@ -92,7 +110,9 @@ export async function getCodingActivityDays() {
         const todayIso = new Date().toISOString().split("T")[0];
 
         return Array.isArray(payload?.days)
-          ? payload.days.filter(day => day?.date && day.date <= todayIso)
+          ? payload.days
+              .filter(day => day?.date && day.date <= todayIso)
+              .map(normalizeWakaDay)
           : [];
       } catch (error) {
         console.error("[api/activity] failed to fetch wakatime activity", error);
