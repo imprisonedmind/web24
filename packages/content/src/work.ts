@@ -108,8 +108,7 @@ export const personalWorkItems: WorkItem[] = [
     image: "https://friendsbeat.lukestephens.co.za/seo-large.jpg",
     alt: "Friends Beat music discovery web app cover image",
     favourite: true,
-    description: "spotify friend activity and music discovery app",
-    year: "2026",
+    year: "2025",
   },
   {
     title: "finchy",

@@ -8,7 +8,7 @@ export function HomeAppsSection() {
   return (
     <section className="-mt-4 flex w-full flex-col gap-1 md:mt-0">
       <SectionHeader title="apps" />
-      <div className="flex flex-row items-center gap-4 overflow-x-auto">
+      <div className="flex flex-row items-center gap-4 overflow-x-auto py-2">
         {appItems.map((item) => (
           <HomeAppLogo key={item.link} item={item} />
         ))}
