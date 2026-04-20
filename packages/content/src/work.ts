@@ -102,6 +102,16 @@ export const personalWorkItems: WorkItem[] = [
     year: "2026",
   },
   {
+    title: "Friends Beat",
+    link: "https://friendsbeat.lukestephens.co.za/",
+    tag: "web app",
+    image: "https://friendsbeat.lukestephens.co.za/seo-large.jpg",
+    alt: "Friends Beat music discovery web app cover image",
+    favourite: true,
+    description: "spotify friend activity and music discovery app",
+    year: "2026",
+  },
+  {
     title: "finchy",
     link: "https://finchy.lukestephens.co.za/",
     tag: "mobile",
