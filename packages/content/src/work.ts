@@ -130,7 +130,7 @@ export const personalWorkItems: WorkItem[] = [
   },
   {
     title: "sus.watch",
-    link: "https://sus.watch",
+    link: "https://suswatch.lukestephens.co.za",
     tag: "web app",
     image: "/images/work/sus_watch.jpg",
     alt: "A device management portal",
