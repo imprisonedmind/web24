@@ -25,6 +25,7 @@
     "lint:web": "bun run --cwd apps/web lint",
     "lint:api": "bun run --cwd apps/api lint",
     "sync-trakt": "bun run scripts/sync-trakt.ts",
+    "trakt:sanitize": "bun run scripts/sanitize-trakt-history.ts",
     "trakt:login": "bun run scripts/trakt-auth.ts login",
     "spotify:login": "bun run scripts/spotify-auth.ts login"
   },

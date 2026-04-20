@@ -121,6 +121,7 @@ type RecentSyncResult = {
   inserted: number;
   updated: number;
   skipped: number;
+  deduped: number;
   currentWatching: string | null;
 };
 
@@ -226,6 +227,28 @@ function getActivityDate(watchedAtMs: number) {
   return new Date(watchedAtMs).toISOString().slice(0, 10);
 }
 
+function getHistoryDedupeKey(entry: HistoryEntry) {
+  const date = getActivityDate(entry.watchedAtMs);
+
+  if (entry.entryType === "movie") {
+    return `${date}:movie:${entry.aggregateKey}`;
+  }
+
+  if (typeof entry.season === "number" && typeof entry.episode === "number") {
+    return `${date}:episode:${entry.aggregateKey}:s${entry.season}:e${entry.episode}`;
+  }
+
+  return `${date}:${entry.entryType}:${entry.href || entry.aggregateKey}`;
+}
+
+function isPreferredHistoryEntry(candidate: HistoryEntry, current: HistoryEntry) {
+  if (candidate.watchedAtMs !== current.watchedAtMs) {
+    return candidate.watchedAtMs > current.watchedAtMs;
+  }
+
+  return candidate.historyId.localeCompare(current.historyId) > 0;
+}
+
 function toDailyActivityDelta(entry: HistoryEntry): DailyActivityDelta {
   const seconds = Math.max(0, (entry.runtimeMinutes || 0) * 60);
   const isMovie = entry.entryType === "movie";
@@ -256,6 +279,15 @@ function addDailyActivityDelta(
   current.movieSeconds += delta.movieSeconds * multiplier;
   current.episodeSeconds += delta.episodeSeconds * multiplier;
   totals.set(delta.date, current);
+}
+
+function subtractDailyActivityDelta(delta: DailyActivityDelta): DailyActivityDelta {
+  return {
+    date: delta.date,
+    totalSeconds: -delta.totalSeconds,
+    movieSeconds: -delta.movieSeconds,
+    episodeSeconds: -delta.episodeSeconds,
+  };
 }
 
 async function applyDailyActivityDelta(ctx: any, delta: DailyActivityDelta) {
@@ -293,6 +325,11 @@ async function applyDailyActivityDelta(ctx: any, delta: DailyActivityDelta) {
   await ctx.db.insert("traktDailyActivity", patch);
 }
 
+async function deleteHistoryEntry(ctx: any, entry: HistoryEntry & { _id: any }) {
+  await ctx.db.delete(entry._id);
+  await applyDailyActivityDelta(ctx, subtractDailyActivityDelta(toDailyActivityDelta(entry)));
+}
+
 async function replaceDailyActivity(ctx: any, rows: DailyActivity[]) {
   const existing = await ctx.db.query("traktDailyActivity").collect();
   await Promise.all(existing.map((doc: any) => ctx.db.delete(doc._id)));
@@ -303,10 +340,77 @@ async function replaceDailyActivity(ctx: any, rows: DailyActivity[]) {
   }
 }
 
+async function rebuildDailyActivityFromEntries(ctx: any, entries: HistoryEntry[]) {
+  const totals = new Map<string, DailyActivityDelta>();
+  for (const entry of entries) {
+    addDailyActivityDelta(totals, toDailyActivityDelta(entry));
+  }
+
+  const updatedAtMs = Date.now();
+  const rows = Array.from(totals.values())
+    .filter((row) => row.totalSeconds > 0)
+    .sort((left, right) => left.date.localeCompare(right.date))
+    .map((row) => ({
+      ...row,
+      updatedAtMs,
+    }));
+
+  await replaceDailyActivity(ctx, rows);
+  return rows.length;
+}
+
+async function sanitizeDuplicateHistoryEntriesImpl(ctx: any, dryRun = false) {
+  const entries = (await ctx.db.query("traktHistoryEntries").collect()) as (HistoryEntry & {
+    _id: any;
+    _creationTime: number;
+  })[];
+  const groups = new Map<string, (HistoryEntry & { _id: any; _creationTime: number })[]>();
+
+  for (const entry of entries) {
+    const key = getHistoryDedupeKey(entry);
+    groups.set(key, [...(groups.get(key) ?? []), entry]);
+  }
+
+  let duplicateGroups = 0;
+  let deleted = 0;
+  const keptEntries: HistoryEntry[] = [];
+
+  for (const group of groups.values()) {
+    const preferred = group.reduce((winner, candidate) =>
+      isPreferredHistoryEntry(candidate, winner) ? candidate : winner,
+    );
+    keptEntries.push(preferred);
+
+    if (group.length <= 1) continue;
+
+    duplicateGroups += 1;
+    const duplicates = group.filter((entry) => entry._id !== preferred._id);
+    deleted += duplicates.length;
+
+    if (!dryRun) {
+      for (const duplicate of duplicates) {
+        await ctx.db.delete(duplicate._id);
+      }
+    }
+  }
+
+  const daysRebuilt = dryRun ? 0 : await rebuildDailyActivityFromEntries(ctx, keptEntries);
+
+  return {
+    scanned: entries.length,
+    kept: keptEntries.length,
+    duplicateGroups,
+    deleted,
+    daysRebuilt,
+    dryRun,
+  };
+}
+
 async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
   let inserted = 0;
   let updated = 0;
   let skipped = 0;
+  let deduped = 0;
 
   for (const entry of entries) {
     const existing = await ctx.db
@@ -315,6 +419,29 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
       .collect();
 
     if (!existing.length) {
+      const dedupeKey = getHistoryDedupeKey(entry);
+      const duplicateEntries = (await ctx.db.query("traktHistoryEntries").collect()).filter(
+        (row: HistoryEntry) => getHistoryDedupeKey(row) === dedupeKey,
+      );
+
+      if (duplicateEntries.length) {
+        const preferred = duplicateEntries.reduce(
+          (current: HistoryEntry & { _id: any }, candidate: HistoryEntry & { _id: any }) =>
+            isPreferredHistoryEntry(candidate, current) ? candidate : current,
+        );
+
+        if (!isPreferredHistoryEntry(entry, preferred)) {
+          skipped += 1;
+          deduped += 1;
+          continue;
+        }
+
+        for (const duplicate of duplicateEntries) {
+          await deleteHistoryEntry(ctx, duplicate);
+          deduped += 1;
+        }
+      }
+
       await ctx.db.insert("traktHistoryEntries", entry);
       await applyDailyActivityDelta(ctx, toDailyActivityDelta(entry));
       inserted += 1;
@@ -323,10 +450,37 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
 
     const [current, ...duplicates] = existing;
     for (const duplicate of duplicates) {
-      await ctx.db.delete(duplicate._id);
+      await deleteHistoryEntry(ctx, duplicate);
+      deduped += 1;
     }
 
     const { _id: _currentId, _creationTime: _currentCreationTime, ...currentData } = current;
+
+    const dedupeKey = getHistoryDedupeKey(entry);
+    const duplicateEntries = (await ctx.db.query("traktHistoryEntries").collect()).filter(
+      (row: HistoryEntry & { _id: any }) =>
+        row._id !== current._id && getHistoryDedupeKey(row) === dedupeKey,
+    );
+
+    if (duplicateEntries.length) {
+      const preferred = duplicateEntries.reduce(
+        (winner: HistoryEntry & { _id: any }, candidate: HistoryEntry & { _id: any }) =>
+          isPreferredHistoryEntry(candidate, winner) ? candidate : winner,
+        current,
+      );
+
+      if (preferred._id !== current._id && !isPreferredHistoryEntry(entry, preferred)) {
+        await deleteHistoryEntry(ctx, current);
+        skipped += 1;
+        deduped += 1;
+        continue;
+      }
+
+      for (const duplicate of duplicateEntries) {
+        await deleteHistoryEntry(ctx, duplicate);
+        deduped += 1;
+      }
+    }
 
     if (entriesEqual(currentData, entry)) {
       skipped += 1;
@@ -336,17 +490,12 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
     const currentDelta = toDailyActivityDelta(currentData as HistoryEntry);
     const nextDelta = toDailyActivityDelta(entry);
     await ctx.db.patch(current._id, entry);
-    await applyDailyActivityDelta(ctx, {
-      date: currentDelta.date,
-      totalSeconds: -currentDelta.totalSeconds,
-      movieSeconds: -currentDelta.movieSeconds,
-      episodeSeconds: -currentDelta.episodeSeconds,
-    });
+    await applyDailyActivityDelta(ctx, subtractDailyActivityDelta(currentDelta));
     await applyDailyActivityDelta(ctx, nextDelta);
     updated += 1;
   }
 
-  return { inserted, updated, skipped };
+  return { inserted, updated, skipped, deduped };
 }
 
 async function setCurrentWatchingState(ctx: any, currentWatching: CurrentWatching | undefined, syncedAtMs: number) {
@@ -646,6 +795,15 @@ export const clearHistory = mutation({
   },
 });
 
+export const sanitizeDuplicateHistoryEntries = mutation({
+  args: {
+    dryRun: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    return await sanitizeDuplicateHistoryEntriesImpl(ctx, args.dryRun ?? false);
+  },
+});
+
 export const upsertHistoryBatch = mutation({
   args: {
     entries: v.array(historyEntryValidator),
@@ -795,6 +953,7 @@ async function runRecentSyncImpl(ctx: ActionCtx, windowHours: number): Promise<R
   let inserted = 0;
   let updated = 0;
   let skipped = 0;
+  let deduped = 0;
 
   for (let page = 1; page <= 100; page += 1) {
     const url =
@@ -830,6 +989,7 @@ async function runRecentSyncImpl(ctx: ActionCtx, windowHours: number): Promise<R
       inserted += result.inserted;
       updated += result.updated;
       skipped += result.skipped;
+      deduped += result.deduped;
     }
 
     if (batch.length < 100) break;
@@ -873,6 +1033,7 @@ async function runRecentSyncImpl(ctx: ActionCtx, windowHours: number): Promise<R
     inserted,
     updated,
     skipped,
+    deduped,
     currentWatching: currentWatching?.title ?? null,
   };
 }
@@ -892,14 +1053,8 @@ export const rebuildDailyActivity = action({
     const entries = (await ctx.runQuery(api.trakt.listHistoryEntries, {
       order: "asc",
     })) as (HistoryEntry & { historyId: string })[];
-    const dedupedEntries = new Map<string, HistoryEntry>();
-
-    for (const entry of entries) {
-      dedupedEntries.set(entry.historyId, entry);
-    }
-
     const totals = new Map<string, DailyActivityDelta>();
-    for (const entry of dedupedEntries.values()) {
+    for (const entry of entries) {
       addDailyActivityDelta(totals, toDailyActivityDelta(entry));
     }
 
@@ -915,7 +1070,7 @@ export const rebuildDailyActivity = action({
     await ctx.runMutation(internal.trakt.replaceDailyActivityInternal, { rows });
 
     return {
-      historyEntries: dedupedEntries.size,
+      historyEntries: entries.length,
       days: rows.length,
     };
   },
