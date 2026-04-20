@@ -103,7 +103,7 @@ export const personalWorkItems: WorkItem[] = [
   },
   {
     title: "finchy",
-    link: "https://finchy-website.vercel.app/",
+    link: "https://finchy.lukestephens.co.za/",
     tag: "mobile",
     image: "/images/apps/previews/finchy.jpg",
     alt: "mobile app for spend management",
@@ -139,7 +139,7 @@ export const personalWorkItems: WorkItem[] = [
   },
   {
     title: "Giggity",
-    link: "https://giggity.co.za",
+    link: "https://giggity.lukestephens.co.za/",
     tag: "web app",
     image: "/images/work/giggity2.png",
     alt: "Giggity.co.za website cover image",
