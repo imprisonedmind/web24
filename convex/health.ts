@@ -82,6 +82,25 @@ const takeoutSleepEventValidator = v.object({
   source: v.string(),
 });
 
+const takeoutExerciseEventValidator = v.object({
+  externalId: v.string(),
+  date: v.string(),
+  title: v.string(),
+  activityType: v.string(),
+  startTime: v.string(),
+  endTime: v.string(),
+  startTimeMs: v.number(),
+  endTimeMs: v.number(),
+  durationSeconds: v.number(),
+  steps: v.optional(v.number()),
+  distanceMeters: v.optional(v.number()),
+  caloriesKcal: v.optional(v.number()),
+  heartRateMinBpm: v.optional(v.number()),
+  heartRateAvgBpm: v.optional(v.number()),
+  heartRateMaxBpm: v.optional(v.number()),
+  source: v.string(),
+});
+
 async function deleteRowsInWindow(
   ctx: MutationCtx,
   windowStartMs: number,
@@ -416,6 +435,7 @@ export const importTakeoutHealthData = mutation({
   args: {
     metrics: v.array(takeoutDailyMetricValidator),
     sleepEvents: v.array(takeoutSleepEventValidator),
+    exerciseEvents: v.array(takeoutExerciseEventValidator),
   },
   handler: async (ctx, args) => {
     const updatedAtMs = Date.now();
@@ -424,6 +444,8 @@ export const importTakeoutHealthData = mutation({
     let metricRowsUnchanged = 0;
     let sleepRowsInserted = 0;
     let sleepDaysSkipped = 0;
+    let exerciseRowsInserted = 0;
+    let exerciseRowsSkipped = 0;
 
     for (const metric of args.metrics) {
       const existingRows = await ctx.db
@@ -570,6 +592,106 @@ export const importTakeoutHealthData = mutation({
       }
     }
 
+    const exerciseEventsByDate = new Map<string, typeof args.exerciseEvents>();
+    for (const event of args.exerciseEvents) {
+      exerciseEventsByDate.set(event.date, [...(exerciseEventsByDate.get(event.date) ?? []), event]);
+    }
+
+    for (const [date, events] of exerciseEventsByDate) {
+      const [existingDailyRows, existingExerciseEvents] = await Promise.all([
+        ctx.db
+          .query("healthDailySummaries")
+          .withIndex("by_date", (q: any) => q.eq("date", date))
+          .collect(),
+        ctx.db
+          .query("healthActivityEvents")
+          .withIndex("by_date", (q: any) => q.eq("date", date))
+          .collect(),
+      ]);
+      const existingDaily = existingDailyRows[0];
+
+      if (
+        (existingDaily?.exerciseSeconds ?? 0) > 0 ||
+        existingExerciseEvents.some((event: any) => event.kind === "exercise")
+      ) {
+        exerciseRowsSkipped += events.length;
+        continue;
+      }
+
+      let exerciseSeconds = 0;
+      let exerciseSteps = 0;
+      let exerciseDistance = 0;
+      let exerciseCalories = 0;
+      let insertedForDate = 0;
+
+      for (const event of events) {
+        const existingEvent = await ctx.db
+          .query("healthActivityEvents")
+          .withIndex("by_externalId", (q: any) => q.eq("externalId", event.externalId))
+          .unique();
+        if (existingEvent) {
+          exerciseRowsSkipped += 1;
+          continue;
+        }
+
+        exerciseSeconds += event.durationSeconds;
+        exerciseSteps += event.steps ?? 0;
+        exerciseDistance += event.distanceMeters ?? 0;
+        exerciseCalories += event.caloriesKcal ?? 0;
+
+        await ctx.db.insert("healthActivityEvents", {
+          externalId: event.externalId,
+          date: event.date,
+          kind: "exercise",
+          title: event.title,
+          activityType: event.activityType,
+          startTime: event.startTime,
+          endTime: event.endTime,
+          startTimeMs: event.startTimeMs,
+          endTimeMs: event.endTimeMs,
+          durationSeconds: event.durationSeconds,
+          steps: positiveNumber(event.steps),
+          distanceMeters: positiveNumber(event.distanceMeters),
+          caloriesKcal: positiveNumber(event.caloriesKcal),
+          heartRateMinBpm: positiveNumber(event.heartRateMinBpm),
+          heartRateAvgBpm: positiveNumber(event.heartRateAvgBpm),
+          heartRateMaxBpm: positiveNumber(event.heartRateMaxBpm),
+          sourcePackageName: event.source,
+          metadataId: event.externalId,
+          updatedAtMs,
+        });
+        exerciseRowsInserted += 1;
+        insertedForDate += 1;
+      }
+
+      if (exerciseSeconds <= 0) continue;
+
+      const patch = {
+        exerciseSeconds,
+        exerciseSessions: insertedForDate,
+        sources: Array.from(new Set([...(existingDaily?.sources ?? []), "google-fit-takeout"])).sort(),
+        updatedAtMs,
+      };
+
+      if (existingDaily) {
+        await ctx.db.patch(existingDaily._id, patch);
+      } else {
+        await ctx.db.insert("healthDailySummaries", {
+          date,
+          steps: positiveNumber(exerciseSteps) ?? 0,
+          distanceMeters: positiveNumber(exerciseDistance) ?? 0,
+          activeCaloriesKcal: positiveNumber(exerciseCalories) ?? 0,
+          totalCaloriesKcal: 0,
+          exerciseSeconds,
+          sleepSeconds: 0,
+          exerciseSessions: insertedForDate,
+          sleepSessions: 0,
+          sources: ["google-fit-takeout"],
+          updatedAtMs,
+        });
+      }
+    }
+
     const existingState = await ctx.db
       .query("healthSyncState")
       .withIndex("by_key", (q: any) => q.eq("key", STATE_KEY))
@@ -585,8 +707,11 @@ export const importTakeoutHealthData = mutation({
       metricRowsUnchanged,
       sleepRowsInserted,
       sleepDaysSkipped,
+      exerciseRowsInserted,
+      exerciseRowsSkipped,
       processedMetricRows: args.metrics.length,
       processedSleepEvents: args.sleepEvents.length,
+      processedExerciseEvents: args.exerciseEvents.length,
       syncedAtMs: updatedAtMs,
     };
   },
