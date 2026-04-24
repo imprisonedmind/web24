@@ -122,16 +122,69 @@ function formatDuration(timeInSeconds: number) {
   return `${minutes}m`;
 }
 
+function formatDistance(distanceMeters: number) {
+  if (distanceMeters >= 1000) {
+    const kilometers = distanceMeters / 1000;
+    return `${Number.isInteger(kilometers) ? kilometers.toFixed(0) : kilometers.toFixed(1)} km`;
+  }
+
+  return `${Math.round(distanceMeters)} m`;
+}
+
+function categoryMetrics(category: NonNullable<WatchDay["categories"]>[number]) {
+  const metrics: { label: string; value: string }[] = [];
+  const isGenericSteps = category.name === "Steps";
+
+  if (category.distanceMeters && category.distanceMeters > 0) {
+    metrics.push({ label: "Distance", value: formatDistance(category.distanceMeters) });
+  }
+  if (!isGenericSteps && category.steps && category.steps > 0) {
+    metrics.push({ label: "Steps", value: Math.round(category.steps).toLocaleString() });
+  }
+  if (category.caloriesKcal && category.caloriesKcal > 0) {
+    metrics.push({ label: "Calories", value: `${Math.round(category.caloriesKcal)} kcal` });
+  }
+  if (!isGenericSteps && category.heartRateAvgBpm && category.heartRateAvgBpm > 0) {
+    metrics.push({
+      label: "Heartbeat",
+      value: `${Math.round(category.heartRateAvgBpm)} avg${
+        category.heartRateMaxBpm && category.heartRateMaxBpm > 0
+          ? ` / ${Math.round(category.heartRateMaxBpm)} max`
+          : ""
+      }`,
+    });
+  }
+
+  return metrics;
+}
+
+function categoryPrimaryValue(category: NonNullable<WatchDay["categories"]>[number]) {
+  if (category.name === "Steps" && category.steps && category.steps > 0) {
+    return Math.round(category.steps).toLocaleString();
+  }
+
+  return formatDuration(category.total);
+}
+
 function Chunk({ chunk }: { chunk: WatchDay[] }) {
   const categoryColors: Record<string, string> = {
     Coding: "#20b958",
     Designing: "#a855f7",
     Meeting: "#de44ef",
-    "Writing Docs": "#08eac1",
+    "Writing Docs": "#2563eb",
     Browsing: "#086aea",
     Movie: "#ea4408",
     Episode: "#ea7908",
-    Listening: "#20b958"
+    Listening: "#20b958",
+    Exercise: "#dc2626",
+    Steps: "#ef4444",
+    Walking: "#dc2626",
+    Running: "#ef4444",
+    "Rock Climbing": "#b91c1c",
+    "Strength Training": "#f87171",
+    Other: "#dc2626",
+    Sleep: "#2563eb",
+    Nap: "#60a5fa"
   };
 
   const today = new Date().toISOString().split("T")[0];
@@ -169,7 +222,9 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
             ? defaultBorderColor
             : chunkItem.date === today
               ? todayBorderColor
-              : categoryColors[dominantCategory?.name ?? ""] ?? defaultBorderColor;
+              : dominantCategory?.name === "Steps"
+                ? defaultBorderColor
+                : categoryColors[dominantCategory?.name ?? ""] ?? defaultBorderColor;
         const backgroundColor =
           !chunkItem.categories || chunkItem.total < 60
             ? defaultColor
@@ -186,29 +241,48 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
             {hoveredDate === chunkItem.date && modalRoot && hoverPosition
               ? createPortal(
                   <div
-                    className="pointer-events-none absolute z-10 flex h-fit w-max flex-col gap-2 rounded-sm bg-white p-2 shadow-lg"
+                    className="pointer-events-none absolute z-10 flex h-fit w-[240px] flex-col gap-2 rounded-sm bg-white p-2 shadow-lg"
                     style={{ top: `${hoverPosition.y}px`, left: `${hoverPosition.x + 10}px` }}
                   >
-                    <div className="flex flex-col gap-1">
-                      <p className="text-xs font-semibold">{dateTitle}</p>
-                      <div className="flex justify-between text-xs text-gray-500">
+                    <div className="flex flex-col gap-1 text-xs text-gray-500">
+                      <p className="font-semibold text-gray-900">{dateTitle}</p>
+                      <div className="flex justify-between gap-4">
                         <p>Total:</p>
                         <p>{formatDuration(chunkItem.total)}</p>
                       </div>
                     </div>
                     {chunkItem.categories && chunkItem.categories.length > 0 ? (
                       <div className="flex flex-col gap-1">
-                        <p className="text-xs font-semibold">Categories</p>
-                        <ul>
-                          {visibleCategories.map(category => (
+                        <p className="text-xs font-semibold text-gray-900">Categories</p>
+                        <ul className="flex flex-col gap-2 text-xs text-gray-500">
+                          {visibleCategories.map((category, index) => {
+                            const metrics = categoryMetrics(category);
+                            return (
                               <li
                                 key={category.name}
-                                className="flex justify-between gap-4 text-xs text-gray-500"
+                                className={`flex flex-col gap-1 ${
+                                  visibleCategories.length > 1 && index > 0
+                                    ? "border-t border-gray-200 pt-2"
+                                    : ""
+                                }`}
                               >
-                                <p>{category.name}:</p>
-                                <p>{formatDuration(category.total)}</p>
+                                <div className="flex justify-between gap-4">
+                                  <p>{category.name}:</p>
+                                  <p>{categoryPrimaryValue(category)}</p>
+                                </div>
+                                {metrics.length > 0 ? (
+                                  <div className="flex flex-col gap-1">
+                                    {metrics.map(metric => (
+                                      <div key={metric.label} className="flex justify-between gap-4">
+                                        <p>{metric.label}:</p>
+                                        <p>{metric.value}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : null}
                               </li>
-                            ))}
+                            );
+                          })}
                         </ul>
                       </div>
                     ) : (

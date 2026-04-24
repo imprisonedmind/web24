@@ -1,7 +1,15 @@
 export type WatchDay = {
   date: string;
   total: number;
-  categories?: { name: string; total: number }[];
+  categories?: {
+    name: string;
+    total: number;
+    distanceMeters?: number;
+    steps?: number;
+    caloriesKcal?: number;
+    heartRateAvgBpm?: number;
+    heartRateMaxBpm?: number;
+  }[];
 };
 
 export type WatchedItem = {
