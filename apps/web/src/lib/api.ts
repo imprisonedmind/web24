@@ -70,6 +70,25 @@ export const homeActivityQueryOptions = queryOptions({
   retry: false,
 });
 
+export type HomeHeroHealthStats = {
+  heartRateBpm: number | null;
+  steps: number | null;
+  date: string | null;
+};
+
+export const homeHeroHealthStatsQueryOptions = queryOptions({
+  queryKey: ["activity", "home", "hero"],
+  queryFn: async () => {
+    try {
+      return await fetchJson<HomeHeroHealthStats>("/api/activity/home/hero");
+    } catch (error) {
+      console.warn("[home-hero-health] request failed; rendering fallback stats", error);
+      return { heartRateBpm: null, steps: null, date: null } satisfies HomeHeroHealthStats;
+    }
+  },
+  retry: false,
+});
+
 export const fullActivityQueryOptions = queryOptions({
   queryKey: ["activity", "full"],
   queryFn: async () => {
@@ -97,6 +116,17 @@ export const activityWorkQueryOptions = queryOptions({
       "/api/activity/work",
     );
     return payload.workSections ?? [];
+  },
+  refetchInterval: 30_000,
+});
+
+export const activityHealthQueryOptions = queryOptions({
+  queryKey: ["activity", "health"],
+  queryFn: async () => {
+    const payload = await fetchJson<{ healthSections?: { label: string; days: WatchDay[] }[] }>(
+      "/api/activity/health",
+    );
+    return payload.healthSections ?? [];
   },
   refetchInterval: 30_000,
 });

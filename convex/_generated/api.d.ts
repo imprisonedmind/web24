@@ -9,6 +9,8 @@
  */
 
 import type * as crons from "../crons.js";
+import type * as health from "../health.js";
+import type * as http from "../http.js";
 import type * as trakt from "../trakt.js";
 
 import type {
@@ -19,6 +21,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   crons: typeof crons;
+  health: typeof health;
+  http: typeof http;
   trakt: typeof trakt;
 }>;
 
