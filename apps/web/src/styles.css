@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -125,4 +127,8 @@ body {
 
 .tech-marquee:hover .tech-marquee-track {
   animation-play-state: paused;
+}
+
+.font-doto {
+  font-family: 'Doto', monospace;
 }

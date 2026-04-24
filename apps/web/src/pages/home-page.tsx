@@ -9,6 +9,7 @@ import {
   SocialSection,
   TechSection,
 } from "../components/home";
+import { HeroImage } from "../components/home/hero-image";
 import { HomeAppsSection } from "../components/home-apps";
 import {
   HomeActivityWidget,
@@ -21,11 +22,11 @@ import { WritingPreviewLink } from "../components/previews";
 import { MusicWidgetCard, TvWidgetCard } from "../components/widgets";
 import {
   homeActivityQueryOptions,
+  homeHeroHealthStatsQueryOptions,
   musicQueryOptions,
   tvStatusQueryOptions,
 } from "../lib/api";
 import { queryClient } from "../lib/query-client";
-import { CFImage } from "../components/cf-image";
 
 export function HomePage() {
   const featuredWork = getFeaturedWorkItems(6);
@@ -34,11 +35,9 @@ export function HomePage() {
   return (
     <section className="mb-8 flex flex-col gap-8">
       <section className="mt-8 flex flex-col justify-between gap-4 md:flex-row">
-        <CFImage
-          className="mx-auto hidden max-h-[400px] max-w-[300px] rounded-2xl object-cover md:flex"
+        <HeroImage
           src="/images/profile/luke2.jpg"
           alt="Luke Stephens"
-          preset="heroPortrait"
         />
 
         <div className="flex flex-col justify-between gap-4 md:gap-0">
@@ -58,7 +57,12 @@ export function HomePage() {
           <SectionHeader
             title="writing"
             action={
-              <SmallLink href="/writing" label="more" ariaLabel="More writing" srSuffix=" writing" />
+              <SmallLink
+                href="/writing"
+                label="more"
+                ariaLabel="More writing"
+                srSuffix=" writing"
+              />
             }
           />
           <section className="grid gap-1">
@@ -88,6 +92,7 @@ export function HomePage() {
 
 export async function preloadHomePage() {
   queryClient.prefetchQuery(homeActivityQueryOptions).catch(() => undefined);
+  queryClient.prefetchQuery(homeHeroHealthStatsQueryOptions).catch(() => undefined);
   queryClient.prefetchQuery(tvStatusQueryOptions).catch(() => undefined);
   queryClient.prefetchQuery(musicQueryOptions).catch(() => undefined);
 }
