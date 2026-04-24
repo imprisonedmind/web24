@@ -717,6 +717,47 @@ export const importTakeoutHealthData = mutation({
   },
 });
 
+export const removeTakeoutSleepAwakeExerciseEvents = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const events = await ctx.db.query("healthActivityEvents").collect();
+    const badEvents = events.filter((event: any) =>
+      event.kind === "exercise" &&
+      event.sourcePackageName === "google-fit-takeout" &&
+      event.activityType?.startsWith("sleep")
+    );
+    const removedByDate = new Map<string, { seconds: number; sessions: number }>();
+
+    for (const event of badEvents) {
+      const existing = removedByDate.get(event.date) ?? { seconds: 0, sessions: 0 };
+      existing.seconds += event.durationSeconds;
+      existing.sessions += 1;
+      removedByDate.set(event.date, existing);
+      await ctx.db.delete(event._id);
+    }
+
+    for (const [date, removed] of removedByDate) {
+      const rows = await ctx.db
+        .query("healthDailySummaries")
+        .withIndex("by_date", (q: any) => q.eq("date", date))
+        .collect();
+      const existing = rows[0];
+      if (!existing) continue;
+
+      await ctx.db.patch(existing._id, {
+        exerciseSeconds: Math.max(0, existing.exerciseSeconds - removed.seconds),
+        exerciseSessions: Math.max(0, existing.exerciseSessions - removed.sessions),
+        updatedAtMs: Date.now(),
+      });
+    }
+
+    return {
+      removedEvents: badEvents.length,
+      touchedDates: removedByDate.size,
+    };
+  },
+});
+
 export const clearHealthData = mutation({
   args: {
     limit: v.optional(v.number()),

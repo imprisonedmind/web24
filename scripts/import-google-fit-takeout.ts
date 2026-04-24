@@ -211,6 +211,10 @@ async function readExerciseSessions(takeoutPath: string) {
       aggregate?: { metricName: string; intValue?: number; floatValue?: number }[];
     };
 
+    if (!raw.fitnessActivity || raw.fitnessActivity.startsWith("sleep")) {
+      continue;
+    }
+
     const startTimeMs = new Date(raw.startTime).getTime();
     const endTimeMs = new Date(raw.endTime).getTime();
     const duration = durationSeconds(raw.startTime, raw.endTime);
