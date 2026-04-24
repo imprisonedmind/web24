@@ -40,6 +40,25 @@ type TakeoutSleepEvent = {
   source: string;
 };
 
+type TakeoutExerciseEvent = {
+  externalId: string;
+  date: string;
+  title: string;
+  activityType: string;
+  startTime: string;
+  endTime: string;
+  startTimeMs: number;
+  endTimeMs: number;
+  durationSeconds: number;
+  steps?: number;
+  distanceMeters?: number;
+  caloriesKcal?: number;
+  heartRateMinBpm?: number;
+  heartRateAvgBpm?: number;
+  heartRateMaxBpm?: number;
+  source: string;
+};
+
 function argValue(name: string) {
   const index = process.argv.indexOf(name);
   return index >= 0 ? process.argv[index + 1] : undefined;
@@ -176,13 +195,82 @@ async function readSleepEvents(takeoutPath: string) {
   return events.sort((left, right) => left.startTimeMs - right.startTimeMs);
 }
 
-function monthSummary(metrics: TakeoutMetric[], sleepEvents: TakeoutSleepEvent[]) {
+async function readExerciseSessions(takeoutPath: string) {
+  const dir = path.join(takeoutPath, "All Sessions");
+  const files = (await readdir(dir)).filter(
+    (file) => file.endsWith(".json") && !file.endsWith("_SLEEP.json")
+  );
+  const events: TakeoutExerciseEvent[] = [];
+
+  for (const file of files) {
+    const raw = JSON.parse(await readFile(path.join(dir, file), "utf8")) as {
+      fitnessActivity: string;
+      startTime: string;
+      endTime: string;
+      duration?: string;
+      aggregate?: { metricName: string; intValue?: number; floatValue?: number }[];
+    };
+
+    const startTimeMs = new Date(raw.startTime).getTime();
+    const endTimeMs = new Date(raw.endTime).getTime();
+    const duration = durationSeconds(raw.startTime, raw.endTime);
+    if (!Number.isFinite(startTimeMs) || !Number.isFinite(endTimeMs) || duration <= 0) continue;
+
+    // Parse aggregate metrics
+    let steps: number | undefined;
+    let distanceMeters: number | undefined;
+    let caloriesKcal: number | undefined;
+
+    for (const agg of raw.aggregate ?? []) {
+      switch (agg.metricName) {
+        case "com.google.step_count.delta":
+          steps = agg.intValue ?? agg.floatValue;
+          break;
+        case "com.google.distance.delta":
+          distanceMeters = agg.intValue ?? agg.floatValue;
+          break;
+        case "com.google.calories.expended":
+          caloriesKcal = agg.floatValue ?? agg.intValue;
+          break;
+      }
+    }
+
+    // Format title from activity type
+    const activityType = raw.fitnessActivity ?? "unknown";
+    const title = activityType
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    events.push({
+      externalId: `google-fit-takeout:exercise:${startTimeMs}:${endTimeMs}`,
+      date: localDate(raw.startTime),
+      title,
+      activityType,
+      startTime: raw.startTime,
+      endTime: raw.endTime,
+      startTimeMs,
+      endTimeMs,
+      durationSeconds: duration,
+      steps: positive(steps),
+      distanceMeters: positive(distanceMeters),
+      caloriesKcal: positive(caloriesKcal),
+      source: TAKEOUT_SOURCE,
+    });
+  }
+
+  return events.sort((left, right) => left.startTimeMs - right.startTimeMs);
+}
+
+function monthSummary(metrics: TakeoutMetric[], sleepEvents: TakeoutSleepEvent[], exerciseEvents: TakeoutExerciseEvent[]) {
   const byMonth = new Map<string, {
     month: string;
     metricDays: number;
     stepDays: number;
     totalSteps: number;
     sleepEvents: number;
+    exerciseEvents: number;
+    exerciseEventDays: Set<string>;
   }>();
 
   for (const metric of metrics) {
@@ -193,6 +281,8 @@ function monthSummary(metrics: TakeoutMetric[], sleepEvents: TakeoutSleepEvent[]
       stepDays: 0,
       totalSteps: 0,
       sleepEvents: 0,
+      exerciseEvents: 0,
+      exerciseEventDays: new Set(),
     };
     entry.metricDays += 1;
     if ((metric.steps ?? 0) > 0) entry.stepDays += 1;
@@ -208,12 +298,35 @@ function monthSummary(metrics: TakeoutMetric[], sleepEvents: TakeoutSleepEvent[]
       stepDays: 0,
       totalSteps: 0,
       sleepEvents: 0,
+      exerciseEvents: 0,
+      exerciseEventDays: new Set(),
     };
     entry.sleepEvents += 1;
     byMonth.set(month, entry);
   }
 
-  return Array.from(byMonth.values()).sort((left, right) => left.month.localeCompare(right.month));
+  for (const event of exerciseEvents) {
+    const month = event.date.slice(0, 7);
+    const entry = byMonth.get(month) ?? {
+      month,
+      metricDays: 0,
+      stepDays: 0,
+      totalSteps: 0,
+      sleepEvents: 0,
+      exerciseEvents: 0,
+      exerciseEventDays: new Set(),
+    };
+    entry.exerciseEvents += 1;
+    entry.exerciseEventDays.add(event.date);
+    byMonth.set(month, entry);
+  }
+
+  return Array.from(byMonth.values())
+    .map((entry) => ({
+      ...entry,
+      exerciseEventDays: entry.exerciseEventDays.size,
+    }))
+    .sort((left, right) => left.month.localeCompare(right.month));
 }
 
 async function main() {
@@ -222,9 +335,10 @@ async function main() {
   const dryRun = process.argv.includes("--dry-run");
   const metrics = await readDailyMetrics(takeoutPath);
   const sleepEvents = await readSleepEvents(takeoutPath);
+  const exerciseEvents = await readExerciseSessions(takeoutPath);
 
-  console.table(monthSummary(metrics, sleepEvents));
-  console.log(`Parsed ${metrics.length} daily metric files and ${sleepEvents.length} sleep sessions.`);
+  console.table(monthSummary(metrics, sleepEvents, exerciseEvents));
+  console.log(`Parsed ${metrics.length} daily metric files, ${sleepEvents.length} sleep sessions, and ${exerciseEvents.length} exercise sessions.`);
 
   if (dryRun) {
     console.log("Dry run only; no Convex writes performed.");
@@ -238,14 +352,19 @@ async function main() {
     metricRowsUnchanged: 0,
     sleepRowsInserted: 0,
     sleepDaysSkipped: 0,
+    exerciseRowsInserted: 0,
+    exerciseRowsSkipped: 0,
     processedMetricRows: 0,
     processedSleepEvents: 0,
+    processedExerciseEvents: 0,
   };
 
-  for (let index = 0; index < Math.max(metrics.length, sleepEvents.length); index += BATCH_SIZE) {
+  const maxLength = Math.max(metrics.length, sleepEvents.length, exerciseEvents.length);
+  for (let index = 0; index < maxLength; index += BATCH_SIZE) {
     const result = await convex.mutation(api.health.importTakeoutHealthData, {
       metrics: metrics.slice(index, index + BATCH_SIZE),
       sleepEvents: sleepEvents.slice(index, index + BATCH_SIZE),
+      exerciseEvents: exerciseEvents.slice(index, index + BATCH_SIZE),
     });
 
     totals = {
@@ -254,8 +373,11 @@ async function main() {
       metricRowsUnchanged: totals.metricRowsUnchanged + result.metricRowsUnchanged,
       sleepRowsInserted: totals.sleepRowsInserted + result.sleepRowsInserted,
       sleepDaysSkipped: totals.sleepDaysSkipped + result.sleepDaysSkipped,
+      exerciseRowsInserted: totals.exerciseRowsInserted + result.exerciseRowsInserted,
+      exerciseRowsSkipped: totals.exerciseRowsSkipped + result.exerciseRowsSkipped,
       processedMetricRows: totals.processedMetricRows + result.processedMetricRows,
       processedSleepEvents: totals.processedSleepEvents + result.processedSleepEvents,
+      processedExerciseEvents: totals.processedExerciseEvents + result.processedExerciseEvents,
     };
   }
 
