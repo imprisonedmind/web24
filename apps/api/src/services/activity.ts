@@ -194,22 +194,16 @@ function buildHealthSectionDays(
 
     if (kind === "exercise") {
       const eventSeconds = eventCategories.reduce((total, category) => total + category.total, 0);
-      const eventSteps = eventCategories.reduce((total, category) => total + (category.steps ?? 0), 0);
-      const eventDistanceMeters = eventCategories.reduce((total, category) => total + (category.distanceMeters ?? 0), 0);
-      const eventCaloriesKcal = eventCategories.reduce((total, category) => total + (category.caloriesKcal ?? 0), 0);
-      const remainingSteps = Math.max(row.steps - eventSteps, 0);
-      const remainingDistanceMeters = Math.max(row.distanceMeters - eventDistanceMeters, 0);
-      const remainingCaloriesKcal = Math.max(row.activeCaloriesKcal - eventCaloriesKcal, 0);
-      const stepSeconds = Math.round(remainingSteps * STEP_SECONDS_PER_STEP);
+      const stepSeconds = Math.round(row.steps * STEP_SECONDS_PER_STEP);
       const categories = [...eventCategories];
 
-      if (remainingSteps > 0 && stepSeconds >= MIN_STEP_ACTIVITY_SECONDS) {
+      if (row.steps > 0 && stepSeconds >= MIN_STEP_ACTIVITY_SECONDS) {
         categories.push({
           name: "Steps",
           total: stepSeconds,
-          steps: remainingSteps,
-          distanceMeters: remainingDistanceMeters > 0 ? remainingDistanceMeters : undefined,
-          caloriesKcal: remainingCaloriesKcal > 0 ? remainingCaloriesKcal : undefined,
+          steps: row.steps,
+          distanceMeters: row.distanceMeters > 0 ? row.distanceMeters : undefined,
+          caloriesKcal: row.activeCaloriesKcal > 0 ? row.activeCaloriesKcal : undefined,
           heartRateAvgBpm: row.heartRateAvgBpm,
           heartRateMaxBpm: undefined,
         });
