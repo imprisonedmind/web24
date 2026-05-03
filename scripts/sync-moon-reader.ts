@@ -44,8 +44,23 @@ type BookRow = {
 
 type OpenLibrarySearchResponse = {
   docs?: {
+    title?: string;
+    author_name?: string[];
     cover_i?: number;
-    key?: string;
+    isbn?: string[];
+  }[];
+};
+
+type GoogleBooksResponse = {
+  items?: {
+    volumeInfo?: {
+      title?: string;
+      authors?: string[];
+      imageLinks?: {
+        thumbnail?: string;
+        smallThumbnail?: string;
+      };
+    };
   }[];
 };
 
@@ -234,35 +249,157 @@ function stableSourceId(filename: string) {
   return createHash("sha256").update(filename.toLowerCase()).digest("hex").slice(0, 24);
 }
 
-async function resolveBookCoverUrl(title: string, author?: string | null) {
-  const params = new URLSearchParams({
-    title,
-    limit: "1",
-  });
+function cleanAuthor(author?: string | null) {
+  return author?.split(";")[0].replace(/\s+/g, " ").trim() || undefined;
+}
 
-  if (author) {
-    params.set("author", author.split(";")[0].trim());
+function cleanTitle(title: string) {
+  return title
+    .replace(/\s*:\s*A Novel$/i, "")
+    .replace(/\s*\([^)]*(z-library|1lib|z-lib)[^)]*\)\s*/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function titleFromFilename(filename: string) {
+  return cleanTitle(
+    (filename.split("/").pop() ?? filename)
+      .replace(/\.(epub|pdf|mobi)$/i, "")
+      .replace(/\([^)]*\)/g, " ")
+      .replace(/\bZ-Library\b/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
+}
+
+function queryHints(book: { book: string | null; author: string | null; filename: string; description: string | null; category: string | null }) {
+  const text = [book.book, book.author, book.filename, book.description, book.category].filter(Boolean).join(" ");
+  const hints = new Set<string>();
+
+  if (/large language model|manning|raschka/i.test(text)) {
+    hints.add("Manning");
   }
 
-  try {
-    const res = await fetch(`https://openlibrary.org/search.json?${params.toString()}`, {
-      headers: {
-        "User-Agent": "web24-moon-reader-sync/1.0",
-      },
-    });
+  return [...hints];
+}
 
-    if (!res.ok) {
-      logStep(`Open Library cover lookup failed for '${title}' (${res.status})`);
+function isbnCandidates(text: string) {
+  return Array.from(
+    new Set(
+      Array.from(text.matchAll(/(?:97[89][-\s]?)?\d[-\s]?\d{2,5}[-\s]?\d{2,7}[-\s]?\d{1,7}[-\s]?[\dX]/gi))
+        .map((match) => match[0].replace(/[^\dX]/gi, ""))
+        .filter((value) => value.length === 10 || value.length === 13),
+    ),
+  );
+}
+
+async function openLibraryByIsbn(isbn: string): Promise<{ provider: string; url: string } | undefined> {
+  const url = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
+  const response = await fetch(url, { method: "HEAD" });
+  return response.ok ? { provider: `openlibrary:isbn:${isbn}`, url } : undefined;
+}
+
+async function fetchJsonWithRetry<T>(url: string, attempts = 3): Promise<T | undefined> {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const response = await fetch(url);
+    if (response.ok) return (await response.json()) as T;
+
+    if (![429, 500, 502, 503, 504].includes(response.status) || attempt === attempts) {
       return undefined;
     }
 
-    const data = (await res.json()) as OpenLibrarySearchResponse;
-    const coverId = data.docs?.find((doc) => typeof doc.cover_i === "number")?.cover_i;
-    return coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : undefined;
-  } catch (error) {
-    logStep(`Open Library cover lookup failed for '${title}': ${error instanceof Error ? error.message : String(error)}`);
-    return undefined;
+    await new Promise((resolve) => setTimeout(resolve, attempt * 500));
   }
+
+  return undefined;
+}
+
+async function googleBooksSearch(title: string, author?: string): Promise<{ provider: string; url: string; title?: string; author?: string } | undefined> {
+  const query = [`intitle:${title}`, author ? `inauthor:${author}` : null].filter(Boolean).join("+");
+  const params = new URLSearchParams({
+    q: query,
+    maxResults: "5",
+    printType: "books",
+  });
+  const data = await fetchJsonWithRetry<GoogleBooksResponse>(
+    `https://www.googleapis.com/books/v1/volumes?${params.toString()}`,
+  );
+  if (!data) return undefined;
+  const match = data.items?.find((item) => item.volumeInfo?.imageLinks?.thumbnail);
+  const thumbnail = match?.volumeInfo?.imageLinks?.thumbnail;
+  if (!thumbnail) return undefined;
+
+  return {
+    provider: "googlebooks:search",
+    url: thumbnail.replace(/^http:/, "https:").replace("&edge=curl", ""),
+    title: match.volumeInfo?.title,
+    author: match.volumeInfo?.authors?.[0],
+  };
+}
+
+async function resolveBookCoverUrl(
+  book: { book: string | null; author: string | null; filename: string; description: string | null; category: string | null },
+  title: string,
+  author?: string | null,
+) {
+  const cleanedTitle = cleanTitle(title);
+  const cleanedAuthor = cleanAuthor(author);
+  const fallbackTitle = titleFromFilename(book.filename);
+  const longFilenameTitle = cleanTitle(
+    (book.filename.split("/").pop() ?? book.filename)
+      .replace(/\.(epub|pdf|mobi)$/i, "")
+      .replace(/\s*\([^)]*(z-library|1lib|z-lib)[^)]*\)\s*/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
+  const isbnText = [book.book, book.author, book.filename, book.description, book.category].filter(Boolean).join("\n");
+  const hints = queryHints(book);
+
+  const openLibrarySearch = async (searchTitle: string, searchAuthor?: string) => {
+    const params = new URLSearchParams({ title: searchTitle, limit: "5" });
+    if (searchAuthor) params.set("author", searchAuthor);
+
+    try {
+      const res = await fetch(`https://openlibrary.org/search.json?${params.toString()}`, {
+        headers: {
+          "User-Agent": "web24-moon-reader-sync/1.0",
+        },
+      });
+
+      if (!res.ok) return undefined;
+
+      const data = (await res.json()) as OpenLibrarySearchResponse;
+      const match = data.docs?.find((doc) => typeof doc.cover_i === "number");
+      if (!match?.cover_i) return undefined;
+
+      return {
+        provider: "openlibrary:search",
+        url: `https://covers.openlibrary.org/b/id/${match.cover_i}-L.jpg`,
+      };
+    } catch {
+      return undefined;
+    }
+  };
+
+  for (const isbn of isbnCandidates(isbnText)) {
+    const result = await openLibraryByIsbn(isbn);
+    if (result) return result.url;
+  }
+
+  for (const candidateTitle of Array.from(new Set([cleanedTitle, fallbackTitle, longFilenameTitle]))) {
+    const openLibraryResult = await openLibrarySearch(candidateTitle, cleanedAuthor);
+    if (openLibraryResult) return openLibraryResult.url;
+
+    const googleBooksResult = await googleBooksSearch(candidateTitle, cleanedAuthor);
+    if (googleBooksResult) return googleBooksResult.url;
+
+    for (const hint of hints) {
+      const hintedGoogleResult = await googleBooksSearch(`${candidateTitle} ${hint}`, cleanedAuthor);
+      if (hintedGoogleResult) return hintedGoogleResult.url;
+    }
+  }
+
+  return undefined;
 }
 
 function parseProgressPercent(progress: string | undefined) {
@@ -351,7 +488,11 @@ async function parseMoonReaderBackup(backupPath: string, metadata: {
         filename: row.filename,
         author: metadataRow?.author || undefined,
         category: metadataRow?.category || undefined,
-        coverUrl: await resolveBookCoverUrl(title, metadataRow?.author),
+        coverUrl: await resolveBookCoverUrl(
+          metadataRow ?? { filename: row.filename, book: null, author: null, description: null, category: null },
+          title,
+          metadataRow?.author,
+        ),
         status: progressPercent >= 100 ? "completed" as const : "in_progress" as const,
         progressPercent,
         totalReadingSeconds: Math.round(row.usedTime / 1000),
