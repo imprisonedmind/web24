@@ -19,11 +19,12 @@ import {
 import { HomeWorkSection } from "../components/home-work";
 import { SectionHeader, SmallLink } from "../components/legacy";
 import { WritingPreviewLink } from "../components/previews";
-import { MusicWidgetCard, TvWidgetCard } from "../components/widgets";
+import { MusicWidgetCard, ReadingWidgetCard, TvWidgetCard } from "../components/widgets";
 import {
   homeActivityQueryOptions,
   homeHeroHealthStatsQueryOptions,
   musicQueryOptions,
+  readingStatusQueryOptions,
   tvStatusQueryOptions,
 } from "../lib/api";
 import { queryClient } from "../lib/query-client";
@@ -78,9 +79,10 @@ export function HomePage() {
           </Suspense>
         </HomeActivityWidgetErrorBoundary>
 
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <LocationSection />
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/*<LocationSection />*/}
           <TvWidgetCard />
+          <ReadingWidgetCard />
           <MusicWidgetCard />
         </section>
 
@@ -94,5 +96,6 @@ export async function preloadHomePage() {
   queryClient.prefetchQuery(homeActivityQueryOptions).catch(() => undefined);
   queryClient.prefetchQuery(homeHeroHealthStatsQueryOptions).catch(() => undefined);
   queryClient.prefetchQuery(tvStatusQueryOptions).catch(() => undefined);
+  queryClient.prefetchQuery(readingStatusQueryOptions).catch(() => undefined);
   queryClient.prefetchQuery(musicQueryOptions).catch(() => undefined);
 }

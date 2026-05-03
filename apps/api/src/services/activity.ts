@@ -1,5 +1,9 @@
 import { AsyncCache } from "../lib/cache";
-import { getSyncedHealthCurrentStats, listSyncedHealthDailyActivity } from "../lib/convex";
+import {
+  getSyncedHealthCurrentStats,
+  listSyncedHealthDailyActivity,
+  listSyncedReadingActivity,
+} from "../lib/convex";
 import { getWatchDaysLastYear } from "./watched";
 
 type ActivityDay = {
@@ -13,6 +17,8 @@ type ActivityDay = {
     caloriesKcal?: number;
     heartRateAvgBpm?: number;
     heartRateMaxBpm?: number;
+    wordsRead?: number;
+    bookCount?: number;
   }[];
 };
 
@@ -128,14 +134,16 @@ export async function getCodingActivityDays() {
 export async function getHomeActivityDays(cookieHeader?: string | null) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
-  const [codingDays, watchDays, healthRows] = await Promise.all([
+  const [codingDays, watchDays, healthRows, readingActivity] = await Promise.all([
     getCodingActivityDays(),
     getWatchDaysLastYear(cookieHeader),
-    listSyncedHealthDailyActivity({ startDate: sinceDate, endDate })
+    listSyncedHealthDailyActivity({ startDate: sinceDate, endDate }),
+    listSyncedReadingActivity({ startDate: sinceDate, endDate })
   ]);
   const exerciseDays = buildHealthSectionDays(healthRows, "exercise");
+  const readingDays = buildReadingSectionDays(readingActivity.dailyActivity);
 
-  return mergeDays(codingDays, watchDays, exerciseDays);
+  return mergeDays(codingDays, watchDays, exerciseDays, readingDays);
 }
 
 export async function getHomeHeroHealthStats() {
@@ -245,6 +253,41 @@ function buildHealthSectionDays(
   return days;
 }
 
+function buildReadingSectionDays(
+  rows: Awaited<ReturnType<typeof listSyncedReadingActivity>>["dailyActivity"]
+) {
+  const sinceMs = Date.now() - 364 * 24 * 60 * 60 * 1000;
+  const daysByDate = new Map<string, ActivityDay>();
+
+  for (const row of rows) {
+    if (row.totalReadingSeconds <= 0) continue;
+    daysByDate.set(row.date, {
+      date: row.date,
+      total: row.totalReadingSeconds,
+      categories: [
+        {
+          name: "Reading",
+          total: row.totalReadingSeconds,
+          wordsRead: row.totalWordsRead,
+          bookCount: row.bookCount,
+        },
+      ],
+    });
+  }
+
+  const days: ActivityDay[] = [];
+  const cursor = new Date(sinceMs);
+  const end = new Date();
+
+  while (cursor <= end) {
+    const date = cursor.toISOString().slice(0, 10);
+    days.push(daysByDate.get(date) ?? { date, total: 0, categories: [] });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return days;
+}
+
 export async function getWatchingActivityDays(cookieHeader?: string | null) {
   return getWatchDaysLastYear(cookieHeader);
 }
@@ -274,16 +317,27 @@ export async function getHealthActivitySections() {
   return sections.filter(section => sumTotals(section.days) > 0);
 }
 
+export async function getReadingActivitySections() {
+  const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const endDate = new Date().toISOString().slice(0, 10);
+  const activity = await listSyncedReadingActivity({ startDate: sinceDate, endDate });
+  const days = buildReadingSectionDays(activity.dailyActivity);
+
+  return sumTotals(days) > 0 ? [{ label: "reading", days }] : [];
+}
+
 export async function getFullActivityDays(cookieHeader?: string | null) {
-  const [watchingDays, workSections, healthSections] = await Promise.all([
+  const [watchingDays, workSections, healthSections, readingSections] = await Promise.all([
     getWatchingActivityDays(cookieHeader),
     getWorkActivitySections(),
-    getHealthActivitySections()
+    getHealthActivitySections(),
+    getReadingActivitySections()
   ]);
 
   return {
     watchingDays,
     workSections,
-    healthSections
+    healthSections,
+    readingSections
   };
 }

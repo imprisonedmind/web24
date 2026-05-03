@@ -9,6 +9,8 @@ export type WatchDay = {
     caloriesKcal?: number;
     heartRateAvgBpm?: number;
     heartRateMaxBpm?: number;
+    wordsRead?: number;
+    bookCount?: number;
   }[];
 };
 
@@ -17,6 +19,15 @@ export type WatchedItem = {
   title: string;
   subtitle?: string;
   posterUrl: string;
+  href: string;
+  meta?: string;
+};
+
+export type ReadingItem = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  coverUrl?: string;
   href: string;
   meta?: string;
 };

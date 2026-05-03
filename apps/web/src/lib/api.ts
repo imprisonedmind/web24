@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import type { ExtendedRecordMap } from "notion-types";
 
-import type { WatchDay, WatchedItem } from "../types";
+import type { ReadingItem, WatchDay, WatchedItem } from "../types";
 
 export type TvEntry = {
   type: "movie" | "show" | "episode";
@@ -19,6 +19,17 @@ export type TvEntry = {
 export type TvStatus = {
   currentlyWatching: TvEntry | null;
   lastWatched: TvEntry | null;
+};
+
+export type ReadingStatus = {
+  title: string;
+  author?: string;
+  coverUrl?: string;
+  progressPercent: number;
+  lastReadDate?: string;
+  status: "completed" | "in_progress";
+  totalReadingSeconds: number;
+  totalWordsRead: number;
 };
 
 export type RecentlyPlayedTrack = {
@@ -95,6 +106,8 @@ export const fullActivityQueryOptions = queryOptions({
     return fetchJson<{
       watchingDays?: WatchDay[];
       workSections?: { label: string; days: WatchDay[] }[];
+      healthSections?: { label: string; days: WatchDay[] }[];
+      readingSections?: { label: string; days: WatchDay[] }[];
     }>("/api/activity/full");
   },
   refetchInterval: 30_000,
@@ -127,6 +140,17 @@ export const activityHealthQueryOptions = queryOptions({
       "/api/activity/health",
     );
     return payload.healthSections ?? [];
+  },
+  refetchInterval: 30_000,
+});
+
+export const activityReadingQueryOptions = queryOptions({
+  queryKey: ["activity", "reading"],
+  queryFn: async () => {
+    const payload = await fetchJson<{ readingSections?: { label: string; days: WatchDay[] }[] }>(
+      "/api/activity/reading",
+    );
+    return payload.readingSections ?? [];
   },
   refetchInterval: 30_000,
 });
@@ -178,6 +202,36 @@ export const tvStatusQueryOptions = queryOptions({
   queryFn: async () => fetchJson<TvStatus>("/api/tv/status"),
   refetchInterval: 30_000,
 });
+
+export const readingStatusQueryOptions = queryOptions({
+  queryKey: ["reading", "status"],
+  queryFn: async () => fetchJson<ReadingStatus | null>("/api/reading/status"),
+  refetchInterval: 30_000,
+});
+
+export const readingOverviewQueryOptions = queryOptions({
+  queryKey: ["reading", "overview"],
+  queryFn: async () => {
+    return fetchJson<{
+      currentItems?: ReadingItem[];
+      finishedItems?: ReadingItem[];
+      sessionItems?: ReadingItem[];
+    }>("/api/reading/overview");
+  },
+});
+
+export function readingListQueryOptions(
+  scope: "current" | "finished" | "sessions",
+  limit: number,
+) {
+  return queryOptions({
+    queryKey: ["reading", scope, limit],
+    queryFn: async () => {
+      const payload = await fetchJson<{ items?: ReadingItem[] }>(`/api/reading/${scope}?limit=${limit}`);
+      return payload.items ?? [];
+    },
+  });
+}
 
 export const musicQueryOptions = queryOptions({
   queryKey: ["music", "currently-playing"],
