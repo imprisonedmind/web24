@@ -175,6 +175,18 @@ function categoryMetrics(
       }`,
     });
   }
+  if (category.wordsRead && category.wordsRead > 0) {
+    metrics.push({
+      label: "Words",
+      value: Math.round(category.wordsRead).toLocaleString(),
+    });
+  }
+  if (category.bookCount && category.bookCount > 0) {
+    metrics.push({
+      label: category.bookCount === 1 ? "Book" : "Books",
+      value: Math.round(category.bookCount).toLocaleString(),
+    });
+  }
 
   return metrics;
 }
@@ -307,6 +319,7 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
     Other: "#dc2626",
     Sleep: "#2563eb",
     Nap: "#60a5fa",
+    Reading: "#db2777",
   };
 
   const today = new Date().toISOString().split("T")[0];

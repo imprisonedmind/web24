@@ -24,6 +24,10 @@ const WatchedListPage = lazy(() =>
 const WatchedMonthsPage = lazy(() =>
   import("./pages/watched-months-page").then((module) => ({ default: module.WatchedMonthsPage }))
 );
+const ReadPage = lazy(() => import("./pages/read-page").then((module) => ({ default: module.ReadPage })));
+const ReadListPage = lazy(() =>
+  import("./pages/read-list-page").then((module) => ({ default: module.ReadListPage }))
+);
 const TechPage = lazy(() => import("./pages/tech-page").then((module) => ({ default: module.TechPage })));
 
 const rootRoute = createRootRoute({
@@ -99,6 +103,34 @@ const watchedMonthsRoute = createRoute({
   component: WatchedMonthsPage,
 });
 
+const readRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/read",
+  loader: () => import("./pages/read-page").then((module) => module.preloadReadPage()),
+  component: ReadPage,
+});
+
+const readCurrentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/read/current",
+  loader: () => import("./pages/read-list-page").then((module) => module.preloadReadListPage("current")),
+  component: () => <ReadListPage scope="current" />,
+});
+
+const readFinishedRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/read/finished",
+  loader: () => import("./pages/read-list-page").then((module) => module.preloadReadListPage("finished")),
+  component: () => <ReadListPage scope="finished" />,
+});
+
+const readSessionsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/read/sessions",
+  loader: () => import("./pages/read-list-page").then((module) => module.preloadReadListPage("sessions")),
+  component: () => <ReadListPage scope="sessions" />,
+});
+
 const techRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tech",
@@ -116,6 +148,10 @@ const routeTree = rootRoute.addChildren([
   watchedMonthRoute,
   watchedAllTimeRoute,
   watchedMonthsRoute,
+  readRoute,
+  readCurrentRoute,
+  readFinishedRoute,
+  readSessionsRoute,
   techRoute,
 ]);
 

@@ -1,12 +1,17 @@
 import { Hono } from "hono";
 
 import { AsyncCache } from "../lib/cache";
-import { getSyncedHealthVersion, getSyncedHistoryVersion } from "../lib/convex";
+import {
+  getSyncedHealthVersion,
+  getSyncedHistoryVersion,
+  getSyncedReadingVersion,
+} from "../lib/convex";
 import {
   getFullActivityDays,
   getHealthActivitySections,
   getHomeHeroHealthStats,
   getHomeActivityDays,
+  getReadingActivitySections,
   getWatchingActivityDays,
   getWorkActivitySections
 } from "../services/activity";
@@ -20,15 +25,17 @@ const activityFullCache = new AsyncCache<Awaited<ReturnType<typeof getFullActivi
 const activityWatchingCache = new AsyncCache<{ watchingDays: Awaited<ReturnType<typeof getWatchingActivityDays>> }>();
 const activityWorkCache = new AsyncCache<{ workSections: Awaited<ReturnType<typeof getWorkActivitySections>> }>();
 const activityHealthCache = new AsyncCache<{ healthSections: Awaited<ReturnType<typeof getHealthActivitySections>> }>();
+const activityReadingCache = new AsyncCache<{ readingSections: Awaited<ReturnType<typeof getReadingActivitySections>> }>();
 
 activityRoutes.get("/home", async c => {
   try {
-    const [historyVersion, healthVersion] = await Promise.all([
+    const [historyVersion, healthVersion, readingVersion] = await Promise.all([
       getSyncedHistoryVersion(),
-      getSyncedHealthVersion()
+      getSyncedHealthVersion(),
+      getSyncedReadingVersion()
     ]);
     const payload = await activityHomeCache.getOrRefresh({
-      key: `activity:home:${historyVersion}:${healthVersion}`,
+      key: `activity:home:${historyVersion}:${healthVersion}:${readingVersion}`,
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => ({
@@ -60,12 +67,13 @@ activityRoutes.get("/home/hero", async c => {
 
 activityRoutes.get("/full", async c => {
   try {
-    const [historyVersion, healthVersion] = await Promise.all([
+    const [historyVersion, healthVersion, readingVersion] = await Promise.all([
       getSyncedHistoryVersion(),
-      getSyncedHealthVersion()
+      getSyncedHealthVersion(),
+      getSyncedReadingVersion()
     ]);
     const payload = await activityFullCache.getOrRefresh({
-      key: `activity:full:${historyVersion}:${healthVersion}`,
+      key: `activity:full:${historyVersion}:${healthVersion}:${readingVersion}`,
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => getFullActivityDays(),
@@ -73,7 +81,7 @@ activityRoutes.get("/full", async c => {
     return c.json(payload, 200);
   } catch (error) {
     console.error("[api/activity/full] failed", error);
-    return c.json({ watchingDays: [], workSections: [] }, 500);
+    return c.json({ watchingDays: [], workSections: [], healthSections: [], readingSections: [] }, 500);
   }
 });
 
@@ -127,6 +135,24 @@ activityRoutes.get("/health", async c => {
   } catch (error) {
     console.error("[api/activity/health] failed", error);
     return c.json({ healthSections: [] }, 500);
+  }
+});
+
+activityRoutes.get("/reading", async c => {
+  try {
+    const version = await getSyncedReadingVersion();
+    const payload = await activityReadingCache.getOrRefresh({
+      key: `activity:reading:${version}`,
+      ttlMs: ACTIVITY_TTL_MS,
+      staleWhileRevalidateMs: ACTIVITY_STALE_MS,
+      loader: async () => ({
+        readingSections: await getReadingActivitySections(),
+      }),
+    });
+    return c.json(payload, 200);
+  } catch (error) {
+    console.error("[api/activity/reading] failed", error);
+    return c.json({ readingSections: [] }, 500);
   }
 });
 
