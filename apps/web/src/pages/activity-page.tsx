@@ -8,6 +8,7 @@ import {
 import { Breadcrumbs } from "../components/breadcrumbs";
 import {
   activityHealthQueryOptions,
+  activityReadingQueryOptions,
   activityWatchingQueryOptions,
   activityWorkQueryOptions,
 } from "../lib/api";
@@ -25,6 +26,10 @@ export function ActivityPage() {
     data: healthSections = [],
     isLoading: isHealthLoading,
   } = useQuery(activityHealthQueryOptions);
+  const {
+    data: readingSections = [],
+    isLoading: isReadingLoading,
+  } = useQuery(activityReadingQueryOptions);
 
   return (
     <section className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
@@ -67,6 +72,18 @@ export function ActivityPage() {
               days={section.days}
             />
           ))}
+
+      {isReadingLoading ? (
+        <ActivitySectionLoading title="reading" />
+      ) : (
+        readingSections.map(section => (
+          <ActivitySection
+            key={section.label}
+            title={section.label}
+            days={section.days}
+          />
+        ))
+      )}
     </section>
   );
 }

@@ -81,6 +81,56 @@ export type SyncedHealthCurrentStats = {
   updatedAtMs: number;
 };
 
+export type SyncedReadingActivity = {
+  books: {
+    source: string;
+    sourceId: string;
+    title: string;
+    filename: string;
+    author?: string;
+    category?: string;
+    coverUrl?: string;
+    status: "completed" | "in_progress";
+    progressPercent: number;
+    totalReadingSeconds: number;
+    totalWordsRead: number;
+    activeDays: number;
+    firstReadDate?: string;
+    lastReadDate?: string;
+    updatedAtMs: number;
+  }[];
+  dailyActivity: {
+    date: string;
+    totalReadingSeconds: number;
+    totalWordsRead: number;
+    bookCount: number;
+    source: string;
+    updatedAtMs: number;
+  }[];
+  bookDailyActivity: {
+    sourceId: string;
+    date: string;
+    title: string;
+    filename: string;
+    readingSeconds: number;
+    wordsRead: number;
+    progressPercent: number;
+    source: string;
+    updatedAtMs: number;
+  }[];
+  state: {
+    key: string;
+    source: string;
+    syncedAtMs: number;
+    backupPath?: string;
+    backupModifiedAt?: string;
+    backupContentHash?: string;
+    books: number;
+    dailyRows: number;
+    bookDailyRows: number;
+  } | null;
+};
+
 let client: ConvexHttpClient | null = null;
 
 function getConvexUrl() {
@@ -142,4 +192,15 @@ export async function getSyncedHealthCurrentStats() {
 
 export async function getSyncedHealthVersion() {
   return (await getClient().query(api.health.getSyncVersion, {})) as string;
+}
+
+export async function listSyncedReadingActivity(args?: {
+  startDate?: string;
+  endDate?: string;
+}) {
+  return (await getClient().query(api.reading.listReadingActivity, args ?? {})) as SyncedReadingActivity;
+}
+
+export async function getSyncedReadingVersion() {
+  return (await getClient().query(api.reading.getSyncVersion, {})) as string;
 }

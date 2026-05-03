@@ -92,6 +92,42 @@ export const publicRoutes: PublicRoute[] = [
     }
   },
   {
+    path: "/read",
+    label: "Read",
+    seo: {
+      title: "Read — Luke Stephens",
+      description:
+        "Reading activity, current books, recent reading sessions, and finished books by Luke Stephens."
+    }
+  },
+  {
+    path: "/read/current",
+    label: "Currently Reading",
+    seo: {
+      title: "Currently Reading — Luke Stephens",
+      description:
+        "Books currently being read by Luke Stephens."
+    }
+  },
+  {
+    path: "/read/finished",
+    label: "Finished Books",
+    seo: {
+      title: "Finished Books — Luke Stephens",
+      description:
+        "Finished reading history by Luke Stephens."
+    }
+  },
+  {
+    path: "/read/sessions",
+    label: "Reading Sessions",
+    seo: {
+      title: "Reading Sessions — Luke Stephens",
+      description:
+        "Recent reading sessions from Moon+ Reader activity."
+    }
+  },
+  {
     path: "/tech",
     label: "Tech",
     seo: {

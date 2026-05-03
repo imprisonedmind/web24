@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 
 import {
   musicQueryOptions,
+  readingStatusQueryOptions,
   tvStatusQueryOptions,
+  type ReadingStatus,
   type SongData,
   type TvEntry,
 } from "../lib/api";
@@ -96,6 +98,72 @@ export function TvWidgetCard() {
           <p className="min-w-0 truncate text-sm font-medium text-neutral-800">{title}</p>
           {meta ? (
             <div className="flex-shrink-0 rounded-full bg-neutral-100 px-2 py-1 text-xs text-neutral-700">
+              {meta}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function fallbackBookCover(title: string, author?: string) {
+  return (
+    <div className="flex h-full w-full flex-col justify-between bg-[#db2777] p-5 text-white">
+      <div className="h-1 w-10 rounded-full bg-white/70" />
+      <div className="flex flex-col gap-2">
+        <p className="line-clamp-4 text-lg font-semibold leading-tight">{title}</p>
+        {author ? <p className="line-clamp-2 text-sm text-white/80">{author}</p> : null}
+      </div>
+      <div className="h-1 w-16 rounded-full bg-white/70" />
+    </div>
+  );
+}
+
+export function ReadingWidgetCard() {
+  const { data: status = null } = useQuery(readingStatusQueryOptions);
+  const book = status as ReadingStatus | null;
+
+  if (!book) {
+    return null;
+  }
+
+  const meta =
+    book.status === "in_progress"
+      ? `${Math.round(book.progressPercent)}%`
+      : formatDistanceLabel(book.lastReadDate);
+
+  return (
+    <div className="flex w-full flex-col gap-1">
+      <SectionHeader
+        title="read"
+        action={<SmallLink href="/read" label="more" ariaLabel="More read" srSuffix=" read" />}
+      />
+      <div className="flex min-h-[32rem] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
+        <div className="relative h-full w-full overflow-hidden rounded-lg bg-neutral-100 md:h-72">
+          {book.coverUrl ? (
+            <a
+              href={`https://openlibrary.org/search?q=${encodeURIComponent(`${book.title} ${book.author ?? ""}`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="block h-full w-full"
+            >
+              <CFImage
+                src={book.coverUrl}
+                alt={book.title}
+                className="h-full w-full object-cover"
+                unoptimized
+              />
+            </a>
+          ) : (
+            fallbackBookCover(book.title, book.author)
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <p className="min-w-0 truncate text-sm font-medium lowercase text-neutral-800">{book.title}</p>
+          {meta ? (
+            <div className="flex-shrink-0 rounded-full bg-neutral-100 px-2 py-1 text-xs lowercase text-neutral-700">
               {meta}
             </div>
           ) : null}
