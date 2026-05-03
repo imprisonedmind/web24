@@ -61,18 +61,6 @@ export function ActivityPage() {
             />
           ))}
 
-      {isHealthLoading
-        ? ["exercise", "sleep"].map(label => (
-            <ActivitySectionLoading key={label} title={label} />
-          ))
-        : healthSections.map(section => (
-            <ActivitySection
-              key={section.label}
-              title={section.label}
-              days={section.days}
-            />
-          ))}
-
       {isReadingLoading ? (
         <ActivitySectionLoading title="reading" />
       ) : (
@@ -84,6 +72,18 @@ export function ActivityPage() {
           />
         ))
       )}
+
+      {isHealthLoading
+        ? ["exercise", "sleep"].map(label => (
+            <ActivitySectionLoading key={label} title={label} />
+          ))
+        : healthSections.map(section => (
+            <ActivitySection
+              key={section.label}
+              title={section.label}
+              days={section.days}
+            />
+          ))}
     </section>
   );
 }
