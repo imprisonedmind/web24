@@ -9,7 +9,7 @@ import { api } from "../convex/_generated/api";
 import { envEntriesToObject, readEnvEntries } from "../packages/config/src/envFile";
 
 const ENV_PATH = path.join(process.cwd(), ".env.local");
-const DEFAULT_CONVEX_URL = "https://diligent-axolotl-318.eu-west-1.convex.cloud";
+const DEFAULT_CONVEX_URL = "https://convex-web24-prod.lukestephens.co.za";
 const DEFAULT_BACKUP_PATH = path.join(process.env.HOME ?? "", "Downloads", "Backup.zip");
 const SOURCE = "moon-reader";
 const LOCAL_TIME_ZONE = process.env.MOON_READER_TIME_ZONE ?? "Africa/Johannesburg";

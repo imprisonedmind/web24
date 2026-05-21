@@ -11,7 +11,7 @@ const DEFAULT_TAKEOUT_PATH = path.join(
   "Takeout",
   "Fit",
 );
-const DEFAULT_CONVEX_URL = "https://diligent-axolotl-318.eu-west-1.convex.cloud";
+const DEFAULT_CONVEX_URL = "https://convex-web24-prod.lukestephens.co.za";
 const TAKEOUT_SOURCE = "google-fit-takeout";
 const BATCH_SIZE = 80;
 const LOCAL_TIME_ZONE = "Africa/Johannesburg";
