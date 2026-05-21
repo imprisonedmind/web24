@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "SITE_URL": "__REMOVED_SITE_URL__",
-    "CONVEX_URL": "https://diligent-axolotl-318.eu-west-1.convex.cloud"
+    "CONVEX_URL": "__REMOVED_CONVEX_URL__"
   },
   "assets": {
     "directory": "./apps/web/dist",
