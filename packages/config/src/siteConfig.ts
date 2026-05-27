@@ -1,52 +1,34 @@
-type RuntimeEnv = {
-  SITE_URL?: string;
-  VITE_SITE_URL?: string;
-};
+export const PUBLIC_SITE_URL_ENV_KEY = "VITE_SITE_URL" as const;
 
-function readRuntimeEnv(): RuntimeEnv {
-  const env: RuntimeEnv = {};
+export type PublicSiteEnv = Partial<Record<typeof PUBLIC_SITE_URL_ENV_KEY, string>>;
 
-  if (
-    typeof import.meta !== "undefined" &&
-    typeof import.meta.env !== "undefined"
-  ) {
-    env.SITE_URL = import.meta.env.SITE_URL;
-    env.VITE_SITE_URL = import.meta.env.VITE_SITE_URL;
-  }
-
-  if (typeof process !== "undefined" && process.env) {
-    env.SITE_URL ??= process.env.SITE_URL;
-    env.VITE_SITE_URL ??= process.env.VITE_SITE_URL;
-  }
-
-  return env;
+export function normalizeSiteUrl(value: string) {
+  return value.trim().replace(/\/+$/, "");
 }
 
-const runtimeEnv = readRuntimeEnv();
+export function getRequiredPublicSiteUrl(env: PublicSiteEnv) {
+  const rawSiteUrl = env[PUBLIC_SITE_URL_ENV_KEY];
 
-const rawSiteUrl = runtimeEnv.SITE_URL ?? runtimeEnv.VITE_SITE_URL;
+  if (!rawSiteUrl?.trim()) {
+    throw new Error(`Missing ${PUBLIC_SITE_URL_ENV_KEY}`);
+  }
 
-if (!rawSiteUrl) {
-  throw new Error("Missing SITE_URL or VITE_SITE_URL");
+  return normalizeSiteUrl(rawSiteUrl);
 }
 
-const normalizedSiteUrl = rawSiteUrl.replace(/\/$/, "");
-
-export const siteConfig = {
+const siteMetadata = {
   title: "Luke Stephens",
   description:
     "Luke Stephens — software designer and persistent tinkerer sharing work, writing, and activity logs.",
-  url: normalizedSiteUrl,
   defaultOgImage: "/images/profile/luke2.jpg",
   openGraphLogo: "/faviconX167.svg",
   twitterSite: "@site",
   twitterCreator: "@lukey_stephens"
 } as const;
 
-export const vite8FeatureFlags = [
-  "Rolldown builds",
-  "Oxc transforms",
-  "Vite DevTools",
-  "tsconfig path resolution",
-  "forwarded browser console"
-] as const;
+export function createSiteConfig(env: PublicSiteEnv) {
+  return {
+    ...siteMetadata,
+    url: getRequiredPublicSiteUrl(env)
+  } as const;
+}

@@ -524,10 +524,9 @@ async function main() {
   const convexUrlArgIndex = process.argv.indexOf("--convex-url");
   const convexUrl =
     (convexUrlArgIndex >= 0 ? process.argv[convexUrlArgIndex + 1] : undefined) ??
-    pickEnv(env, "VITE_CONVEX_URL") ??
     pickEnv(env, "CONVEX_URL");
 
-  if (!convexUrl) formatError("Missing VITE_CONVEX_URL or CONVEX_URL in .env.local");
+  if (!convexUrl) formatError("Missing CONVEX_URL in .env.local");
 
   const tokenData = getStoredTokenData(env) ?? (await loginWithDeviceCode(env));
   const convex = new ConvexHttpClient(convexUrl);

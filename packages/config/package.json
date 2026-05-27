@@ -6,6 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./env-file": "./src/envFile.ts",
+    "./routes": "./src/routes.ts",
+    "./features": "./src/viteFeatures.ts",
     "./site": "./src/siteConfig.ts"
   }
 }

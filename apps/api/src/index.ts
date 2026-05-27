@@ -1,5 +1,5 @@
 import { hydrateProcessEnvFromRoot } from "./lib/runtimeEnv";
-import { siteConfig } from "@web24/config";
+import { getRequiredLocalSiteUrl } from "./lib/siteUrl";
 import { app } from "./app";
 
 await hydrateProcessEnvFromRoot();
@@ -10,5 +10,5 @@ const server = Bun.serve({
 });
 
 console.log(
-  `[web24-api] listening on http://localhost:${server.port} for ${siteConfig.url}`
+  `[web24-api] listening on http://localhost:${server.port} for ${getRequiredLocalSiteUrl()}`
 );

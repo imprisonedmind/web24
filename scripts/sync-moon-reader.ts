@@ -574,9 +574,8 @@ async function main() {
   const env = await loadEnv();
   const convexUrl =
     argValue("--convex-url") ??
-    pickEnv(env, "VITE_CONVEX_URL") ??
     pickEnv(env, "CONVEX_URL");
-  if (!convexUrl) formatError("Missing VITE_CONVEX_URL or CONVEX_URL in .env.local");
+  if (!convexUrl) formatError("Missing CONVEX_URL in .env.local");
   const dryRun = hasArg("--dry-run");
   const { localPath, metadata } = await resolveBackup(env);
 

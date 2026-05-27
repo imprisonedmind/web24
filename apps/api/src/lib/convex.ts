@@ -158,13 +158,10 @@ const CONVEX_QUERY_STALE_MS = 5 * 60_000;
 const convexQueryCache = new AsyncCache<unknown>();
 
 function getConvexUrl() {
-  const value =
-    process.env.VITE_CONVEX_URL ??
-    process.env.CONVEX_URL ??
-    process.env.CONVEX_SITE_URL;
+  const value = process.env.CONVEX_URL;
 
   if (!value) {
-    throw new Error("Missing VITE_CONVEX_URL/CONVEX_URL for Convex-backed Trakt reads");
+    throw new Error("Missing CONVEX_URL for Convex-backed reads");
   }
 
   return value;

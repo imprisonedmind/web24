@@ -3,16 +3,23 @@ import path from "node:path";
 
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { loadEnv } from "vite";
 
-import { publicRoutes, siteConfig } from "@web24/config";
+import { publicRoutes } from "@web24/config";
+import { createSiteConfig } from "@web24/config/site";
 import { getWritingPrerenderRoutes, getWritingRoutePath, writingPosts } from "@web24/content";
 
 import { App } from "../src/app";
 
+const repoRoot = path.resolve(import.meta.dir, "../../..");
 const distDir = path.resolve(import.meta.dir, "..", "dist");
 const templatePath = path.join(distDir, "index.html");
 const sitemapPath = path.join(distDir, "sitemap.xml");
 const robotsPath = path.join(distDir, "robots.txt");
+const siteConfig = createSiteConfig({
+  ...loadEnv("production", repoRoot, "VITE_"),
+  ...(process.env.VITE_SITE_URL ? { VITE_SITE_URL: process.env.VITE_SITE_URL } : {}),
+});
 
 type SeoRoute = (typeof publicRoutes)[number];
 type SitemapEntry = {

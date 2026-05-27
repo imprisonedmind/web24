@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# web24
 
-## Getting Started
+Personal site monorepo with a Vite SPA frontend and Hono API deployed as a Cloudflare Worker with Workers Assets.
 
-First, run the development server:
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The web app runs through Vite on `http://localhost:5173` and proxies `/api` to the local Bun API on `http://localhost:3001`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Local env values live in the repo-root `.env.local` file.
 
-## Learn More
+Required public build variable:
 
-To learn more about Next.js, take a look at the following resources:
+```dotenv
+VITE_SITE_URL=https://example.com
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Required server/runtime variable:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```dotenv
+CONVEX_URL=https://example.convex.cloud
+```
 
-## Deploy on Vercel
+`apps/web/vite.config.ts` points Vite at the repo root with `envDir`, so Vite loads `.env`, `.env.local`, and mode-specific env files directly. Browser-visible values must use the `VITE_` prefix.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Cloudflare Worker variables are read from runtime bindings. This repo keeps static production values out of `wrangler.jsonc`; set `VITE_SITE_URL`, `CONVEX_URL`, and secrets in the Cloudflare dashboard, and `keep_vars` preserves those dashboard values on deploy.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Build And Deploy
+
+```bash
+bun run build
+bun run deploy:edge
+```

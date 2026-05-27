@@ -1,12 +1,19 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { DevTools } from "@vitejs/devtools";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 
-export default defineConfig(({ command }) => {
-  const enableDevTools = command === "serve" && process.env.VITE_ENABLE_DEVTOOLS === "1";
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+
+export default defineConfig(({ command, mode }) => {
+  const env = loadEnv(mode, repoRoot, "VITE_");
+  const enableDevTools = command === "serve" && env.VITE_ENABLE_DEVTOOLS === "1";
 
   return {
     appType: "spa",
+    envDir: repoRoot,
     publicDir: "../../public",
     define: {
       __VUE_OPTIONS_API__: false,

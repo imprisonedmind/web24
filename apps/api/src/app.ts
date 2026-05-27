@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 
-import { siteConfig, vite8FeatureFlags } from "@web24/config";
+import { vite8FeatureFlags } from "@web24/config";
+import { getRequiredSiteUrl } from "./lib/siteUrl";
 import { activityRoutes } from "./routes/activity";
 import { cacheCurrentlyPlaying, getCurrentlyPlaying } from "./services/music";
 import { musicRoutes } from "./routes/music";
@@ -9,13 +10,19 @@ import { tvRoutes } from "./routes/tv";
 import { watchedRoutes } from "./routes/watched";
 import { writingRoutes } from "./routes/writing";
 
-export const app = new Hono();
+type ApiEnv = {
+  Bindings: {
+    VITE_SITE_URL?: string;
+  };
+};
+
+export const app = new Hono<ApiEnv>();
 
 app.get("/api/health", c => {
   return c.json({
     ok: true,
     app: "web24-api",
-    siteUrl: siteConfig.url
+    siteUrl: getRequiredSiteUrl(c.env)
   });
 });
 

@@ -1,9 +1,12 @@
 import { afterAll, describe, expect, test } from "bun:test";
 
-import { siteConfig } from "@web24/config";
+import { hydrateProcessEnvFromRoot } from "./lib/runtimeEnv";
+import { getRequiredLocalSiteUrl } from "./lib/siteUrl";
 import { getTopWritingPosts } from "../../../packages/content/src/writing";
 
-const BASE_URL = siteConfig.url;
+await hydrateProcessEnvFromRoot();
+
+const BASE_URL = getRequiredLocalSiteUrl();
 
 type EndpointSpec = {
   name: string;
