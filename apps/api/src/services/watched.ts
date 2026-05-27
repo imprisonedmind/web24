@@ -1,7 +1,9 @@
 import {
   listSyncedDailyActivity,
   listSyncedHistoryEntries,
-  type SyncedHistoryEntry
+  listSyncedMostWatchedAggregates,
+  type SyncedHistoryEntry,
+  type SyncedWatchAggregate,
 } from "../lib/convex";
 
 const FALLBACK_POSTER = "/fallback-poster.jpg";
@@ -19,16 +21,6 @@ type WatchDay = {
   date: string;
   total: number;
   categories: { name: string; total: number }[];
-};
-
-type AggregateEntry = {
-  id: string;
-  type: "show" | "movie";
-  title: string;
-  minutes: number;
-  plays: number;
-  posterUrl: string;
-  href: string;
 };
 
 function formatMinutes(totalMinutes: number) {
@@ -64,31 +56,7 @@ function toRecentCard(entry: SyncedHistoryEntry): WatchCardItem {
   };
 }
 
-function aggregateEntries(entries: SyncedHistoryEntry[]) {
-  const aggregates = new Map<string, AggregateEntry>();
-
-  for (const entry of entries) {
-    const aggregate =
-      aggregates.get(entry.aggregateKey) ??
-      {
-        id: entry.aggregateKey,
-        type: entry.aggregateType,
-        title: entry.aggregateTitle,
-        minutes: 0,
-        plays: 0,
-        posterUrl: entry.aggregatePosterUrl || FALLBACK_POSTER,
-        href: entry.aggregateHref,
-      };
-
-    aggregate.minutes += entry.aggregateRuntimeMinutes || entry.runtimeMinutes || 0;
-    aggregate.plays += 1;
-    aggregates.set(entry.aggregateKey, aggregate);
-  }
-
-  return Array.from(aggregates.values());
-}
-
-function toAggregateCard(item: AggregateEntry, suffix: string): WatchCardItem {
+function toAggregateCard(item: SyncedWatchAggregate, suffix: string): WatchCardItem {
   return {
     id: `${item.id}-${suffix}`,
     title: item.title,
@@ -107,23 +75,15 @@ export async function getRecentlyWatched(limit = 12, _cookieHeader?: string | nu
 
 export async function getMostWatchedPast30Days(limit = 12, _cookieHeader?: string | null) {
   const sinceMs = Date.now() - 30 * 24 * 60 * 60 * 1000;
-  const entries = await listSyncedHistoryEntries({ startMs: sinceMs, order: "desc" });
+  const entries = await listSyncedMostWatchedAggregates({ startMs: sinceMs, limit });
 
-  return aggregateEntries(entries)
-    .filter((item) => item.minutes > 0)
-    .sort((left, right) => right.minutes - left.minutes)
-    .slice(0, limit)
-    .map((item) => toAggregateCard(item, "30d"));
+  return entries.map((item) => toAggregateCard(item, "30d"));
 }
 
 export async function getMostWatchedAllTime(limit = 12, _cookieHeader?: string | null) {
-  const entries = await listSyncedHistoryEntries({ order: "desc" });
+  const entries = await listSyncedMostWatchedAggregates({ limit });
 
-  return aggregateEntries(entries)
-    .filter((item) => item.minutes > 0)
-    .sort((left, right) => right.minutes - left.minutes)
-    .slice(0, limit)
-    .map((item) => toAggregateCard(item, "all-time"));
+  return entries.map((item) => toAggregateCard(item, "all-time"));
 }
 
 export async function getMostWatchedForMonth(
@@ -142,17 +102,13 @@ export async function getMostWatchedForMonth(
   ).getTime();
   const monthKey = `${monthDate.getUTCFullYear()}-${String(monthDate.getUTCMonth() + 1).padStart(2, "0")}`;
 
-  const entries = await listSyncedHistoryEntries({
+  const entries = await listSyncedMostWatchedAggregates({
     startMs: rangeStart,
     endMs: rangeEnd,
-    order: "desc",
+    limit,
   });
 
-  return aggregateEntries(entries)
-    .filter((item) => item.minutes > 0)
-    .sort((left, right) => right.minutes - left.minutes)
-    .slice(0, limit)
-    .map((item) => toAggregateCard(item, monthKey));
+  return entries.map((item) => toAggregateCard(item, monthKey));
 }
 
 export async function getWatchDaysLastYear(_cookieHeader?: string | null) {

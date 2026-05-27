@@ -1,6 +1,7 @@
 import { ConvexHttpClient } from "convex/browser";
 
 import { api } from "../../../../convex/_generated/api";
+import { AsyncCache } from "./cache";
 
 export type SyncedHistoryEntry = {
   historyId: string;
@@ -72,6 +73,16 @@ export type SyncedHealthDailyActivity = {
   updatedAtMs: number;
 };
 
+export type SyncedWatchAggregate = {
+  id: string;
+  type: "show" | "movie";
+  title: string;
+  minutes: number;
+  plays: number;
+  posterUrl: string;
+  href: string;
+};
+
 export type SyncedHealthCurrentStats = {
   date: string;
   steps?: number;
@@ -132,6 +143,9 @@ export type SyncedReadingActivity = {
 };
 
 let client: ConvexHttpClient | null = null;
+const CONVEX_QUERY_TTL_MS = 60_000;
+const CONVEX_QUERY_STALE_MS = 5 * 60_000;
+const convexQueryCache = new AsyncCache<unknown>();
 
 function getConvexUrl() {
   const value =
@@ -153,8 +167,24 @@ function getClient() {
   return client;
 }
 
+function cacheKey(prefix: string, args?: Record<string, unknown>) {
+  return `${prefix}:${JSON.stringify(args ?? {})}`;
+}
+
+async function cachedConvexQuery<T>(key: string, loader: () => Promise<T>) {
+  return (await convexQueryCache.getOrRefresh({
+    key,
+    ttlMs: CONVEX_QUERY_TTL_MS,
+    staleWhileRevalidateMs: CONVEX_QUERY_STALE_MS,
+    loader,
+  })) as T;
+}
+
 export async function getSyncedCurrentlyWatching() {
-  return (await getClient().query(api.trakt.getCurrentWatching, {})) as SyncedCurrentlyWatching | null;
+  return cachedConvexQuery(
+    "trakt:current-watching",
+    async () => (await getClient().query(api.trakt.getCurrentWatching, {})) as SyncedCurrentlyWatching | null,
+  );
 }
 
 export async function listSyncedHistoryEntries(args?: {
@@ -163,7 +193,22 @@ export async function listSyncedHistoryEntries(args?: {
   limit?: number;
   order?: "asc" | "desc";
 }) {
-  return (await getClient().query(api.trakt.listHistoryEntries, args ?? {})) as SyncedHistoryEntry[];
+  return cachedConvexQuery(
+    cacheKey("trakt:history", args),
+    async () => (await getClient().query(api.trakt.listHistoryEntries, args ?? {})) as SyncedHistoryEntry[],
+  );
+}
+
+export async function listSyncedMostWatchedAggregates(args?: {
+  startMs?: number;
+  endMs?: number;
+  limit?: number;
+}) {
+  return cachedConvexQuery(
+    cacheKey("trakt:most-watched", args),
+    async () =>
+      (await getClient().query(api.trakt.listMostWatchedAggregates, args ?? {})) as SyncedWatchAggregate[],
+  );
 }
 
 export async function getSyncedHistoryVersion() {
@@ -176,31 +221,49 @@ export async function listSyncedDailyActivity(args?: {
   startDate?: string;
   endDate?: string;
 }) {
-  return (await getClient().query(api.trakt.listDailyActivity, args ?? {})) as SyncedDailyActivity[];
+  return cachedConvexQuery(
+    cacheKey("trakt:daily-activity", args),
+    async () => (await getClient().query(api.trakt.listDailyActivity, args ?? {})) as SyncedDailyActivity[],
+  );
 }
 
 export async function listSyncedHealthDailyActivity(args?: {
   startDate?: string;
   endDate?: string;
 }) {
-  return (await getClient().query(api.health.listDailyActivity, args ?? {})) as SyncedHealthDailyActivity[];
+  return cachedConvexQuery(
+    cacheKey("health:daily-activity", args),
+    async () => (await getClient().query(api.health.listDailyActivity, args ?? {})) as SyncedHealthDailyActivity[],
+  );
 }
 
 export async function getSyncedHealthCurrentStats() {
-  return (await getClient().query(api.health.getCurrentStats, {})) as SyncedHealthCurrentStats | null;
+  return cachedConvexQuery(
+    "health:current-stats",
+    async () => (await getClient().query(api.health.getCurrentStats, {})) as SyncedHealthCurrentStats | null,
+  );
 }
 
 export async function getSyncedHealthVersion() {
-  return (await getClient().query(api.health.getSyncVersion, {})) as string;
+  return cachedConvexQuery(
+    "health:sync-version",
+    async () => (await getClient().query(api.health.getSyncVersion, {})) as string,
+  );
 }
 
 export async function listSyncedReadingActivity(args?: {
   startDate?: string;
   endDate?: string;
 }) {
-  return (await getClient().query(api.reading.listReadingActivity, args ?? {})) as SyncedReadingActivity;
+  return cachedConvexQuery(
+    cacheKey("reading:activity", args),
+    async () => (await getClient().query(api.reading.listReadingActivity, args ?? {})) as SyncedReadingActivity,
+  );
 }
 
 export async function getSyncedReadingVersion() {
-  return (await getClient().query(api.reading.getSyncVersion, {})) as string;
+  return cachedConvexQuery(
+    "reading:sync-version",
+    async () => (await getClient().query(api.reading.getSyncVersion, {})) as string,
+  );
 }

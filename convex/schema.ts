@@ -32,6 +32,18 @@ export default defineSchema({
     episodeSeconds: v.number(),
     updatedAtMs: v.number(),
   }).index("by_date", ["date"]),
+  traktWatchAggregates: defineTable({
+    aggregateKey: v.string(),
+    aggregateType: v.union(v.literal("movie"), v.literal("show")),
+    aggregateTitle: v.string(),
+    aggregateHref: v.string(),
+    aggregatePosterUrl: v.string(),
+    minutes: v.number(),
+    plays: v.number(),
+    updatedAtMs: v.number(),
+  })
+    .index("by_aggregateKey", ["aggregateKey"])
+    .index("by_minutes", ["minutes"]),
   traktState: defineTable({
     key: v.string(),
     syncedAtMs: v.number(),

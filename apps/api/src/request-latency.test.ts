@@ -1,4 +1,4 @@
-import { afterAll, describe, test } from "bun:test";
+import { afterAll, describe, expect, test } from "bun:test";
 
 import { siteConfig } from "@web24/config";
 import { getTopWritingPosts } from "../../../packages/content/src/writing";
@@ -23,6 +23,15 @@ type RequestGroupProfile = {
   durationMs: number;
   requests: RequestProfile[];
 };
+
+type CacheProbeProfile = {
+  name: string;
+  first: RequestProfile;
+  second: RequestProfile;
+};
+
+const HEALTHY_WARM_ENDPOINT_MS = 350;
+const HEALTHY_WARM_GROUP_MS = 700;
 
 const homeFirstPaintEndpoints: EndpointSpec[] = [
   {
@@ -81,12 +90,14 @@ const secondaryEndpoints: EndpointSpec[] = [
 
 const requestProfiles: RequestProfile[] = [];
 const groupProfiles: RequestGroupProfile[] = [];
+const cacheProbeProfiles: CacheProbeProfile[] = [];
 
 describe("production API request latency", () => {
   for (const endpoint of [...homeFirstPaintEndpoints, ...watchedFirstPaintEndpoints, ...secondaryEndpoints]) {
     test(endpoint.name, async () => {
       const profile = await profileEndpoint(endpoint);
       requestProfiles.push(profile);
+      expect(profile.status).toBe(200);
       printRequestProfile(profile);
     });
   }
@@ -94,12 +105,52 @@ describe("production API request latency", () => {
   test("home first paint bundle", async () => {
     const profile = await profileGroup("home first paint", homeFirstPaintEndpoints);
     groupProfiles.push(profile);
+    expect(profile.requests.every(request => request.status === 200)).toBe(true);
     printGroupProfile(profile);
   });
 
   test("watched first paint bundle", async () => {
     const profile = await profileGroup("watched first paint", watchedFirstPaintEndpoints);
     groupProfiles.push(profile);
+    expect(profile.requests.every(request => request.status === 200)).toBe(true);
+    printGroupProfile(profile);
+  });
+
+  test("activity home warm cache", async () => {
+    const profile = await profileCache("activity:home cache", {
+      name: "activity:home",
+      path: "/api/activity/home",
+    });
+
+    cacheProbeProfiles.push(profile);
+    expect(profile.first.status).toBe(200);
+    expect(profile.second.status).toBe(200);
+    expect(profile.second.responseBytes).toBe(profile.first.responseBytes);
+    expect(profile.second.durationMs).toBeLessThan(HEALTHY_WARM_ENDPOINT_MS);
+    printCacheProfile(profile);
+  });
+
+  test("reading status warm cache", async () => {
+    const profile = await profileCache("reading:status cache", {
+      name: "reading:status",
+      path: "/api/reading/status",
+    });
+
+    cacheProbeProfiles.push(profile);
+    expect(profile.first.status).toBe(200);
+    expect(profile.second.status).toBe(200);
+    expect(profile.second.responseBytes).toBe(profile.first.responseBytes);
+    expect(profile.second.durationMs).toBeLessThan(HEALTHY_WARM_ENDPOINT_MS);
+    printCacheProfile(profile);
+  });
+
+  test("home refresh bundle warm cache", async () => {
+    await profileGroup("home refresh warmup", homeFirstPaintEndpoints);
+    const profile = await profileGroup("home refresh warm cache", homeFirstPaintEndpoints);
+
+    groupProfiles.push(profile);
+    expect(profile.requests.every(request => request.status === 200)).toBe(true);
+    expect(profile.durationMs).toBeLessThan(HEALTHY_WARM_GROUP_MS);
     printGroupProfile(profile);
   });
 });
@@ -139,6 +190,17 @@ async function profileEndpoint(endpoint: EndpointSpec): Promise<RequestProfile> 
   };
 }
 
+async function profileCache(name: string, endpoint: EndpointSpec): Promise<CacheProbeProfile> {
+  const first = await profileEndpoint(endpoint);
+  const second = await profileEndpoint(endpoint);
+
+  return {
+    name,
+    first,
+    second,
+  };
+}
+
 function printRequestProfile(request: RequestProfile) {
   console.log(
     [
@@ -165,6 +227,19 @@ function printGroupProfile(group: RequestGroupProfile) {
   }
 }
 
+function printCacheProfile(profile: CacheProbeProfile) {
+  const delta = profile.second.durationMs - profile.first.durationMs;
+  console.log(
+    [
+      `\n[api-latency] ${profile.name}`,
+      `first=${formatMs(profile.first.durationMs)}`,
+      `second=${formatMs(profile.second.durationMs)}`,
+      `delta=${delta >= 0 ? "+" : ""}${formatMs(delta)}`,
+      `size=${profile.second.responseBytes}B`,
+    ].join(" | "),
+  );
+}
+
 function printSummary() {
   if (requestProfiles.length === 0) return;
 
@@ -184,6 +259,21 @@ function printSummary() {
     console.log("\n[api-latency] grouped first-paint summary");
     for (const group of [...groupProfiles].sort((left, right) => right.durationMs - left.durationMs)) {
       console.log(`  ${group.name} | duration=${formatMs(group.durationMs)}`);
+    }
+  }
+
+  if (cacheProbeProfiles.length > 0) {
+    console.log("\n[api-latency] warm cache probes");
+    for (const profile of cacheProbeProfiles) {
+      const delta = profile.second.durationMs - profile.first.durationMs;
+      console.log(
+        [
+          `  ${profile.name}`,
+          `first=${formatMs(profile.first.durationMs)}`,
+          `second=${formatMs(profile.second.durationMs)}`,
+          `delta=${delta >= 0 ? "+" : ""}${formatMs(delta)}`,
+        ].join(" | "),
+      );
     }
   }
 }

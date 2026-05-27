@@ -133,6 +133,26 @@ type DailyActivity = {
   updatedAtMs: number;
 };
 
+type WatchAggregate = {
+  id: string;
+  type: "movie" | "show";
+  title: string;
+  minutes: number;
+  plays: number;
+  posterUrl: string;
+  href: string;
+};
+
+type WatchAggregateDelta = {
+  aggregateKey: string;
+  aggregateType: "movie" | "show";
+  aggregateTitle: string;
+  aggregateHref: string;
+  aggregatePosterUrl: string;
+  minutes: number;
+  plays: number;
+};
+
 type DailyActivityDelta = {
   date: string;
   totalSeconds: number;
@@ -270,6 +290,18 @@ function toDailyActivityDelta(entry: HistoryEntry): DailyActivityDelta {
   };
 }
 
+function toWatchAggregateDelta(entry: HistoryEntry, multiplier = 1): WatchAggregateDelta {
+  return {
+    aggregateKey: entry.aggregateKey,
+    aggregateType: entry.aggregateType,
+    aggregateTitle: entry.aggregateTitle,
+    aggregateHref: entry.aggregateHref,
+    aggregatePosterUrl: entry.aggregatePosterUrl,
+    minutes: (entry.aggregateRuntimeMinutes || entry.runtimeMinutes || 0) * multiplier,
+    plays: multiplier,
+  };
+}
+
 function addDailyActivityDelta(
   totals: Map<string, DailyActivityDelta>,
   delta: DailyActivityDelta,
@@ -334,9 +366,47 @@ async function applyDailyActivityDelta(ctx: any, delta: DailyActivityDelta) {
   await ctx.db.insert("traktDailyActivity", patch);
 }
 
+async function applyWatchAggregateDelta(ctx: any, delta: WatchAggregateDelta) {
+  if (!delta.minutes && !delta.plays) return;
+
+  const existing = await ctx.db
+    .query("traktWatchAggregates")
+    .withIndex("by_aggregateKey", (q: any) => q.eq("aggregateKey", delta.aggregateKey))
+    .unique();
+
+  const nextMinutes = Math.max(0, (existing?.minutes ?? 0) + delta.minutes);
+  const nextPlays = Math.max(0, (existing?.plays ?? 0) + delta.plays);
+
+  if (!nextMinutes || !nextPlays) {
+    if (existing) {
+      await ctx.db.delete(existing._id);
+    }
+    return;
+  }
+
+  const patch = {
+    aggregateKey: delta.aggregateKey,
+    aggregateType: delta.aggregateType,
+    aggregateTitle: delta.aggregateTitle,
+    aggregateHref: delta.aggregateHref,
+    aggregatePosterUrl: delta.aggregatePosterUrl,
+    minutes: nextMinutes,
+    plays: nextPlays,
+    updatedAtMs: Date.now(),
+  };
+
+  if (existing) {
+    await ctx.db.patch(existing._id, patch);
+    return;
+  }
+
+  await ctx.db.insert("traktWatchAggregates", patch);
+}
+
 async function deleteHistoryEntry(ctx: any, entry: HistoryEntry & { _id: any }) {
   await ctx.db.delete(entry._id);
   await applyDailyActivityDelta(ctx, subtractDailyActivityDelta(toDailyActivityDelta(entry)));
+  await applyWatchAggregateDelta(ctx, toWatchAggregateDelta(entry, -1));
 }
 
 async function replaceDailyActivity(ctx: any, rows: DailyActivity[]) {
@@ -365,6 +435,43 @@ async function rebuildDailyActivityFromEntries(ctx: any, entries: HistoryEntry[]
     }));
 
   await replaceDailyActivity(ctx, rows);
+  return rows.length;
+}
+
+async function replaceWatchAggregates(ctx: any, rows: WatchAggregateDelta[]) {
+  const existing = await ctx.db.query("traktWatchAggregates").collect();
+  await Promise.all(existing.map((doc: any) => ctx.db.delete(doc._id)));
+
+  const updatedAtMs = Date.now();
+  for (const row of rows) {
+    if (!row.minutes || !row.plays) continue;
+    await ctx.db.insert("traktWatchAggregates", {
+      ...row,
+      updatedAtMs,
+    });
+  }
+}
+
+async function rebuildWatchAggregatesFromEntries(ctx: any, entries: HistoryEntry[]) {
+  const totals = new Map<string, WatchAggregateDelta>();
+
+  for (const entry of entries) {
+    const current = totals.get(entry.aggregateKey) ?? {
+      aggregateKey: entry.aggregateKey,
+      aggregateType: entry.aggregateType,
+      aggregateTitle: entry.aggregateTitle,
+      aggregateHref: entry.aggregateHref,
+      aggregatePosterUrl: entry.aggregatePosterUrl,
+      minutes: 0,
+      plays: 0,
+    };
+    current.minutes += entry.aggregateRuntimeMinutes || entry.runtimeMinutes || 0;
+    current.plays += 1;
+    totals.set(entry.aggregateKey, current);
+  }
+
+  const rows = Array.from(totals.values()).filter((row) => row.minutes > 0 && row.plays > 0);
+  await replaceWatchAggregates(ctx, rows);
   return rows.length;
 }
 
@@ -404,6 +511,7 @@ async function sanitizeDuplicateHistoryEntriesImpl(ctx: any, dryRun = false) {
   }
 
   const daysRebuilt = dryRun ? 0 : await rebuildDailyActivityFromEntries(ctx, keptEntries);
+  const aggregatesRebuilt = dryRun ? 0 : await rebuildWatchAggregatesFromEntries(ctx, keptEntries);
 
   return {
     scanned: entries.length,
@@ -411,6 +519,7 @@ async function sanitizeDuplicateHistoryEntriesImpl(ctx: any, dryRun = false) {
     duplicateGroups,
     deleted,
     daysRebuilt,
+    aggregatesRebuilt,
     dryRun,
   };
 }
@@ -484,6 +593,7 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
 
       await ctx.db.insert("traktHistoryEntries", entry);
       await applyDailyActivityDelta(ctx, toDailyActivityDelta(entry));
+      await applyWatchAggregateDelta(ctx, toWatchAggregateDelta(entry));
       forgetDedupeDay(entry);
       inserted += 1;
       continue;
@@ -533,6 +643,8 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
     await ctx.db.patch(current._id, entry);
     await applyDailyActivityDelta(ctx, subtractDailyActivityDelta(currentDelta));
     await applyDailyActivityDelta(ctx, nextDelta);
+    await applyWatchAggregateDelta(ctx, toWatchAggregateDelta(currentData as HistoryEntry, -1));
+    await applyWatchAggregateDelta(ctx, toWatchAggregateDelta(entry));
     forgetDedupeDay(currentData as HistoryEntry);
     forgetDedupeDay(entry);
     updated += 1;
@@ -832,9 +944,15 @@ export const clearHistory = mutation({
   handler: async (ctx) => {
     const existing = await ctx.db.query("traktHistoryEntries").collect();
     const dailyActivity = await ctx.db.query("traktDailyActivity").collect();
+    const watchAggregates = await ctx.db.query("traktWatchAggregates").collect();
     await Promise.all(existing.map((doc) => ctx.db.delete(doc._id)));
     await Promise.all(dailyActivity.map((doc) => ctx.db.delete(doc._id)));
-    return { deleted: existing.length, deletedActivityDays: dailyActivity.length };
+    await Promise.all(watchAggregates.map((doc) => ctx.db.delete(doc._id)));
+    return {
+      deleted: existing.length,
+      deletedActivityDays: dailyActivity.length,
+      deletedWatchAggregates: watchAggregates.length,
+    };
   },
 });
 
@@ -909,22 +1027,93 @@ export const listHistoryEntries = query({
   },
 });
 
+export const listMostWatchedAggregates = query({
+  args: {
+    startMs: v.optional(v.number()),
+    endMs: v.optional(v.number()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    if (args.startMs === undefined && args.endMs === undefined) {
+      const rows = await ctx.db
+        .query("traktWatchAggregates")
+        .withIndex("by_minutes")
+        .order("desc")
+        .take(args.limit ?? 12);
+
+      return rows.map((row) => ({
+        id: row.aggregateKey,
+        type: row.aggregateType,
+        title: row.aggregateTitle,
+        minutes: row.minutes,
+        plays: row.plays,
+        posterUrl: row.aggregatePosterUrl || FALLBACK_POSTER,
+        href: row.aggregateHref,
+      }));
+    }
+
+    const rows = await ctx.db
+      .query("traktHistoryEntries")
+      .withIndex("by_watchedAtMs", (q: any) => {
+        let range = q;
+        if (args.startMs !== undefined) {
+          range = range.gte("watchedAtMs", args.startMs);
+        }
+        if (args.endMs !== undefined) {
+          range = range.lt("watchedAtMs", args.endMs);
+        }
+        return range;
+      })
+      .collect();
+
+    const aggregates = new Map<string, WatchAggregate>();
+
+    for (const entry of rows) {
+      const aggregate =
+        aggregates.get(entry.aggregateKey) ??
+        {
+          id: entry.aggregateKey,
+          type: entry.aggregateType,
+          title: entry.aggregateTitle,
+          minutes: 0,
+          plays: 0,
+          posterUrl: entry.aggregatePosterUrl || FALLBACK_POSTER,
+          href: entry.aggregateHref,
+        };
+
+      aggregate.minutes += entry.aggregateRuntimeMinutes || entry.runtimeMinutes || 0;
+      aggregate.plays += 1;
+      aggregates.set(entry.aggregateKey, aggregate);
+    }
+
+    return Array.from(aggregates.values())
+      .filter((item) => item.minutes > 0)
+      .sort((left, right) => right.minutes - left.minutes)
+      .slice(0, args.limit ?? 12);
+  },
+});
+
 export const listDailyActivity = query({
   args: {
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const rows = await ctx.db.query("traktDailyActivity").withIndex("by_date").collect();
-
-    return rows
-      .filter((row) => {
-        if (args.startDate && row.date < args.startDate) return false;
-        if (args.endDate && row.date > args.endDate) return false;
-        return true;
+    const rows = await ctx.db
+      .query("traktDailyActivity")
+      .withIndex("by_date", (q: any) => {
+        let range = q;
+        if (args.startDate) {
+          range = range.gte("date", args.startDate);
+        }
+        if (args.endDate) {
+          range = range.lte("date", args.endDate);
+        }
+        return range;
       })
-      .sort((left, right) => left.date.localeCompare(right.date))
-      .map(({ _id: _rowId, _creationTime: _rowCreationTime, ...row }) => row);
+      .collect();
+
+    return rows.map(({ _id: _rowId, _creationTime: _rowCreationTime, ...row }) => row);
   },
 });
 
@@ -1121,6 +1310,42 @@ export const rebuildDailyActivity = action({
   },
 });
 
+export const rebuildWatchAggregates = action({
+  args: {},
+  handler: async (ctx) => {
+    const entries = (await ctx.runQuery(api.trakt.listHistoryEntries, {
+      order: "asc",
+    })) as (HistoryEntry & { historyId: string })[];
+    const totals = new Map<string, WatchAggregateDelta>();
+
+    for (const entry of entries) {
+      const current = totals.get(entry.aggregateKey) ?? {
+        aggregateKey: entry.aggregateKey,
+        aggregateType: entry.aggregateType,
+        aggregateTitle: entry.aggregateTitle,
+        aggregateHref: entry.aggregateHref,
+        aggregatePosterUrl: entry.aggregatePosterUrl,
+        minutes: 0,
+        plays: 0,
+      };
+      current.minutes += entry.aggregateRuntimeMinutes || entry.runtimeMinutes || 0;
+      current.plays += 1;
+      totals.set(entry.aggregateKey, current);
+    }
+
+    const rows = Array.from(totals.values())
+      .filter((row) => row.minutes > 0 && row.plays > 0)
+      .sort((left, right) => right.minutes - left.minutes);
+
+    await ctx.runMutation(internal.trakt.replaceWatchAggregatesInternal, { rows });
+
+    return {
+      historyEntries: entries.length,
+      aggregates: rows.length,
+    };
+  },
+});
+
 export const upsertHistoryBatchInternal = internalMutation({
   args: {
     entries: v.array(historyEntryValidator),
@@ -1146,6 +1371,26 @@ export const replaceDailyActivityInternal = internalMutation({
   },
   handler: async (ctx, args) => {
     await replaceDailyActivity(ctx, args.rows);
+    return { replaced: args.rows.length };
+  },
+});
+
+export const replaceWatchAggregatesInternal = internalMutation({
+  args: {
+    rows: v.array(
+      v.object({
+        aggregateKey: v.string(),
+        aggregateType: v.union(v.literal("movie"), v.literal("show")),
+        aggregateTitle: v.string(),
+        aggregateHref: v.string(),
+        aggregatePosterUrl: v.string(),
+        minutes: v.number(),
+        plays: v.number(),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    await replaceWatchAggregates(ctx, args.rows);
     return { replaced: args.rows.length };
   },
 });
