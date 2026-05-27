@@ -22,6 +22,7 @@
     "typecheck:api": "bun run --cwd apps/api typecheck",
     "test:trakt": "bun test convex/trakt-performance.test.ts",
     "test:watched": "bun test apps/api/src/watched-performance.test.ts",
+    "test:activity": "bun test apps/api/src/activity-performance.test.ts",
     "test:api:latency": "bun run --cwd apps/api test:latency",
     "lint": "bun run lint:web && bun run lint:api",
     "lint:web": "bun run --cwd apps/web lint",

@@ -26,6 +26,7 @@ const WAKATIME_SHARE_URL =
   "__REMOVED_WAKATIME_SHARE_URL__";
 const WAKATIME_TTL_MS = 60 * 60 * 1000;
 const WAKATIME_STALE_MS = 6 * 60 * 60 * 1000;
+const HOME_CODING_ACTIVITY_WAIT_MS = 650;
 const codingActivityCache = new AsyncCache<ActivityDay[]>();
 const STEP_SECONDS_PER_STEP = 0.6;
 const MIN_STEP_ACTIVITY_SECONDS = 60;
@@ -131,11 +132,32 @@ export async function getCodingActivityDays() {
   });
 }
 
+async function withFallbackTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T, label: string) {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+
+  try {
+    return await Promise.race([
+      promise.catch((error) => {
+        console.error(`[api/activity] ${label} failed`, error);
+        return fallback;
+      }),
+      new Promise<T>((resolve) => {
+        timeout = setTimeout(() => {
+          console.warn(`[api/activity] ${label} exceeded ${timeoutMs}ms; using fallback for this response`);
+          resolve(fallback);
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
+}
+
 export async function getHomeActivityDays(cookieHeader?: string | null) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
   const [codingDays, watchDays, healthRows, readingActivity] = await Promise.all([
-    getCodingActivityDays(),
+    withFallbackTimeout(getCodingActivityDays(), HOME_CODING_ACTIVITY_WAIT_MS, [] as ActivityDay[], "wakatime activity"),
     getWatchDaysLastYear(cookieHeader),
     listSyncedHealthDailyActivity({ startDate: sinceDate, endDate }),
     listSyncedReadingActivity({ startDate: sinceDate, endDate })
