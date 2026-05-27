@@ -3,8 +3,13 @@ import { v } from "convex/values";
 import { action, internalMutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 
-const WAKATIME_SHARE_URL =
-  "__REMOVED_WAKATIME_SHARE_URL__";
+function getRequiredEnv(key: string) {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`Missing ${key} in Convex environment`);
+  }
+  return value;
+}
 
 const codingCategoryValidator = v.object({
   name: v.string(),
@@ -72,7 +77,7 @@ export const listDailyActivity = query({
 export const syncWakaTime = action({
   args: {},
   handler: async (ctx) => {
-    const response = await fetch(WAKATIME_SHARE_URL, {
+    const response = await fetch(getRequiredEnv("WAKATIME_SHARE_URL"), {
       headers: {
         dataType: "jsonp",
       },

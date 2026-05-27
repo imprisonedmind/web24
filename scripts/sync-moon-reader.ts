@@ -9,7 +9,6 @@ import { api } from "../convex/_generated/api";
 import { envEntriesToObject, readEnvEntries } from "../packages/config/src/envFile";
 
 const ENV_PATH = path.join(process.cwd(), ".env.local");
-const DEFAULT_CONVEX_URL = "__REMOVED_CONVEX_URL__";
 const DEFAULT_BACKUP_PATH = path.join(process.env.HOME ?? "", "Downloads", "Backup.zip");
 const SOURCE = "moon-reader";
 const LOCAL_TIME_ZONE = process.env.MOON_READER_TIME_ZONE ?? "Africa/Johannesburg";
@@ -576,8 +575,8 @@ async function main() {
   const convexUrl =
     argValue("--convex-url") ??
     pickEnv(env, "VITE_CONVEX_URL") ??
-    pickEnv(env, "CONVEX_URL") ??
-    DEFAULT_CONVEX_URL;
+    pickEnv(env, "CONVEX_URL");
+  if (!convexUrl) formatError("Missing VITE_CONVEX_URL or CONVEX_URL in .env.local");
   const dryRun = hasArg("--dry-run");
   const { localPath, metadata } = await resolveBackup(env);
 

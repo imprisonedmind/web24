@@ -24,10 +24,11 @@ function readRuntimeEnv(): RuntimeEnv {
 
 const runtimeEnv = readRuntimeEnv();
 
-const rawSiteUrl =
-  runtimeEnv.SITE_URL ??
-  runtimeEnv.VITE_SITE_URL ??
-  "__REMOVED_SITE_URL__";
+const rawSiteUrl = runtimeEnv.SITE_URL ?? runtimeEnv.VITE_SITE_URL;
+
+if (!rawSiteUrl) {
+  throw new Error("Missing SITE_URL or VITE_SITE_URL");
+}
 
 const normalizedSiteUrl = rawSiteUrl.replace(/\/$/, "");
 

@@ -4,10 +4,6 @@
   "main": "./apps/api/src/worker.ts",
   "compatibility_date": "2026-03-18",
   "compatibility_flags": ["nodejs_compat"],
-  "vars": {
-    "SITE_URL": "__REMOVED_SITE_URL__",
-    "CONVEX_URL": "__REMOVED_CONVEX_URL__"
-  },
   "assets": {
     "directory": "./apps/web/dist",
     "binding": "ASSETS",

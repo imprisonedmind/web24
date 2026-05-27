@@ -11,7 +11,6 @@ const DEFAULT_TAKEOUT_PATH = path.join(
   "Takeout",
   "Fit",
 );
-const DEFAULT_CONVEX_URL = "__REMOVED_CONVEX_URL__";
 const TAKEOUT_SOURCE = "google-fit-takeout";
 const BATCH_SIZE = 80;
 const LOCAL_TIME_ZONE = "Africa/Johannesburg";
@@ -335,7 +334,10 @@ function monthSummary(metrics: TakeoutMetric[], sleepEvents: TakeoutSleepEvent[]
 
 async function main() {
   const takeoutPath = argValue("--takeout") ?? DEFAULT_TAKEOUT_PATH;
-  const convexUrl = argValue("--convex-url") ?? process.env.CONVEX_URL ?? DEFAULT_CONVEX_URL;
+  const convexUrl = argValue("--convex-url") ?? process.env.CONVEX_URL;
+  if (!convexUrl) {
+    throw new Error("Missing CONVEX_URL");
+  }
   const dryRun = process.argv.includes("--dry-run");
   const metrics = await readDailyMetrics(takeoutPath);
   const sleepEvents = await readSleepEvents(takeoutPath);
