@@ -227,6 +227,15 @@ function getActivityDate(watchedAtMs: number) {
   return new Date(watchedAtMs).toISOString().slice(0, 10);
 }
 
+function getActivityDateRange(watchedAtMs: number) {
+  const date = getActivityDate(watchedAtMs);
+  const startMs = Date.parse(`${date}T00:00:00.000Z`);
+  return {
+    startMs,
+    endMs: startMs + 24 * 60 * 60 * 1000,
+  };
+}
+
 function getHistoryDedupeKey(entry: HistoryEntry) {
   const date = getActivityDate(entry.watchedAtMs);
 
@@ -412,6 +421,34 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
   let skipped = 0;
   let deduped = 0;
 
+  const dayEntries = new Map<string, (HistoryEntry & { _id: any; _creationTime: number })[]>();
+
+  async function getEntriesForDedupeDay(entry: HistoryEntry) {
+    const date = getActivityDate(entry.watchedAtMs);
+    const cached = dayEntries.get(date);
+    if (cached) return cached;
+
+    const { startMs, endMs } = getActivityDateRange(entry.watchedAtMs);
+    const rows = (await ctx.db
+      .query("traktHistoryEntries")
+      .withIndex("by_watchedAtMs", (q: any) =>
+        q.gte("watchedAtMs", startMs).lt("watchedAtMs", endMs),
+      )
+      .collect()) as (HistoryEntry & { _id: any; _creationTime: number })[];
+
+    dayEntries.set(date, rows);
+    return rows;
+  }
+
+  function forgetDedupeDay(entry: HistoryEntry) {
+    dayEntries.delete(getActivityDate(entry.watchedAtMs));
+  }
+
+  async function deleteHistoryEntryAndInvalidate(entry: HistoryEntry & { _id: any }) {
+    await deleteHistoryEntry(ctx, entry);
+    forgetDedupeDay(entry);
+  }
+
   for (const entry of entries) {
     const existing = await ctx.db
       .query("traktHistoryEntries")
@@ -420,13 +457,16 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
 
     if (!existing.length) {
       const dedupeKey = getHistoryDedupeKey(entry);
-      const duplicateEntries = (await ctx.db.query("traktHistoryEntries").collect()).filter(
+      const duplicateEntries = (await getEntriesForDedupeDay(entry)).filter(
         (row: HistoryEntry) => getHistoryDedupeKey(row) === dedupeKey,
       );
 
       if (duplicateEntries.length) {
         const preferred = duplicateEntries.reduce(
-          (current: HistoryEntry & { _id: any }, candidate: HistoryEntry & { _id: any }) =>
+          (
+            current: HistoryEntry & { _id: any; _creationTime: number },
+            candidate: HistoryEntry & { _id: any; _creationTime: number },
+          ) =>
             isPreferredHistoryEntry(candidate, current) ? candidate : current,
         );
 
@@ -437,27 +477,28 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
         }
 
         for (const duplicate of duplicateEntries) {
-          await deleteHistoryEntry(ctx, duplicate);
+          await deleteHistoryEntryAndInvalidate(duplicate);
           deduped += 1;
         }
       }
 
       await ctx.db.insert("traktHistoryEntries", entry);
       await applyDailyActivityDelta(ctx, toDailyActivityDelta(entry));
+      forgetDedupeDay(entry);
       inserted += 1;
       continue;
     }
 
     const [current, ...duplicates] = existing;
     for (const duplicate of duplicates) {
-      await deleteHistoryEntry(ctx, duplicate);
+      await deleteHistoryEntryAndInvalidate(duplicate);
       deduped += 1;
     }
 
     const { _id: _currentId, _creationTime: _currentCreationTime, ...currentData } = current;
 
     const dedupeKey = getHistoryDedupeKey(entry);
-    const duplicateEntries = (await ctx.db.query("traktHistoryEntries").collect()).filter(
+    const duplicateEntries = (await getEntriesForDedupeDay(entry)).filter(
       (row: HistoryEntry & { _id: any }) =>
         row._id !== current._id && getHistoryDedupeKey(row) === dedupeKey,
     );
@@ -470,14 +511,14 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
       );
 
       if (preferred._id !== current._id && !isPreferredHistoryEntry(entry, preferred)) {
-        await deleteHistoryEntry(ctx, current);
+        await deleteHistoryEntryAndInvalidate(current);
         skipped += 1;
         deduped += 1;
         continue;
       }
 
       for (const duplicate of duplicateEntries) {
-        await deleteHistoryEntry(ctx, duplicate);
+        await deleteHistoryEntryAndInvalidate(duplicate);
         deduped += 1;
       }
     }
@@ -492,6 +533,8 @@ async function upsertHistoryEntries(ctx: any, entries: HistoryEntry[]) {
     await ctx.db.patch(current._id, entry);
     await applyDailyActivityDelta(ctx, subtractDailyActivityDelta(currentDelta));
     await applyDailyActivityDelta(ctx, nextDelta);
+    forgetDedupeDay(currentData as HistoryEntry);
+    forgetDedupeDay(entry);
     updated += 1;
   }
 
@@ -844,23 +887,25 @@ export const listHistoryEntries = query({
   },
   handler: async (ctx, args) => {
     const order = args.order ?? "desc";
-    let results = await ctx.db.query("traktHistoryEntries").withIndex("by_watchedAtMs").collect();
-
-    results = results.filter((entry) => {
-      if (args.startMs !== undefined && entry.watchedAtMs < args.startMs) return false;
-      if (args.endMs !== undefined && entry.watchedAtMs >= args.endMs) return false;
-      return true;
-    });
-
-    results.sort((left, right) =>
-      order === "desc" ? right.watchedAtMs - left.watchedAtMs : left.watchedAtMs - right.watchedAtMs,
-    );
+    const query = ctx.db
+      .query("traktHistoryEntries")
+      .withIndex("by_watchedAtMs", (q: any) => {
+        let range = q;
+        if (args.startMs !== undefined) {
+          range = range.gte("watchedAtMs", args.startMs);
+        }
+        if (args.endMs !== undefined) {
+          range = range.lt("watchedAtMs", args.endMs);
+        }
+        return range;
+      })
+      .order(order);
 
     if (args.limit !== undefined) {
-      return results.slice(0, args.limit);
+      return await query.take(args.limit);
     }
 
-    return results;
+    return await query.collect();
   },
 });
 
