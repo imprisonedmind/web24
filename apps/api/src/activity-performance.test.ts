@@ -24,11 +24,12 @@ function getFunctionBody(name: string) {
 }
 
 describe("activity API performance", () => {
-  test("home activity does not block indefinitely on WakaTime", () => {
+  test("home activity reads coding activity from Convex instead of WakaTime", () => {
     const body = getFunctionBody("getHomeActivityDays");
 
-    expect(source).toContain("HOME_CODING_ACTIVITY_WAIT_MS");
-    expect(source).toContain("withFallbackTimeout");
-    expect(body).toContain("withFallbackTimeout(getCodingActivityDays()");
+    expect(source).toContain("listSyncedCodingDailyActivity");
+    expect(source).not.toContain("wakatime.com/share");
+    expect(source).not.toContain("fetch(WAKATIME");
+    expect(body).toContain("getCodingActivityDays(sinceDate, endDate)");
   });
 });

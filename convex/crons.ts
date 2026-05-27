@@ -11,4 +11,11 @@ crons.interval(
   { windowHours: 72 },
 );
 
+crons.interval(
+  "sync wakatime coding activity",
+  { hours: 1 },
+  api.coding.syncWakaTime,
+  {},
+);
+
 export default crons;

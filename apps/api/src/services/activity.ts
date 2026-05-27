@@ -1,5 +1,6 @@
 import { AsyncCache } from "../lib/cache";
 import {
+  listSyncedCodingDailyActivity,
   getSyncedHealthCurrentStats,
   listSyncedHealthDailyActivity,
   listSyncedReadingActivity,
@@ -22,12 +23,6 @@ type ActivityDay = {
   }[];
 };
 
-const WAKATIME_SHARE_URL =
-  "__REMOVED_WAKATIME_SHARE_URL__";
-const WAKATIME_TTL_MS = 60 * 60 * 1000;
-const WAKATIME_STALE_MS = 6 * 60 * 60 * 1000;
-const HOME_CODING_ACTIVITY_WAIT_MS = 650;
-const codingActivityCache = new AsyncCache<ActivityDay[]>();
 const STEP_SECONDS_PER_STEP = 0.6;
 const MIN_STEP_ACTIVITY_SECONDS = 60;
 const CATEGORY_LABELS: Record<string, string> = {
@@ -35,24 +30,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   "Writing Docs": "writing",
   Designing: "designing",
 };
-
-function normalizeCategoryName(name: string) {
-  return name.trim().toLowerCase() === "ai coding" ? "Coding" : name;
-}
-
-function normalizeWakaDay(day: ActivityDay) {
-  const categoryTotals = new Map<string, number>();
-
-  for (const category of day.categories ?? []) {
-    const name = normalizeCategoryName(category.name);
-    categoryTotals.set(name, (categoryTotals.get(name) ?? 0) + category.total);
-  }
-
-  return {
-    ...day,
-    categories: Array.from(categoryTotals, ([name, total]) => ({ name, total }))
-  } satisfies ActivityDay;
-}
 
 function mergeDays(...dayGroups: ActivityDay[][]) {
   const map: Record<string, ActivityDay> = {};
@@ -98,66 +75,15 @@ function mergeDays(...dayGroups: ActivityDay[][]) {
   return Object.values(map).sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export async function getCodingActivityDays() {
-  return codingActivityCache.getOrRefresh({
-    key: "wakatime:coding-days",
-    ttlMs: WAKATIME_TTL_MS,
-    staleWhileRevalidateMs: WAKATIME_STALE_MS,
-    loader: async () => {
-      try {
-        const response = await fetch(WAKATIME_SHARE_URL, {
-          headers: {
-            dataType: "jsonp"
-          }
-        });
-
-        if (!response.ok) {
-          console.warn(`[api/activity] wakatime request failed (${response.status})`);
-          return [] as ActivityDay[];
-        }
-
-        const payload = (await response.json()) as { days?: ActivityDay[] } | null;
-        const todayIso = new Date().toISOString().split("T")[0];
-
-        return Array.isArray(payload?.days)
-          ? payload.days
-              .filter(day => day?.date && day.date <= todayIso)
-              .map(normalizeWakaDay)
-          : [];
-      } catch (error) {
-        console.error("[api/activity] failed to fetch wakatime activity", error);
-        return [] as ActivityDay[];
-      }
-    }
-  });
-}
-
-async function withFallbackTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T, label: string) {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-
-  try {
-    return await Promise.race([
-      promise.catch((error) => {
-        console.error(`[api/activity] ${label} failed`, error);
-        return fallback;
-      }),
-      new Promise<T>((resolve) => {
-        timeout = setTimeout(() => {
-          console.warn(`[api/activity] ${label} exceeded ${timeoutMs}ms; using fallback for this response`);
-          resolve(fallback);
-        }, timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timeout) clearTimeout(timeout);
-  }
+export async function getCodingActivityDays(startDate?: string, endDate?: string) {
+  return listSyncedCodingDailyActivity({ startDate, endDate });
 }
 
 export async function getHomeActivityDays(cookieHeader?: string | null) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
   const [codingDays, watchDays, healthRows, readingActivity] = await Promise.all([
-    withFallbackTimeout(getCodingActivityDays(), HOME_CODING_ACTIVITY_WAIT_MS, [] as ActivityDay[], "wakatime activity"),
+    getCodingActivityDays(sinceDate, endDate),
     getWatchDaysLastYear(cookieHeader),
     listSyncedHealthDailyActivity({ startDate: sinceDate, endDate }),
     listSyncedReadingActivity({ startDate: sinceDate, endDate })
@@ -315,7 +241,9 @@ export async function getWatchingActivityDays(cookieHeader?: string | null) {
 }
 
 export async function getWorkActivitySections() {
-  const codingDays = await getCodingActivityDays();
+  const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const endDate = new Date().toISOString().slice(0, 10);
+  const codingDays = await getCodingActivityDays(sinceDate, endDate);
 
   return Object.entries(CATEGORY_LABELS)
     .map(([sourceName, label]) => {

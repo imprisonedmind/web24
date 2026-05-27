@@ -138,6 +138,17 @@ export default defineSchema({
       }),
     ),
   }).index("by_key", ["key"]),
+  codingDailyActivity: defineTable({
+    date: v.string(),
+    total: v.number(),
+    categories: v.array(
+      v.object({
+        name: v.string(),
+        total: v.number(),
+      }),
+    ),
+    updatedAtMs: v.number(),
+  }).index("by_date", ["date"]),
   readingBooks: defineTable({
     source: v.string(),
     sourceId: v.string(),

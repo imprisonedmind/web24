@@ -47,6 +47,16 @@ export type SyncedDailyActivity = {
   updatedAtMs: number;
 };
 
+export type SyncedCodingDailyActivity = {
+  date: string;
+  total: number;
+  categories: {
+    name: string;
+    total: number;
+  }[];
+  updatedAtMs: number;
+};
+
 export type SyncedHealthDailyActivity = {
   date: string;
   totalSeconds: number;
@@ -224,6 +234,16 @@ export async function listSyncedDailyActivity(args?: {
   return cachedConvexQuery(
     cacheKey("trakt:daily-activity", args),
     async () => (await getClient().query(api.trakt.listDailyActivity, args ?? {})) as SyncedDailyActivity[],
+  );
+}
+
+export async function listSyncedCodingDailyActivity(args?: {
+  startDate?: string;
+  endDate?: string;
+}) {
+  return cachedConvexQuery(
+    cacheKey("coding:daily-activity", args),
+    async () => (await getClient().query(api.coding.listDailyActivity, args ?? {})) as SyncedCodingDailyActivity[],
   );
 }
 
