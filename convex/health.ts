@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 
 const STATE_KEY = "default";
-const PRESENTATION_VERSION = "event-category-metrics-v1";
+const PRESENTATION_VERSION = "event-category-title-fallback-v1";
 
 const dailySummaryValidator = v.object({
   date: v.string(),
@@ -203,7 +203,8 @@ function round(value: number | undefined | null) {
 
 function eventCategoryName(event: any) {
   if (event.kind === "sleep") return event.title;
-  if (event.title === "Other" || event.activityType === "other") return "Other Exercise";
+  if (event.title && event.title !== "Other") return event.title;
+  if (event.activityType === "other") return "Other Exercise";
   return event.title || event.activityType || "Exercise";
 }
 
