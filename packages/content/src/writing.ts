@@ -46,6 +46,14 @@ const blogPosts: WritingPost[] = [
       "Learn how to connect your Olarm communicator with HomeKit and Google Home using Homebridge. This step-by-step guide covers installation, plugin setup, and configuration to seamlessly integrate your Olarm alarm system with iOS and Android platforms."
   },
   {
+    id: "159f90ec476b8039a452c4675a6f24c6",
+    date: "11 Dec 24",
+    title: "device management portal",
+    openGraph: "images/projects/portal.png",
+    openGraphSmall: "images/projects/portal.png",
+    description: "Case study on building a secure device management portal."
+  },
+  {
     id: "d9d9ff0975444fa191bd2a5a2e102c91",
     date: "02 Aug 24",
     title: "fix external camera flicker on mac",
