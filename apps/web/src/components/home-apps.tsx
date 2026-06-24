@@ -37,7 +37,7 @@ function HomeAppLogo({ item }: { item: AppItem }) {
         aria-label={item.title}
       >
         <CFImage
-          className="h-full w-full object-cover"
+          className={`h-full w-full ${item.logoFit === "contain" ? "object-contain p-3" : "object-cover"}`}
           src={item.image}
           alt={item.alt}
           preset="appLogo"

@@ -25,3 +25,36 @@ export function WorkCard({ item }: { item: WorkItem }) {
     </a>
   );
 }
+
+export function WorkListCard({ item }: { item: WorkItem }) {
+  return (
+    <a
+      href={item.link}
+      target={item.internal ? "_self" : "_blank"}
+      rel={item.internal ? undefined : "noreferrer"}
+      className="flex w-full flex-col gap-2 rounded-xl bg-white p-2 text-inherit no-underline shadow-sm transition duration-150 ease-in-out hover:shadow-md"
+    >
+      <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-neutral-100">
+        <CFImage
+          src={item.image}
+          alt={item.alt}
+          className="h-full w-full bg-gray-200 object-cover"
+          preset="workCard"
+        />
+      </div>
+      <div className="flex justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-sm">{item.title}</p>
+          {item.description ? (
+            <p className="mt-1 text-xs leading-snug text-neutral-500">
+              {item.description}
+            </p>
+          ) : null}
+        </div>
+        <p className="h-fit flex-shrink-0 rounded-full bg-neutral-100 p-1 px-2 text-xs">
+          {item.tag}
+        </p>
+      </div>
+    </a>
+  );
+}

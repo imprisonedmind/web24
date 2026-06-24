@@ -5,6 +5,7 @@ export interface AppItem {
   image: string;
   previewImage: string;
   alt: string;
+  logoFit?: "cover" | "contain";
   year?: string;
   internal?: boolean;
 }
@@ -35,6 +36,16 @@ export const appItems: AppItem[] = [
     image: "/images/apps/logos/finchy.jpg",
     previewImage: "/images/apps/previews/finchy.jpg",
     alt: "mobile app for spend management",
+    year: "2025",
+  },
+  {
+    title: "ootify",
+    link: "https://ootify.me/",
+    tag: "web addon",
+    image: "/images/apps/logos/ootify-logo-wordmark.svg",
+    previewImage: "/images/work/ootify.jpg",
+    alt: "ootify app logo",
+    logoFit: "contain",
     year: "2025",
   },
 ];
