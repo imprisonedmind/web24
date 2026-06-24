@@ -39,7 +39,7 @@ activityRoutes.get("/home", async c => {
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => ({
-        days: await getHomeActivityDays(),
+        days: await getHomeActivityDays(undefined, readingVersion),
       }),
     });
     return c.json(payload, 200);
@@ -76,7 +76,7 @@ activityRoutes.get("/full", async c => {
       key: `activity:full:${historyVersion}:${healthVersion}:${readingVersion}`,
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
-      loader: async () => getFullActivityDays(),
+      loader: async () => getFullActivityDays(undefined, readingVersion),
     });
     return c.json(payload, 200);
   } catch (error) {
@@ -146,7 +146,7 @@ activityRoutes.get("/reading", async c => {
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => ({
-        readingSections: await getReadingActivitySections(),
+        readingSections: await getReadingActivitySections(version),
       }),
     });
     return c.json(payload, 200);

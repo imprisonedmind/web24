@@ -2,7 +2,11 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-const DEFAULT_BACKUP_PATH = path.join(process.env.HOME ?? "", "Downloads", "Backup.zip");
+const DEFAULT_BACKUP_PATH = path.join(
+  process.env.HOME ?? "",
+  "Downloads",
+  "Backup.zip",
+);
 
 type BookRow = {
   book: string | null;
@@ -21,11 +25,18 @@ type CoverResult = {
 
 type OpenLibrarySearchResponse = {
   docs?: {
+    key?: string;
     title?: string;
     author_name?: string[];
     cover_i?: number;
+    cover_edition_key?: string;
+    edition_key?: string[];
     isbn?: string[];
   }[];
+};
+
+type OpenLibraryWorkResponse = {
+  covers?: number[];
 };
 
 type GoogleBooksResponse = {
@@ -80,12 +91,24 @@ async function extractDatabase(backupPath: string, tempDir: string) {
   const extractDir = path.join(tempDir, "moon-reader");
   run("unzip", ["-q", mrproPath, "-d", extractDir]);
 
-  const namesList = path.join(extractDir, "com.flyersoft.moonreaderp", "_names.list");
-  const tagNames = (await readFile(namesList, "utf8")).split(/\r?\n/).filter(Boolean);
-  const dbIndex = tagNames.findIndex((name) => name.endsWith("/databases/mrbooks.db"));
+  const namesList = path.join(
+    extractDir,
+    "com.flyersoft.moonreaderp",
+    "_names.list",
+  );
+  const tagNames = (await readFile(namesList, "utf8"))
+    .split(/\r?\n/)
+    .filter(Boolean);
+  const dbIndex = tagNames.findIndex((name) =>
+    name.endsWith("/databases/mrbooks.db"),
+  );
   if (dbIndex < 0) throw new Error("Moon+ backup did not contain mrbooks.db.");
 
-  return path.join(extractDir, "com.flyersoft.moonreaderp", `${dbIndex + 1}.tag`);
+  return path.join(
+    extractDir,
+    "com.flyersoft.moonreaderp",
+    `${dbIndex + 1}.tag`,
+  );
 }
 
 function queryJson<T>(databasePath: string, sql: string): T[] {
@@ -116,8 +139,21 @@ function titleFromFilename(filename: string) {
   );
 }
 
+function titleWithoutSeriesSubtitle(title: string) {
+  const [primaryTitle] = title.split(/\s*:\s*/);
+  return cleanTitle(primaryTitle ?? title);
+}
+
 function queryHints(book: BookRow) {
-  const text = [book.book, book.author, book.filename, book.description, book.category].filter(Boolean).join(" ");
+  const text = [
+    book.book,
+    book.author,
+    book.filename,
+    book.description,
+    book.category,
+  ]
+    .filter(Boolean)
+    .join(" ");
   const hints = new Set<string>();
 
   if (/large language model|manning|raschka/i.test(text)) {
@@ -130,46 +166,107 @@ function queryHints(book: BookRow) {
 function isbnCandidates(text: string) {
   return Array.from(
     new Set(
-      Array.from(text.matchAll(/(?:97[89][-\s]?)?\d[-\s]?\d{2,5}[-\s]?\d{2,7}[-\s]?\d{1,7}[-\s]?[\dX]/gi))
+      Array.from(
+        text.matchAll(
+          /(?:97[89][-\s]?)?\d[-\s]?\d{2,5}[-\s]?\d{2,7}[-\s]?\d{1,7}[-\s]?[\dX]/gi,
+        ),
+      )
         .map((match) => match[0].replace(/[^\dX]/gi, ""))
         .filter((value) => value.length === 10 || value.length === 13),
     ),
   );
 }
 
-async function openLibraryByIsbn(isbn: string): Promise<CoverResult | undefined> {
+async function openLibraryByIsbn(
+  isbn: string,
+): Promise<CoverResult | undefined> {
   const url = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
   const response = await fetch(url, { method: "HEAD" });
-  return response.ok ? { provider: `openlibrary:isbn:${isbn}`, url } : undefined;
+  return response.ok
+    ? { provider: `openlibrary:isbn:${isbn}`, url }
+    : undefined;
 }
 
-async function openLibrarySearch(title: string, author?: string): Promise<CoverResult | undefined> {
+async function openLibraryByEditionKey(
+  editionKey: string,
+): Promise<CoverResult | undefined> {
+  const url = `https://covers.openlibrary.org/b/olid/${editionKey}-L.jpg?default=false`;
+  const response = await fetch(url, { method: "HEAD" });
+  return response.ok
+    ? { provider: `openlibrary:olid:${editionKey}`, url }
+    : undefined;
+}
+
+async function openLibrarySearch(
+  title: string,
+  author?: string,
+): Promise<CoverResult | undefined> {
   const params = new URLSearchParams({ title, limit: "5" });
   if (author) params.set("author", author);
 
-  const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`, {
-    headers: { "User-Agent": "web24-reading-cover-test/1.0" },
-  });
+  const response = await fetch(
+    `https://openlibrary.org/search.json?${params.toString()}`,
+    {
+      headers: { "User-Agent": "web24-reading-cover-test/1.0" },
+    },
+  );
   if (!response.ok) return undefined;
 
   const data = (await response.json()) as OpenLibrarySearchResponse;
   const match = data.docs?.find((doc) => typeof doc.cover_i === "number");
-  if (!match?.cover_i) return undefined;
+  if (match?.cover_i) {
+    return {
+      provider: "openlibrary:search",
+      url: `https://covers.openlibrary.org/b/id/${match.cover_i}-L.jpg`,
+      title: match.title,
+      author: match.author_name?.[0],
+    };
+  }
 
-  return {
-    provider: "openlibrary:search",
-    url: `https://covers.openlibrary.org/b/id/${match.cover_i}-L.jpg`,
-    title: match.title,
-    author: match.author_name?.[0],
-  };
+  const editionKeys =
+    data.docs?.flatMap((doc) =>
+      [doc.cover_edition_key, ...(doc.edition_key ?? [])].filter(
+        (key): key is string => Boolean(key),
+      ),
+    ) ?? [];
+  for (const editionKey of Array.from(new Set(editionKeys))) {
+    const editionResult = await openLibraryByEditionKey(editionKey);
+    if (editionResult) return editionResult;
+  }
+
+  const workKeys =
+    data.docs
+      ?.map((doc) => doc.key)
+      .filter((key): key is string => key?.startsWith("/works/") ?? false) ??
+    [];
+  for (const workKey of Array.from(new Set(workKeys))) {
+    const work = await fetchJsonWithRetry<OpenLibraryWorkResponse>(
+      `https://openlibrary.org${workKey}.json`,
+    );
+    const coverId = work?.covers?.find((cover) => cover > 0);
+    if (coverId) {
+      return {
+        provider: "openlibrary:work",
+        url: `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`,
+      };
+    }
+  }
+
+  return undefined;
 }
 
-async function fetchJsonWithRetry<T>(url: string, attempts = 3): Promise<T | undefined> {
+async function fetchJsonWithRetry<T>(
+  url: string,
+  attempts = 3,
+): Promise<T | undefined> {
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const response = await fetch(url);
     if (response.ok) return (await response.json()) as T;
 
-    if (![429, 500, 502, 503, 504].includes(response.status) || attempt === attempts) {
+    if (
+      ![429, 500, 502, 503, 504].includes(response.status) ||
+      attempt === attempts
+    ) {
       return undefined;
     }
 
@@ -179,8 +276,13 @@ async function fetchJsonWithRetry<T>(url: string, attempts = 3): Promise<T | und
   return undefined;
 }
 
-async function googleBooksSearch(title: string, author?: string): Promise<CoverResult | undefined> {
-  const query = [`intitle:${title}`, author ? `inauthor:${author}` : null].filter(Boolean).join("+");
+async function googleBooksSearch(
+  title: string,
+  author?: string,
+): Promise<CoverResult | undefined> {
+  const query = [`intitle:${title}`, author ? `inauthor:${author}` : null]
+    .filter(Boolean)
+    .join("+");
   const params = new URLSearchParams({
     q: query,
     maxResults: "5",
@@ -190,7 +292,9 @@ async function googleBooksSearch(title: string, author?: string): Promise<CoverR
     `https://www.googleapis.com/books/v1/volumes?${params.toString()}`,
   );
   if (!data) return undefined;
-  const match = data.items?.find((item) => item.volumeInfo?.imageLinks?.thumbnail);
+  const match = data.items?.find(
+    (item) => item.volumeInfo?.imageLinks?.thumbnail,
+  );
   const thumbnail = match?.volumeInfo?.imageLinks?.thumbnail;
   if (!thumbnail) return undefined;
 
@@ -213,7 +317,15 @@ async function resolveCover(book: BookRow) {
       .replace(/\s+/g, " ")
       .trim(),
   );
-  const isbnText = [book.book, book.author, book.filename, book.description, book.category].filter(Boolean).join("\n");
+  const isbnText = [
+    book.book,
+    book.author,
+    book.filename,
+    book.description,
+    book.category,
+  ]
+    .filter(Boolean)
+    .join("\n");
   const hints = queryHints(book);
 
   for (const isbn of isbnCandidates(isbnText)) {
@@ -221,7 +333,16 @@ async function resolveCover(book: BookRow) {
     if (result) return { title, author, result };
   }
 
-  for (const candidateTitle of Array.from(new Set([title, fallbackTitle, longFilenameTitle]))) {
+  for (const candidateTitle of Array.from(
+    new Set([
+      title,
+      titleWithoutSeriesSubtitle(title),
+      fallbackTitle,
+      titleWithoutSeriesSubtitle(fallbackTitle),
+      longFilenameTitle,
+      titleWithoutSeriesSubtitle(longFilenameTitle),
+    ]),
+  )) {
     const openLibraryResult = await openLibrarySearch(candidateTitle, author);
     if (openLibraryResult) return { title, author, result: openLibraryResult };
 
@@ -229,8 +350,12 @@ async function resolveCover(book: BookRow) {
     if (googleBooksResult) return { title, author, result: googleBooksResult };
 
     for (const hint of hints) {
-      const hintedGoogleResult = await googleBooksSearch(`${candidateTitle} ${hint}`, author);
-      if (hintedGoogleResult) return { title, author, result: hintedGoogleResult };
+      const hintedGoogleResult = await googleBooksSearch(
+        `${candidateTitle} ${hint}`,
+        author,
+      );
+      if (hintedGoogleResult)
+        return { title, author, result: hintedGoogleResult };
     }
   }
 
@@ -256,10 +381,14 @@ async function main() {
     const found = results.filter((row) => row.result);
     console.log(`Found covers for ${found.length}/${results.length} books\n`);
     for (const row of results) {
-      console.log(`${row.result ? "OK" : "MISS"} ${row.title}${row.author ? ` — ${row.author}` : ""}`);
+      console.log(
+        `${row.result ? "OK" : "MISS"} ${row.title}${row.author ? ` — ${row.author}` : ""}`,
+      );
       if (row.result) {
         console.log(`  ${row.result.provider}: ${row.result.url}`);
-        console.log(`  matched: ${row.result.title ?? "unknown"}${row.result.author ? ` — ${row.result.author}` : ""}`);
+        console.log(
+          `  matched: ${row.result.title ?? "unknown"}${row.result.author ? ` — ${row.result.author}` : ""}`,
+        );
       }
     }
   } finally {

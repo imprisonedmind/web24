@@ -271,10 +271,12 @@ export async function getSyncedHealthVersion() {
 export async function listSyncedReadingActivity(args?: {
   startDate?: string;
   endDate?: string;
+  cacheVersion?: string;
 }) {
+  const { cacheVersion, ...queryArgs } = args ?? {};
   return cachedConvexQuery(
-    cacheKey("reading:activity", args),
-    async () => (await getClient().query(api.reading.listReadingActivity, args ?? {})) as SyncedReadingActivity,
+    cacheKey("reading:activity", { ...queryArgs, cacheVersion }),
+    async () => (await getClient().query(api.reading.listReadingActivity, queryArgs)) as SyncedReadingActivity,
   );
 }
 

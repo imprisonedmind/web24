@@ -79,14 +79,14 @@ export async function getCodingActivityDays(startDate?: string, endDate?: string
   return listSyncedCodingDailyActivity({ startDate, endDate });
 }
 
-export async function getHomeActivityDays(cookieHeader?: string | null) {
+export async function getHomeActivityDays(cookieHeader?: string | null, readingVersion?: string) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
   const [codingDays, watchDays, healthRows, readingActivity] = await Promise.all([
     getCodingActivityDays(sinceDate, endDate),
     getWatchDaysLastYear(cookieHeader),
     listSyncedHealthDailyActivity({ startDate: sinceDate, endDate }),
-    listSyncedReadingActivity({ startDate: sinceDate, endDate })
+    listSyncedReadingActivity({ startDate: sinceDate, endDate, cacheVersion: readingVersion })
   ]);
   const exerciseDays = buildHealthSectionDays(healthRows, "exercise");
   const readingDays = buildReadingSectionDays(readingActivity.dailyActivity);
@@ -267,21 +267,21 @@ export async function getHealthActivitySections() {
   return sections.filter(section => sumTotals(section.days) > 0);
 }
 
-export async function getReadingActivitySections() {
+export async function getReadingActivitySections(readingVersion?: string) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
-  const activity = await listSyncedReadingActivity({ startDate: sinceDate, endDate });
+  const activity = await listSyncedReadingActivity({ startDate: sinceDate, endDate, cacheVersion: readingVersion });
   const days = buildReadingSectionDays(activity.dailyActivity);
 
   return sumTotals(days) > 0 ? [{ label: "reading", days }] : [];
 }
 
-export async function getFullActivityDays(cookieHeader?: string | null) {
+export async function getFullActivityDays(cookieHeader?: string | null, readingVersion?: string) {
   const [watchingDays, workSections, healthSections, readingSections] = await Promise.all([
     getWatchingActivityDays(cookieHeader),
     getWorkActivitySections(),
     getHealthActivitySections(),
-    getReadingActivitySections()
+    getReadingActivitySections(readingVersion)
   ]);
 
   return {
