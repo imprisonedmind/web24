@@ -3,6 +3,7 @@ import type { CfImageOptions } from "./cf-image";
 export type ImagePresetName =
   | "heroPortrait"
   | "workCard"
+  | "workListCard"
   | "writingCard"
   | "catalogWork"
   | "previewCard"
@@ -30,6 +31,10 @@ export const imagePresets: Record<ImagePresetName, ImagePreset> = {
   workCard: {
     widths: [240, 370],
     sizes: "185px",
+  },
+  workListCard: {
+    widths: [640, 960, 1280, 1600],
+    sizes: "(max-width: 1024px) calc(100vw - 32px), 960px",
   },
   writingCard: {
     widths: [320, 640, 960],
