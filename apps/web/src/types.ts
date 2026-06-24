@@ -4,6 +4,7 @@ export type WatchDay = {
   categories?: {
     name: string;
     total: number;
+    kind?: "exercise" | "sleep";
     distanceMeters?: number;
     steps?: number;
     caloriesKcal?: number;

@@ -321,11 +321,20 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
     Nap: "#60a5fa",
     Reading: "#db2777",
   };
-
   const today = new Date().toISOString().split("T")[0];
   const defaultColor = ACTIVITY_DEFAULT_COLOR;
   const defaultBorderColor = ACTIVITY_DEFAULT_BORDER_COLOR;
   const todayBorderColor = "#0ea5e9";
+  const categoryColor = (
+    category?: NonNullable<WatchDay["categories"]>[number],
+  ) => {
+    if (!category) return defaultColor;
+    if (categoryColors[category.name]) return categoryColors[category.name];
+    if (category.kind === "exercise") return categoryColors.Exercise;
+    if (category.kind === "sleep") return categoryColors.Sleep;
+    return defaultColor;
+  };
+
   const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
   const [hoveredCell, setHoveredCell] = useState<{
     date: string;
@@ -348,7 +357,7 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
               )
             : undefined;
         const baseColor = dominantCategory
-          ? (categoryColors[dominantCategory.name] ?? defaultColor)
+          ? categoryColor(dominantCategory)
           : defaultColor;
         const opacity = Math.min(chunkItem.total / 2300 / 14, 1);
         const red = parseInt(baseColor.slice(1, 3), 16);
@@ -361,8 +370,7 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
               ? todayBorderColor
               : dominantCategory?.name === "Steps"
                 ? defaultBorderColor
-                : (categoryColors[dominantCategory?.name ?? ""] ??
-                  defaultBorderColor);
+                : categoryColor(dominantCategory);
         const backgroundColor =
           !chunkItem.categories || chunkItem.total < 60
             ? defaultColor

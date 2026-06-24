@@ -13,6 +13,7 @@ type ActivityDay = {
   categories?: {
     name: string;
     total: number;
+    kind?: "exercise" | "sleep";
     distanceMeters?: number;
     steps?: number;
     caloriesKcal?: number;
@@ -141,6 +142,7 @@ function buildHealthSectionDays(
       }) => ({
         name,
         total,
+        kind,
         distanceMeters,
         steps,
         caloriesKcal,
@@ -157,6 +159,7 @@ function buildHealthSectionDays(
         categories.push({
           name: "Steps",
           total: stepSeconds,
+          kind,
           steps: row.steps,
           distanceMeters: row.distanceMeters > 0 ? row.distanceMeters : undefined,
           caloriesKcal: row.activeCaloriesKcal > 0 ? row.activeCaloriesKcal : undefined,
