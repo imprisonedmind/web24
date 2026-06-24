@@ -152,6 +152,11 @@ export type SyncedReadingActivity = {
   } | null;
 };
 
+export type SyncedGamingStatus = {
+  currentGame: { gameId: string; title: string; executable: string; platform: string; startedAtMs: number; heartbeatAtMs: number; coverUrl?: string } | null;
+  lastSession: { externalId: string; gameId: string; title: string; executable: string; platform: string; startedAtMs: number; endedAtMs: number; durationSeconds: number; source: string; updatedAtMs: number; coverUrl?: string } | null;
+};
+
 let client: ConvexHttpClient | null = null;
 const CONVEX_QUERY_TTL_MS = 60_000;
 const CONVEX_QUERY_STALE_MS = 5 * 60_000;
@@ -284,5 +289,33 @@ export async function getSyncedReadingVersion() {
   return cachedConvexQuery(
     "reading:sync-version",
     async () => (await getClient().query(api.reading.getSyncVersion, {})) as string,
+  );
+}
+
+export async function listSyncedGamingDailyActivity(args?: { startDate?: string; endDate?: string }) {
+  return cachedConvexQuery(
+    cacheKey("gaming:daily-activity", args),
+    async () => getClient().query(api.gaming.listDailyActivity, args ?? {}),
+  );
+}
+
+export async function getSyncedGamingStatus() {
+  const status = await cachedConvexQuery(
+    "gaming:status",
+    async () => (await getClient().query(api.gaming.getStatus, {})) as SyncedGamingStatus,
+  );
+  const game = status.currentGame ?? status.lastSession;
+  if (!game || game.coverUrl) return status;
+  const coverUrl = await getClient().action(api.gaming.resolveCover, { title: game.title, platform: game.platform });
+  if (!coverUrl) return status;
+  return status.currentGame
+    ? { ...status, currentGame: { ...status.currentGame, coverUrl } }
+    : { ...status, lastSession: status.lastSession ? { ...status.lastSession, coverUrl } : null };
+}
+
+export async function getSyncedGamingVersion() {
+  return cachedConvexQuery(
+    "gaming:sync-version",
+    async () => getClient().query(api.gaming.getSyncVersion, {}),
   );
 }

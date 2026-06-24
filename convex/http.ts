@@ -1,4 +1,5 @@
 import { httpRouter } from "convex/server";
+import type { FunctionArgs } from "convex/server";
 
 import { api } from "./_generated/api";
 import { httpAction } from "./_generated/server";
@@ -92,6 +93,24 @@ function validateSecret(request: Request) {
 
   return providedSecret === expectedSecret;
 }
+
+function validateGamingSecret(request: Request) {
+  const expected = process.env.GAMING_SYNC_SHARED_SECRET;
+  const authorization = request.headers.get("authorization");
+  return !!expected && authorization?.startsWith("Bearer ") === true && authorization.slice(7) === expected;
+}
+
+http.route({
+  path: "/gaming-sync/upload",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!process.env.GAMING_SYNC_SHARED_SECRET) return new Response(JSON.stringify({ error: "Missing GAMING_SYNC_SHARED_SECRET in Convex environment" }), { status: 500, headers: { "Content-Type": "application/json" } });
+    if (!validateGamingSecret(request)) return unauthorized();
+    const payload = (await request.json()) as FunctionArgs<typeof api.gaming.ingest>;
+    const result = await ctx.runMutation(api.gaming.ingest, payload);
+    return new Response(JSON.stringify({ ok: true, result }), { status: 200, headers: { "Content-Type": "application/json" } });
+  }),
+});
 
 http.route({
   path: "/health-sync/upload",

@@ -5,6 +5,7 @@ import {
   getSyncedHealthVersion,
   getSyncedHistoryVersion,
   getSyncedReadingVersion,
+  getSyncedGamingVersion,
 } from "../lib/convex";
 import {
   getFullActivityDays,
@@ -12,6 +13,7 @@ import {
   getHomeHeroHealthStats,
   getHomeActivityDays,
   getReadingActivitySections,
+  getGamingActivitySections,
   getWatchingActivityDays,
   getWorkActivitySections
 } from "../services/activity";
@@ -26,16 +28,18 @@ const activityWatchingCache = new AsyncCache<{ watchingDays: Awaited<ReturnType<
 const activityWorkCache = new AsyncCache<{ workSections: Awaited<ReturnType<typeof getWorkActivitySections>> }>();
 const activityHealthCache = new AsyncCache<{ healthSections: Awaited<ReturnType<typeof getHealthActivitySections>> }>();
 const activityReadingCache = new AsyncCache<{ readingSections: Awaited<ReturnType<typeof getReadingActivitySections>> }>();
+const activityGamingCache = new AsyncCache<{ gamingSections: Awaited<ReturnType<typeof getGamingActivitySections>> }>();
 
 activityRoutes.get("/home", async c => {
   try {
-    const [historyVersion, healthVersion, readingVersion] = await Promise.all([
+    const [historyVersion, healthVersion, readingVersion, gamingVersion] = await Promise.all([
       getSyncedHistoryVersion(),
       getSyncedHealthVersion(),
-      getSyncedReadingVersion()
+      getSyncedReadingVersion(),
+      getSyncedGamingVersion(),
     ]);
     const payload = await activityHomeCache.getOrRefresh({
-      key: `activity:home:${historyVersion}:${healthVersion}:${readingVersion}`,
+      key: `activity:home:${historyVersion}:${healthVersion}:${readingVersion}:${gamingVersion}`,
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => ({
@@ -153,6 +157,22 @@ activityRoutes.get("/reading", async c => {
   } catch (error) {
     console.error("[api/activity/reading] failed", error);
     return c.json({ readingSections: [] }, 500);
+  }
+});
+
+activityRoutes.get("/gaming", async c => {
+  try {
+    const version = await getSyncedGamingVersion();
+    const payload = await activityGamingCache.getOrRefresh({
+      key: `activity:gaming:${version}`,
+      ttlMs: ACTIVITY_TTL_MS,
+      staleWhileRevalidateMs: ACTIVITY_STALE_MS,
+      loader: async () => ({ gamingSections: await getGamingActivitySections() }),
+    });
+    return c.json(payload, 200);
+  } catch (error) {
+    console.error("[api/activity/gaming] failed", error);
+    return c.json({ gamingSections: [] }, 500);
   }
 });
 

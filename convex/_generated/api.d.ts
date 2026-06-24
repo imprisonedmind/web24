@@ -10,6 +10,7 @@
 
 import type * as coding from "../coding.js";
 import type * as crons from "../crons.js";
+import type * as gaming from "../gaming.js";
 import type * as health from "../health.js";
 import type * as http from "../http.js";
 import type * as reading from "../reading.js";
@@ -24,6 +25,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   coding: typeof coding;
   crons: typeof crons;
+  gaming: typeof gaming;
   health: typeof health;
   http: typeof http;
   reading: typeof reading;

@@ -138,6 +138,29 @@ export default defineSchema({
       }),
     ),
   }).index("by_key", ["key"]),
+  gamingSessions: defineTable({
+    externalId: v.string(), gameId: v.string(), title: v.string(), executable: v.string(),
+    platform: v.string(), startedAtMs: v.number(), endedAtMs: v.number(),
+    durationSeconds: v.number(), source: v.string(), updatedAtMs: v.number(),
+  }).index("by_externalId", ["externalId"]).index("by_startedAtMs", ["startedAtMs"]),
+  gamingSyncState: defineTable({
+    key: v.string(),
+    currentGame: v.optional(v.object({
+      gameId: v.string(), title: v.string(), executable: v.string(), platform: v.string(),
+      startedAtMs: v.number(), heartbeatAtMs: v.number(),
+    })),
+    updatedAtMs: v.number(),
+  }).index("by_key", ["key"]),
+  gamingMetadata: defineTable({
+    key: v.string(),
+    title: v.string(),
+    platform: v.string(),
+    status: v.union(v.literal("pending"), v.literal("resolved"), v.literal("failed")),
+    igdbId: v.optional(v.number()),
+    matchedTitle: v.optional(v.string()),
+    coverUrl: v.optional(v.string()),
+    updatedAtMs: v.number(),
+  }).index("by_key", ["key"]),
   codingDailyActivity: defineTable({
     date: v.string(),
     total: v.number(),

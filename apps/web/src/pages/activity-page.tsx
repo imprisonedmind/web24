@@ -11,6 +11,7 @@ import {
   activityReadingQueryOptions,
   activityWatchingQueryOptions,
   activityWorkQueryOptions,
+  activityGamingQueryOptions,
 } from "../lib/api";
 
 export function ActivityPage() {
@@ -30,6 +31,7 @@ export function ActivityPage() {
     data: readingSections = [],
     isLoading: isReadingLoading,
   } = useQuery(activityReadingQueryOptions);
+  const { data: gamingSections = [], isLoading: isGamingLoading } = useQuery(activityGamingQueryOptions);
 
   return (
     <section className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
@@ -71,6 +73,12 @@ export function ActivityPage() {
             days={section.days}
           />
         ))
+      )}
+
+      {isGamingLoading ? (
+        <ActivitySectionLoading title="gaming" />
+      ) : (
+        gamingSections.map(section => <ActivitySection key={section.label} title={section.label} days={section.days} />)
       )}
 
       {isHealthLoading

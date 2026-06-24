@@ -9,6 +9,7 @@ import { readingRoutes } from "./routes/reading";
 import { tvRoutes } from "./routes/tv";
 import { watchedRoutes } from "./routes/watched";
 import { writingRoutes } from "./routes/writing";
+import { gamingRoutes } from "./routes/gaming";
 
 type ApiEnv = {
   Bindings: {
@@ -41,6 +42,7 @@ app.route("/api/activity", activityRoutes);
 app.route("/api/music", musicRoutes);
 app.route("/api/reading", readingRoutes);
 app.route("/api/writing", writingRoutes);
+app.route("/api/gaming", gamingRoutes);
 app.get("/api/currentlyPlaying", async c => {
   try {
     const data = await getCurrentlyPlaying(true);

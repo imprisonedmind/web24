@@ -5,6 +5,7 @@ import {
   musicQueryOptions,
   readingStatusQueryOptions,
   tvStatusQueryOptions,
+  gamingStatusQueryOptions,
   type ReadingStatus,
   type SongData,
   type TvEntry,
@@ -37,6 +38,90 @@ function getEpisodeCode(entry?: TvEntry | null) {
     return `${entry.season}x${entry.episode}`;
   }
   return null;
+}
+
+function formatGamingDuration(seconds: number) {
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  return minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes}m`;
+}
+
+export function GamingWidgetCard() {
+  const { data: status } = useQuery(gamingStatusQueryOptions);
+  const game = status?.currentGame ?? status?.lastSession;
+  if (!game) return null;
+  const isPlaying = Boolean(status?.currentGame);
+  const meta = isPlaying
+    ? formatGamingDuration((Date.now() - game.startedAtMs) / 1000)
+    : formatDistanceLabel(new Date(status!.lastSession!.endedAtMs).toISOString());
+
+  return (
+    <div className="flex w-full flex-col gap-1">
+      <SectionHeader title={isPlaying ? "playing" : "played"} action={<SmallLink href="/activity" label="more" ariaLabel="More gaming activity" />} />
+      <div className="flex min-h-[32rem] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
+        <div className="relative min-h-0 flex-1 overflow-hidden rounded-lg bg-neutral-100 text-neutral-600 md:h-72 md:flex-none">
+          {game.coverUrl ? (
+            <img src={game.coverUrl} alt={game.title} className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full min-h-72 flex-col items-center justify-center gap-5 p-8 text-center">
+              <p className="line-clamp-3 text-2xl font-semibold leading-tight">{game.title}</p>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <p className="min-w-0 truncate text-sm font-medium text-neutral-800">{game.title}</p>
+          <div className="flex-shrink-0 rounded-full bg-neutral-100 px-2 py-1 text-xs text-neutral-700">{meta}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function parseTime(value?: string | number | null) {
+  if (typeof value === "number") return value;
+  if (!value) return 0;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+export function HomeWidgetGrid() {
+  const { data: tv } = useQuery(tvStatusQueryOptions);
+  const { data: reading } = useQuery(readingStatusQueryOptions);
+  const { data: music } = useQuery(musicQueryOptions);
+  const { data: gaming } = useQuery(gamingStatusQueryOptions);
+
+  const candidates = [
+    {
+      key: "tv",
+      available: Boolean(tv?.currentlyWatching ?? tv?.lastWatched),
+      timestamp: tv?.currentlyWatching ? Date.now() : parseTime(tv?.lastWatched?.watchedAt),
+      element: <TvWidgetCard />,
+    },
+    {
+      key: "reading",
+      available: Boolean(reading),
+      timestamp: parseTime(reading?.lastReadDate),
+      element: <ReadingWidgetCard />,
+    },
+    {
+      key: "music",
+      available: Boolean(music?.title),
+      timestamp: music?.isPlaying ? Date.now() : parseTime(music?.recentlyPlayed?.[0]?.playedAt ?? music?.playedAt),
+      element: <MusicWidgetCard />,
+    },
+    {
+      key: "gaming",
+      available: Boolean(gaming?.currentGame ?? gaming?.lastSession),
+      timestamp: gaming?.currentGame?.heartbeatAtMs ?? gaming?.lastSession?.endedAtMs ?? 0,
+      element: <GamingWidgetCard />,
+    },
+  ];
+  const visible = new Set(candidates.filter(item => item.available).sort((left, right) => right.timestamp - left.timestamp).slice(0, 3).map(item => item.key));
+
+  return (
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {candidates.filter(item => visible.has(item.key)).map(item => <div key={item.key}>{item.element}</div>)}
+    </section>
+  );
 }
 
 export function TvWidgetCard() {

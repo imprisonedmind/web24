@@ -55,6 +55,11 @@ export type SongData = {
   progressMs?: number;
 };
 
+export type GamingStatus = {
+  currentGame: { gameId: string; title: string; startedAtMs: number; heartbeatAtMs: number; coverUrl?: string } | null;
+  lastSession: { gameId: string; title: string; startedAtMs: number; endedAtMs: number; durationSeconds: number; coverUrl?: string } | null;
+};
+
 async function fetchJson<T>(input: string) {
   const response = await fetch(input, {
     credentials: "include",
@@ -152,6 +157,21 @@ export const activityReadingQueryOptions = queryOptions({
     );
     return payload.readingSections ?? [];
   },
+  refetchInterval: 30_000,
+});
+
+export const activityGamingQueryOptions = queryOptions({
+  queryKey: ["activity", "gaming"],
+  queryFn: async () => {
+    const payload = await fetchJson<{ gamingSections?: { label: string; days: WatchDay[] }[] }>("/api/activity/gaming");
+    return payload.gamingSections ?? [];
+  },
+  refetchInterval: 30_000,
+});
+
+export const gamingStatusQueryOptions = queryOptions({
+  queryKey: ["gaming", "status"],
+  queryFn: async () => fetchJson<GamingStatus>("/api/gaming/status"),
   refetchInterval: 30_000,
 });
 

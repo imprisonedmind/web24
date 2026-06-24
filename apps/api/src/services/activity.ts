@@ -4,6 +4,7 @@ import {
   getSyncedHealthCurrentStats,
   listSyncedHealthDailyActivity,
   listSyncedReadingActivity,
+  listSyncedGamingDailyActivity,
 } from "../lib/convex";
 import { getWatchDaysLastYear } from "./watched";
 
@@ -83,16 +84,17 @@ export async function getCodingActivityDays(startDate?: string, endDate?: string
 export async function getHomeActivityDays(cookieHeader?: string | null, readingVersion?: string) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
-  const [codingDays, watchDays, healthRows, readingActivity] = await Promise.all([
+  const [codingDays, watchDays, healthRows, readingActivity, gamingDays] = await Promise.all([
     getCodingActivityDays(sinceDate, endDate),
     getWatchDaysLastYear(cookieHeader),
     listSyncedHealthDailyActivity({ startDate: sinceDate, endDate }),
-    listSyncedReadingActivity({ startDate: sinceDate, endDate, cacheVersion: readingVersion })
+    listSyncedReadingActivity({ startDate: sinceDate, endDate, cacheVersion: readingVersion }),
+    listSyncedGamingDailyActivity({ startDate: sinceDate, endDate }),
   ]);
   const exerciseDays = buildHealthSectionDays(healthRows, "exercise");
   const readingDays = buildReadingSectionDays(readingActivity.dailyActivity);
 
-  return mergeDays(codingDays, watchDays, exerciseDays, readingDays);
+  return mergeDays(codingDays, watchDays, exerciseDays, readingDays, gamingDays);
 }
 
 export async function getHomeHeroHealthStats() {
@@ -277,6 +279,13 @@ export async function getReadingActivitySections(readingVersion?: string) {
   const days = buildReadingSectionDays(activity.dailyActivity);
 
   return sumTotals(days) > 0 ? [{ label: "reading", days }] : [];
+}
+
+export async function getGamingActivitySections() {
+  const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const endDate = new Date().toISOString().slice(0, 10);
+  const days = await listSyncedGamingDailyActivity({ startDate: sinceDate, endDate });
+  return sumTotals(days) > 0 ? [{ label: "gaming", days }] : [];
 }
 
 export async function getFullActivityDays(cookieHeader?: string | null, readingVersion?: string) {
