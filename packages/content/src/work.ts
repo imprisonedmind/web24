@@ -41,6 +41,9 @@ export const professionalWorkItems: WorkItem[] = [
     description: "Case study on building a secure device management portal",
     year: "2024",
   },
+];
+
+export const archivedWorkItems: WorkItem[] = [
   {
     title: "PTTT",
     link: "https://parentingtheteentribe.com/",
@@ -67,6 +70,33 @@ export const professionalWorkItems: WorkItem[] = [
     alt: "Specno.com website cover image",
     description: "Specno portfolio landing highlighting startup case studies",
     year: "2020",
+  },
+  {
+    title: "sus.watch",
+    link: "https://suswatch.lukestephens.co.za",
+    tag: "web app",
+    image: "/images/work/sus_watch.jpg",
+    alt: "A device management portal",
+    description: "online database of counter strike cheaters",
+    year: "2025",
+  },
+  {
+    title: "Giggity",
+    link: "https://giggity.lukestephens.co.za/",
+    tag: "web app",
+    image: "/images/work/giggity2.png",
+    alt: "Giggity.co.za website cover image",
+    description: "Responsive brochure site for a South African geyser brand",
+    year: "2021",
+  },
+  {
+    title: "bloggin",
+    link: "https://notion-nextjs-bloggin.vercel.app/home",
+    tag: "web app",
+    image: "/images/work/bloggin.png",
+    alt: "bloggin website blog cover",
+    description: "Headless Notion blog starter using Next.js and Notion API",
+    year: "2021",
   },
 ];
 
@@ -145,33 +175,6 @@ export const personalWorkItems: WorkItem[] = [
     year: "2026",
   },
   {
-    title: "sus.watch",
-    link: "https://suswatch.lukestephens.co.za",
-    tag: "web app",
-    image: "/images/work/sus_watch.jpg",
-    alt: "A device management portal",
-    description: "online database of counter strike cheaters",
-    year: "2025",
-  },
-  {
-    title: "Giggity",
-    link: "https://giggity.lukestephens.co.za/",
-    tag: "web app",
-    image: "/images/work/giggity2.png",
-    alt: "Giggity.co.za website cover image",
-    description: "Responsive brochure site for a South African geyser brand",
-    year: "2021",
-  },
-  {
-    title: "bloggin",
-    link: "https://notion-nextjs-bloggin.vercel.app/home",
-    tag: "web app",
-    image: "/images/work/bloggin.png",
-    alt: "bloggin website blog cover",
-    description: "Headless Notion blog starter using Next.js and Notion API",
-    year: "2021",
-  },
-  {
     title: "Postz",
     link: "https://metaversal-posts.vercel.app/",
     tag: "web app",
@@ -234,6 +237,7 @@ export const workItems: WorkItem[] = [
   ...professionalWorkItems,
   ...personalWorkItems,
   ...collegeWorkItems,
+  ...archivedWorkItems,
 ];
 
 export function getAppWorkItems(limit?: number) {

@@ -1,4 +1,9 @@
-import { collegeWorkItems, personalWorkItems, professionalWorkItems } from "@web24/content";
+import {
+  archivedWorkItems,
+  collegeWorkItems,
+  personalWorkItems,
+  professionalWorkItems,
+} from "@web24/content";
 
 import { Breadcrumbs } from "../components/breadcrumbs";
 import { WorkArea } from "../components/work-area";
@@ -10,6 +15,7 @@ export function WorkPage() {
       <WorkArea header="professional" data={professionalWorkItems} />
       <WorkArea header="personal" data={personalWorkItems} />
       <WorkArea header="college" data={collegeWorkItems} />
+      <WorkArea header="archived" data={archivedWorkItems} />
     </section>
   );
 }
