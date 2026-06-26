@@ -32,10 +32,32 @@ export function ActivityPage() {
     isLoading: isReadingLoading,
   } = useQuery(activityReadingQueryOptions);
   const { data: gamingSections = [], isLoading: isGamingLoading } = useQuery(activityGamingQueryOptions);
+  const sleepSection = healthSections.find(section => section.label === "sleep");
+  const exerciseSection = healthSections.find(section => section.label === "exercise");
+  const codingSection = workSections.find(section => section.label === "coding");
+  const remainingWorkSections = workSections.filter(section => section.label !== "coding");
 
   return (
     <section className="mb-8 flex flex-col gap-8 px-[calc(min(16px,8vw))] py-4 sm:px-0">
       <Breadcrumbs />
+
+      {isHealthLoading ? (
+        <ActivitySectionLoading title="sleep" />
+      ) : sleepSection ? (
+        <ActivitySection title={sleepSection.label} days={sleepSection.days} />
+      ) : null}
+
+      {isHealthLoading ? (
+        <ActivitySectionLoading title="exercise" />
+      ) : exerciseSection ? (
+        <ActivitySection title={exerciseSection.label} days={exerciseSection.days} />
+      ) : null}
+
+      {isWorkLoading ? (
+        <ActivitySectionLoading title="coding" />
+      ) : codingSection ? (
+        <ActivitySection title={codingSection.label} days={codingSection.days} />
+      ) : null}
 
       {isWatchingLoading ? (
         <ActivitySectionLoading
@@ -51,17 +73,26 @@ export function ActivityPage() {
         />
       )}
 
-      {isWorkLoading
-        ? ["coding", "writing"].map(label => (
-            <ActivitySectionLoading key={label} title={label} />
-          ))
-        : workSections.map(section => (
-            <ActivitySection
-              key={section.label}
-              title={section.label}
-              days={section.days}
-            />
-          ))}
+      {isGamingLoading ? (
+        <ActivitySectionLoading title="gaming" />
+      ) : (
+        gamingSections.map(section => (
+          <ActivitySection
+            key={section.label}
+            title={section.label}
+            days={section.days}
+            activityColor="#111827"
+          />
+        ))
+      )}
+
+      {remainingWorkSections.map(section => (
+        <ActivitySection
+          key={section.label}
+          title={section.label}
+          days={section.days}
+        />
+      ))}
 
       {isReadingLoading ? (
         <ActivitySectionLoading title="reading" />
@@ -74,24 +105,6 @@ export function ActivityPage() {
           />
         ))
       )}
-
-      {isGamingLoading ? (
-        <ActivitySectionLoading title="gaming" />
-      ) : (
-        gamingSections.map(section => <ActivitySection key={section.label} title={section.label} days={section.days} />)
-      )}
-
-      {isHealthLoading
-        ? ["exercise", "sleep"].map(label => (
-            <ActivitySectionLoading key={label} title={label} />
-          ))
-        : healthSections.map(section => (
-            <ActivitySection
-              key={section.label}
-              title={section.label}
-              days={section.days}
-            />
-          ))}
     </section>
   );
 }

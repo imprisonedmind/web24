@@ -123,6 +123,21 @@ function sumTotals(days: { total: number }[]) {
   return days.reduce((acc, curr) => acc + (curr.total ?? 0), 0);
 }
 
+function fillActivityDateRange(rows: ActivityDay[], startDate: string, endDate: string) {
+  const daysByDate = new Map(rows.map(row => [row.date, row]));
+  const days: ActivityDay[] = [];
+  const cursor = new Date(`${startDate}T00:00:00.000Z`);
+  const end = new Date(`${endDate}T00:00:00.000Z`);
+
+  while (cursor <= end) {
+    const date = cursor.toISOString().slice(0, 10);
+    days.push(daysByDate.get(date) ?? { date, total: 0, categories: [] });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return days;
+}
+
 function buildHealthSectionDays(
   rows: Awaited<ReturnType<typeof listSyncedHealthDailyActivity>>,
   kind: "exercise" | "sleep"
@@ -284,7 +299,11 @@ export async function getReadingActivitySections(readingVersion?: string) {
 export async function getGamingActivitySections() {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
-  const days = await listSyncedGamingDailyActivity({ startDate: sinceDate, endDate });
+  const days = fillActivityDateRange(
+    await listSyncedGamingDailyActivity({ startDate: sinceDate, endDate }),
+    sinceDate,
+    endDate
+  );
   return sumTotals(days) > 0 ? [{ label: "gaming", days }] : [];
 }
 

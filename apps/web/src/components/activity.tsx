@@ -300,7 +300,13 @@ function ActivityTooltip({
   );
 }
 
-function Chunk({ chunk }: { chunk: WatchDay[] }) {
+function Chunk({
+  chunk,
+  activityColor,
+}: {
+  chunk: WatchDay[];
+  activityColor?: string;
+}) {
   const categoryColors: Record<string, string> = {
     Coding: "#20b958",
     Designing: "#a855f7",
@@ -332,6 +338,7 @@ function Chunk({ chunk }: { chunk: WatchDay[] }) {
     if (categoryColors[category.name]) return categoryColors[category.name];
     if (category.kind === "exercise") return categoryColors.Exercise;
     if (category.kind === "sleep") return categoryColors.Sleep;
+    if (activityColor) return activityColor;
     return defaultColor;
   };
 
@@ -466,11 +473,13 @@ export function ActivitySection({
   days,
   header,
   emptyMessage,
+  activityColor,
 }: {
   title: string;
   days: WatchDay[];
   header?: ReactNode;
   emptyMessage?: string;
+  activityColor?: string;
 }) {
   if (!days.length) {
     return emptyMessage ? (
@@ -490,7 +499,7 @@ export function ActivitySection({
         <HeatMapDates />
         <div className="flex w-full flex-nowrap justify-end overflow-x-clip pr-[16px] sm:pr-[14px]">
           {chunkArray(days, 7).map((chunk, index) => (
-            <Chunk key={index} chunk={chunk} />
+            <Chunk key={index} chunk={chunk} activityColor={activityColor} />
           ))}
         </div>
       </div>
