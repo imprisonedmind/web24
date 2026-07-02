@@ -9,6 +9,7 @@ export type ImagePresetName =
   | "previewCard"
   | "appLogo"
   | "appPreview"
+  | "gadgetCard"
   | "locationMap"
   | "techLogo"
   | "musicArtwork";
@@ -59,6 +60,13 @@ export const imagePresets: Record<ImagePresetName, ImagePreset> = {
     height: 176,
     widths: [220, 440],
     sizes: "220px",
+  },
+  gadgetCard: {
+    width: 185,
+    height: 185,
+    widths: [240, 370],
+    sizes: "185px",
+    fit: "contain",
   },
   locationMap: {
     width: 640,

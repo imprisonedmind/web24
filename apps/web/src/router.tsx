@@ -29,6 +29,7 @@ const ReadListPage = lazy(() =>
   import("./pages/read-list-page").then((module) => ({ default: module.ReadListPage }))
 );
 const TechPage = lazy(() => import("./pages/tech-page").then((module) => ({ default: module.TechPage })));
+const GadgetsPage = lazy(() => import("./pages/gadgets-page").then((module) => ({ default: module.GadgetsPage })));
 
 const rootRoute = createRootRoute({
   component: AppFrame,
@@ -137,6 +138,12 @@ const techRoute = createRoute({
   component: TechPage,
 });
 
+const gadgetsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/gadgets",
+  component: GadgetsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   workRoute,
@@ -153,6 +160,7 @@ const routeTree = rootRoute.addChildren([
   readFinishedRoute,
   readSessionsRoute,
   techRoute,
+  gadgetsRoute,
 ]);
 
 export function createAppRouter({ history }: { history: RouterHistory }) {

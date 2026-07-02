@@ -5,6 +5,7 @@ import {
   BioSection,
   EducationSection,
   EmploymentSection,
+  GadgetsSection,
   LocationSection,
   SocialSection,
   TechSection,
@@ -83,6 +84,8 @@ export function HomePage() {
         <HomeWidgetGrid />
 
         <TechSection />
+
+        <GadgetsSection />
       </section>
     </section>
   );

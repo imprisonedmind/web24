@@ -135,5 +135,14 @@ export const publicRoutes: PublicRoute[] = [
       description:
         "Tools, frameworks, and technology used by Luke Stephens."
     }
+  },
+  {
+    path: "/gadgets",
+    label: "Gadgets",
+    seo: {
+      title: "Gadgets — Luke Stephens",
+      description:
+        "Personal devices, desk gear, and gadgets used by Luke Stephens."
+    }
   }
 ];

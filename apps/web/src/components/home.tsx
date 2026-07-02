@@ -1,4 +1,5 @@
 import { BlueDot } from "./blue-dot";
+import { gadgetItems } from "../lib/gadgets";
 import { orderedTechItems } from "../lib/tech";
 import { CFImage } from "./cf-image";
 import { BulletPoint, SectionHeader, SmallLink } from "./legacy";
@@ -19,10 +20,22 @@ export function SocialSection() {
     <div>
       <SectionHeader title="social" />
       <div className="flex flex-col">
-        <SmallLink href="https://www.thecrag.com/climber/luke6" label="thecrag.com" external />
-        <SmallLink href="https://twitter.com/lukey_stephens" label="twitter.com" external />
+        <SmallLink
+          href="https://www.thecrag.com/climber/luke6"
+          label="thecrag.com"
+          external
+        />
+        <SmallLink
+          href="https://twitter.com/lukey_stephens"
+          label="twitter.com"
+          external
+        />
         <SmallLink href="https://layers.to/lukey" label="layers.to" external />
-        <SmallLink href="https://github.com/imprisonedmind" label="github.com" external />
+        <SmallLink
+          href="https://github.com/imprisonedmind"
+          label="github.com"
+          external
+        />
       </div>
     </div>
   );
@@ -50,7 +63,9 @@ export function EducationSection() {
     <div>
       <SectionHeader title="education" />
       <div className="flex flex-col">
-        <p className="text-sm text-neutral-500">BA Visual Communications Degree</p>
+        <p className="text-sm text-neutral-500">
+          BA Visual Communications Degree
+        </p>
         <BulletPoint title="major in multimedia" date="'18-20" />
       </div>
     </div>
@@ -90,7 +105,14 @@ export function TechSection() {
     <div className="px-4 md:px-0">
       <SectionHeader
         title="tech"
-        action={<SmallLink href="/tech" label="more" ariaLabel="More tech" srSuffix=" tech" />}
+        action={
+          <SmallLink
+            href="/tech"
+            label="more"
+            ariaLabel="More tech"
+            srSuffix=" tech"
+          />
+        }
       />
       <div className="tech-marquee relative overflow-hidden py-4">
         <div className="tech-marquee-track flex w-max items-center gap-4 px-4">
@@ -115,5 +137,47 @@ export function TechSection() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function GadgetsSection() {
+  return (
+    <section className="flex w-full flex-col gap-1">
+      <SectionHeader
+        title="gadgets"
+        action={
+          <SmallLink
+            href="/gadgets"
+            label="more"
+            ariaLabel="More gadgets"
+            srSuffix=" gadgets"
+          />
+        }
+      />
+      <div className="flex flex-row gap-2 overflow-x-auto pb-4">
+        {gadgetItems.map((item, index) => (
+          <div
+            key={item.image}
+            className="flex min-w-[185px] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm"
+          >
+            <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-neutral-100">
+              <CFImage
+                className="h-full w-full object-contain p-2"
+                src={item.image}
+                alt={item.title}
+                preset="gadgetCard"
+                loading={index === 0 ? "eager" : undefined}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-sm text-neutral-800">{item.title}</p>
+              <p className="flex-shrink-0 rounded-full bg-neutral-100 p-1 px-2 text-xs lowercase text-neutral-600">
+                {item.tag}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
