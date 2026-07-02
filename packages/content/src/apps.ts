@@ -51,7 +51,7 @@ export const appItems: AppItem[] = [
   {
     title: "Notepond",
     link: "https://notepond.app",
-    tag: "web app",
+    tag: "macOS app",
     image: "/images/apps/logos/notepond.png",
     previewImage: "https://notepond.app/og_1200x630.png",
     alt: "Notepond app logo",

@@ -104,7 +104,7 @@ export const personalWorkItems: WorkItem[] = [
   {
     title: "Notepond",
     link: "https://notepond.app",
-    tag: "web app",
+    tag: "macOS app",
     image: "https://notepond.app/og_1200x630.png",
     alt: "Notepond app logo",
     description: "note-taking app for capturing and organizing ideas",
