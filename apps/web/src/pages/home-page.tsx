@@ -36,7 +36,7 @@ export function HomePage() {
 
   return (
     <section className="mb-8 flex flex-col gap-8">
-      <section className="mt-8 flex flex-col justify-between gap-4 md:flex-row">
+      <section className="mt-0 sm:mt-8 flex flex-col justify-between gap-4 md:flex-row">
         <HeroImage
           src="/images/profile/luke2.jpg"
           alt="Luke Stephens"
