@@ -102,6 +102,15 @@ export const archivedWorkItems: WorkItem[] = [
 
 export const personalWorkItems: WorkItem[] = [
   {
+    title: "Notepond",
+    link: "https://notepond.app",
+    tag: "web app",
+    image: "https://notepond.app/og_1200x630.png",
+    alt: "Notepond app logo",
+    description: "note-taking app for capturing and organizing ideas",
+    year: "2026",
+  },
+  {
     title: "ootify.me",
     link: "https://ootify.me/",
     tag: "web addon",

@@ -48,4 +48,13 @@ export const appItems: AppItem[] = [
     logoFit: "contain",
     year: "2025",
   },
+  {
+    title: "Notepond",
+    link: "https://notepond.app",
+    tag: "web app",
+    image: "/images/apps/logos/notepond.png",
+    previewImage: "https://notepond.app/og_1200x630.png",
+    alt: "Notepond app logo",
+    year: "2026",
+  },
 ];
