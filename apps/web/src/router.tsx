@@ -15,6 +15,12 @@ const WritingDetailPage = lazy(() =>
 const ActivityPage = lazy(() =>
   import("./pages/activity-page").then((module) => ({ default: module.ActivityPage }))
 );
+const GamingPage = lazy(() =>
+  import("./pages/gaming-page").then((module) => ({ default: module.GamingPage }))
+);
+const GamingListPage = lazy(() =>
+  import("./pages/gaming-list-page").then((module) => ({ default: module.GamingListPage }))
+);
 const WatchedPage = lazy(() =>
   import("./pages/watched-page").then((module) => ({ default: module.WatchedPage }))
 );
@@ -66,6 +72,34 @@ const activityRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/activity",
   component: ActivityPage,
+});
+
+const gamingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/gaming",
+  loader: () => import("./pages/gaming-page").then((module) => module.preloadGamingPage()),
+  component: GamingPage,
+});
+
+const gamingRecentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/gaming/recent",
+  loader: () => import("./pages/gaming-list-page").then((module) => module.preloadGamingListPage("recent")),
+  component: () => <GamingListPage scope="recent" />,
+});
+
+const gamingMonthRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/gaming/month",
+  loader: () => import("./pages/gaming-list-page").then((module) => module.preloadGamingListPage("month")),
+  component: () => <GamingListPage scope="month" />,
+});
+
+const gamingAllTimeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/gaming/all-time",
+  loader: () => import("./pages/gaming-list-page").then((module) => module.preloadGamingListPage("all-time")),
+  component: () => <GamingListPage scope="all-time" />,
 });
 
 const watchedRoute = createRoute({
@@ -150,6 +184,10 @@ const routeTree = rootRoute.addChildren([
   writingRoute,
   writingDetailRoute,
   activityRoute,
+  gamingRoute,
+  gamingRecentRoute,
+  gamingMonthRoute,
+  gamingAllTimeRoute,
   watchedRoute,
   watchedRecentRoute,
   watchedMonthRoute,

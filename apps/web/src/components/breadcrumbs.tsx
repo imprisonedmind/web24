@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 
-type TopLevelRoute = "/" | "/work" | "/writing" | "/activity" | "/watched" | "/read" | "/tech" | "/gadgets";
+type TopLevelRoute = "/" | "/work" | "/writing" | "/activity" | "/gaming" | "/watched" | "/read" | "/tech" | "/gadgets";
 
 export function Breadcrumbs() {
   const pathname = useRouterState({

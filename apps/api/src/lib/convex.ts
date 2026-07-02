@@ -157,6 +157,30 @@ export type SyncedGamingStatus = {
   lastSession: { externalId: string; gameId: string; title: string; executable: string; platform: string; startedAtMs: number; endedAtMs: number; durationSeconds: number; source: string; updatedAtMs: number; coverUrl?: string } | null;
 };
 
+export type SyncedGamingSession = {
+  externalId: string;
+  gameId: string;
+  title: string;
+  executable: string;
+  platform: string;
+  startedAtMs: number;
+  endedAtMs: number;
+  durationSeconds: number;
+  source: string;
+  updatedAtMs: number;
+  coverUrl?: string;
+};
+
+export type SyncedGamingAggregate = {
+  gameId: string;
+  title: string;
+  platform: string;
+  durationSeconds: number;
+  sessions: number;
+  latestEndedAtMs: number;
+  coverUrl?: string;
+};
+
 let client: ConvexHttpClient | null = null;
 const CONVEX_QUERY_TTL_MS = 60_000;
 const CONVEX_QUERY_STALE_MS = 5 * 60_000;
@@ -316,6 +340,27 @@ export async function getSyncedGamingStatus() {
   return status.currentGame
     ? { ...status, currentGame: { ...status.currentGame, coverUrl } }
     : { ...status, lastSession: status.lastSession ? { ...status.lastSession, coverUrl } : null };
+}
+
+export async function listSyncedGamingSessions(args?: { limit?: number; cacheVersion?: string }) {
+  const { cacheVersion, ...queryArgs } = args ?? {};
+  return cachedConvexQuery(
+    cacheKey("gaming:sessions", { ...queryArgs, cacheVersion }),
+    async () => (await getClient().query(api.gaming.listRecentSessions, queryArgs)) as SyncedGamingSession[],
+  );
+}
+
+export async function listSyncedGamingAggregates(args?: {
+  startMs?: number;
+  endMs?: number;
+  limit?: number;
+  cacheVersion?: string;
+}) {
+  const { cacheVersion, ...queryArgs } = args ?? {};
+  return cachedConvexQuery(
+    cacheKey("gaming:aggregates", { ...queryArgs, cacheVersion }),
+    async () => (await getClient().query(api.gaming.listMostPlayed, queryArgs)) as SyncedGamingAggregate[],
+  );
 }
 
 export async function getSyncedGamingVersion() {

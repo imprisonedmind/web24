@@ -97,6 +97,82 @@ export const listDailyActivity = query({
   },
 });
 
+export const listRecentSessions = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 12;
+    const sessions = await ctx.db.query("gamingSessions").withIndex("by_startedAtMs").order("desc").take(limit);
+    const metadataByKey = new Map<string, { coverUrl?: string } | null>();
+
+    for (const session of sessions) {
+      const key = metadataKey(session.title);
+      if (!metadataByKey.has(key)) {
+        metadataByKey.set(
+          key,
+          await ctx.db.query("gamingMetadata").withIndex("by_key", q => q.eq("key", key)).unique(),
+        );
+      }
+    }
+
+    return sessions.map(session => ({
+      ...session,
+      coverUrl: metadataByKey.get(metadataKey(session.title))?.coverUrl,
+    }));
+  },
+});
+
+export const listMostPlayed = query({
+  args: { startMs: v.optional(v.number()), endMs: v.optional(v.number()), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 12;
+    const sessions = await ctx.db.query("gamingSessions").withIndex("by_startedAtMs").collect();
+    const totals = new Map<string, {
+      gameId: string;
+      title: string;
+      platform: string;
+      durationSeconds: number;
+      sessions: number;
+      latestEndedAtMs: number;
+    }>();
+
+    for (const session of sessions) {
+      const startedAtMs = Math.max(session.startedAtMs, args.startMs ?? session.startedAtMs);
+      const endedAtMs = Math.min(session.endedAtMs, args.endMs ?? session.endedAtMs);
+      if (endedAtMs <= startedAtMs) continue;
+      const durationSeconds = Math.max(1, Math.round((endedAtMs - startedAtMs) / 1000));
+
+      const key = metadataKey(session.title);
+      const existing = totals.get(key);
+      if (existing) {
+        existing.durationSeconds += durationSeconds;
+        existing.sessions += 1;
+        existing.latestEndedAtMs = Math.max(existing.latestEndedAtMs, session.endedAtMs);
+      } else {
+        totals.set(key, {
+          gameId: session.gameId,
+          title: session.title,
+          platform: session.platform,
+          durationSeconds,
+          sessions: 1,
+          latestEndedAtMs: session.endedAtMs,
+        });
+      }
+    }
+
+    const items = [...totals.entries()]
+      .sort(([, left], [, right]) => right.durationSeconds - left.durationSeconds)
+      .slice(0, limit);
+    const metadata = await Promise.all(
+      items.map(([key]) => ctx.db.query("gamingMetadata").withIndex("by_key", q => q.eq("key", key)).unique()),
+    );
+
+    return items.map(([, item], index) => ({
+      ...item,
+      coverUrl: metadata[index]?.coverUrl,
+    }));
+  },
+});
+
 export const getStatus = query({
   args: {},
   handler: async ctx => {

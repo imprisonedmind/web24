@@ -16,6 +16,9 @@ import { SectionHeader, SmallLink } from "./legacy";
 import { IPodContainer } from "./music-ipod-container";
 import { IpodScreen } from "./music-ipod-screen";
 
+const widgetCardClass = "flex h-[32rem] w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm md:h-auto";
+const widgetMediaClass = "relative h-[29rem] min-h-0 w-full overflow-hidden rounded-lg md:h-72";
+
 function formatDistanceLabel(value?: string | null) {
   if (!value) return null;
 
@@ -56,13 +59,13 @@ export function GamingWidgetCard() {
 
   return (
     <div className="flex w-full flex-col gap-1">
-      <SectionHeader title={isPlaying ? "playing" : "played"} action={<SmallLink href="/activity" label="more" ariaLabel="More gaming activity" />} />
-      <div className="flex min-h-[32rem] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
-        <div className="relative min-h-0 flex-1 overflow-hidden rounded-lg bg-neutral-100 text-neutral-600 md:h-72 md:flex-none">
+      <SectionHeader title={isPlaying ? "playing" : "played"} action={<SmallLink href="/gaming" label="more" ariaLabel="More gaming activity" />} />
+      <div className={widgetCardClass}>
+        <div className={`${widgetMediaClass} bg-neutral-100 text-neutral-600`}>
           {game.coverUrl ? (
             <img src={game.coverUrl} alt={game.title} className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full min-h-72 flex-col items-center justify-center gap-5 p-8 text-center">
+            <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
               <p className="line-clamp-3 text-2xl font-semibold leading-tight">{game.title}</p>
             </div>
           )}
@@ -167,8 +170,8 @@ export function TvWidgetCard() {
         title={label}
         action={<SmallLink href="/watched" label="more" ariaLabel="More watched" srSuffix=" watched" />}
       />
-      <div className="flex min-h-[32rem] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
-        <div className="relative h-full w-full overflow-hidden rounded-lg md:h-72">
+      <div className={widgetCardClass}>
+        <div className={widgetMediaClass}>
           {activeEntry ? (
             <a href={activeEntry.url} target="_blank" rel="noreferrer" className="block h-full w-full">
               <CFImage
@@ -230,8 +233,8 @@ export function ReadingWidgetCard() {
         title="read"
         action={<SmallLink href="/read" label="more" ariaLabel="More read" srSuffix=" read" />}
       />
-      <div className="flex min-h-[32rem] flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
-        <div className="relative h-full w-full overflow-hidden rounded-lg bg-neutral-100 md:h-72">
+      <div className={widgetCardClass}>
+        <div className={`${widgetMediaClass} bg-neutral-100`}>
           {book.coverUrl ? (
             <a
               href={`https://openlibrary.org/search?q=${encodeURIComponent(`${book.title} ${book.author ?? ""}`)}`}
@@ -333,7 +336,7 @@ export function MusicWidgetCard() {
   return (
     <div className="flex w-full flex-col gap-1">
       <SectionHeader title={headerTitle} />
-      <div className="flex min-h-[32rem] w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
+      <div className={widgetCardClass}>
         <div className="h-[29rem] min-h-0 md:h-72">
           <IPodContainer status={playbackStatus}>
             <IpodScreen

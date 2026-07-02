@@ -32,3 +32,11 @@ export type ReadingItem = {
   href: string;
   meta?: string;
 };
+
+export type GamingItem = {
+  id: string;
+  title: string;
+  coverUrl?: string;
+  href?: string;
+  meta?: string;
+};

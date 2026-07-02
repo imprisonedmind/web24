@@ -128,6 +128,42 @@ export const publicRoutes: PublicRoute[] = [
     }
   },
   {
+    path: "/gaming",
+    label: "Gaming",
+    seo: {
+      title: "Gaming — Luke Stephens",
+      description:
+        "Recent game sessions and most played games by Luke Stephens."
+    }
+  },
+  {
+    path: "/gaming/recent",
+    label: "Recently Played",
+    seo: {
+      title: "Recently Played Games — Luke Stephens",
+      description:
+        "Recent gaming activity by Luke Stephens."
+    }
+  },
+  {
+    path: "/gaming/month",
+    label: "Most Played This Month",
+    seo: {
+      title: "Most Played Games This Month — Luke Stephens",
+      description:
+        "Monthly gaming stats and rankings by Luke Stephens."
+    }
+  },
+  {
+    path: "/gaming/all-time",
+    label: "Most Played All Time",
+    seo: {
+      title: "Most Played Games All Time — Luke Stephens",
+      description:
+        "All-time gaming stats and rankings by Luke Stephens."
+    }
+  },
+  {
     path: "/tech",
     label: "Tech",
     seo: {

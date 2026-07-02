@@ -87,8 +87,8 @@ function IpodScreenComponent({
           rel="noreferrer"
           className="flex min-h-0 flex-1 flex-col items-center justify-between gap-3 p-2 pb-1"
         >
-          <div className="flex w-full min-h-0 grow gap-2 overflow-hidden">
-            <div className="relative aspect-square h-full max-w-[96px] flex-shrink-0 overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
+          <div className="flex w-full min-h-0 grow items-center justify-center overflow-hidden">
+            <div className="relative aspect-square h-full max-w-full flex-shrink-0 overflow-hidden rounded-sm border border-neutral-700 bg-neutral-800">
               <CFImage
                 src={track.albumImageUrl || "/images/profile/lukeOG.jpg"}
                 alt={track.title}
@@ -96,15 +96,6 @@ function IpodScreenComponent({
                 preset="musicArtwork"
                 unoptimized={Boolean(track.albumImageUrl)}
               />
-            </div>
-
-            <div className="my-auto min-w-0 flex flex-col gap-1 text-left leading-tight">
-              <p className="truncate text-[10px] font-semibold text-black">{track.title}</p>
-
-              <div className="min-w-0">
-                <p className="truncate text-[9px] text-neutral-600">{track.artist}</p>
-                <p className="truncate text-[8px] text-neutral-500">{track.album}</p>
-              </div>
             </div>
           </div>
 

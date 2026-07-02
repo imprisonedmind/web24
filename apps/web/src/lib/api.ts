@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import type { ExtendedRecordMap } from "notion-types";
 
-import type { ReadingItem, WatchDay, WatchedItem } from "../types";
+import type { GamingItem, ReadingItem, WatchDay, WatchedItem } from "../types";
 
 export type TvEntry = {
   type: "movie" | "show" | "episode";
@@ -174,6 +174,36 @@ export const gamingStatusQueryOptions = queryOptions({
   queryFn: async () => fetchJson<GamingStatus>("/api/gaming/status"),
   refetchInterval: 30_000,
 });
+
+export const gamingOverviewQueryOptions = queryOptions({
+  queryKey: ["gaming", "overview"],
+  queryFn: async () => {
+    const [recent, month, allTime] = await Promise.all([
+      fetchJson<{ items?: GamingItem[] }>("/api/gaming/recent?limit=12"),
+      fetchJson<{ items?: GamingItem[] }>("/api/gaming/month?limit=12"),
+      fetchJson<{ items?: GamingItem[] }>("/api/gaming/all-time?limit=12"),
+    ]);
+
+    return {
+      recentItems: recent.items ?? [],
+      monthItems: month.items ?? [],
+      allTimeItems: allTime.items ?? [],
+    };
+  },
+});
+
+export function gamingListQueryOptions(
+  scope: "recent" | "month" | "all-time",
+  limit: number,
+) {
+  return queryOptions({
+    queryKey: ["gaming", scope, limit],
+    queryFn: async () => {
+      const payload = await fetchJson<{ items?: GamingItem[] }>(`/api/gaming/${scope}?limit=${limit}`);
+      return payload.items ?? [];
+    },
+  });
+}
 
 export const watchedOverviewQueryOptions = queryOptions({
   queryKey: ["watched", "overview"],
