@@ -43,7 +43,7 @@ activityRoutes.get("/home", async c => {
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
       loader: async () => ({
-        days: await getHomeActivityDays(undefined, readingVersion),
+        days: await getHomeActivityDays(undefined, readingVersion, gamingVersion),
       }),
     });
     return c.json(payload, 200);
@@ -167,7 +167,7 @@ activityRoutes.get("/gaming", async c => {
       key: `activity:gaming:${version}`,
       ttlMs: ACTIVITY_TTL_MS,
       staleWhileRevalidateMs: ACTIVITY_STALE_MS,
-      loader: async () => ({ gamingSections: await getGamingActivitySections() }),
+      loader: async () => ({ gamingSections: await getGamingActivitySections(version) }),
     });
     return c.json(payload, 200);
   } catch (error) {

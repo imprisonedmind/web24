@@ -292,10 +292,15 @@ export async function getSyncedReadingVersion() {
   );
 }
 
-export async function listSyncedGamingDailyActivity(args?: { startDate?: string; endDate?: string }) {
+export async function listSyncedGamingDailyActivity(args?: {
+  startDate?: string;
+  endDate?: string;
+  cacheVersion?: string;
+}) {
+  const { cacheVersion, ...queryArgs } = args ?? {};
   return cachedConvexQuery(
-    cacheKey("gaming:daily-activity", args),
-    async () => getClient().query(api.gaming.listDailyActivity, args ?? {}),
+    cacheKey("gaming:daily-activity", { ...queryArgs, cacheVersion }),
+    async () => getClient().query(api.gaming.listDailyActivity, queryArgs),
   );
 }
 

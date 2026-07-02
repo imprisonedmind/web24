@@ -81,7 +81,11 @@ export async function getCodingActivityDays(startDate?: string, endDate?: string
   return listSyncedCodingDailyActivity({ startDate, endDate });
 }
 
-export async function getHomeActivityDays(cookieHeader?: string | null, readingVersion?: string) {
+export async function getHomeActivityDays(
+  cookieHeader?: string | null,
+  readingVersion?: string,
+  gamingVersion?: string
+) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
   const [codingDays, watchDays, healthRows, readingActivity, gamingDays] = await Promise.all([
@@ -89,7 +93,7 @@ export async function getHomeActivityDays(cookieHeader?: string | null, readingV
     getWatchDaysLastYear(cookieHeader),
     listSyncedHealthDailyActivity({ startDate: sinceDate, endDate }),
     listSyncedReadingActivity({ startDate: sinceDate, endDate, cacheVersion: readingVersion }),
-    listSyncedGamingDailyActivity({ startDate: sinceDate, endDate }),
+    listSyncedGamingDailyActivity({ startDate: sinceDate, endDate, cacheVersion: gamingVersion }),
   ]);
   const exerciseDays = buildHealthSectionDays(healthRows, "exercise");
   const readingDays = buildReadingSectionDays(readingActivity.dailyActivity);
@@ -296,11 +300,11 @@ export async function getReadingActivitySections(readingVersion?: string) {
   return sumTotals(days) > 0 ? [{ label: "reading", days }] : [];
 }
 
-export async function getGamingActivitySections() {
+export async function getGamingActivitySections(gamingVersion?: string) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
   const days = fillActivityDateRange(
-    await listSyncedGamingDailyActivity({ startDate: sinceDate, endDate }),
+    await listSyncedGamingDailyActivity({ startDate: sinceDate, endDate, cacheVersion: gamingVersion }),
     sinceDate,
     endDate
   );
