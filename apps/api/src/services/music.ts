@@ -107,7 +107,7 @@ async function spotifyFetch(url: string) {
   });
 }
 
-function recentlyPlayedUrl(limit = 6) {
+function recentlyPlayedUrl(limit = 10) {
   const url = new URL(RECENTLY_PLAYED_ENDPOINT);
   url.searchParams.set("limit", String(Math.min(Math.max(limit, 1), 50)));
   return url.toString();
@@ -138,7 +138,7 @@ export async function getCurrentlyPlaying(requireTrack = true): Promise<SongData
   let recentTracks: RecentlyPlayedTrack[] = [];
 
   try {
-    const recentResponse = await spotifyFetch(recentlyPlayedUrl(6));
+    const recentResponse = await spotifyFetch(recentlyPlayedUrl(10));
     if (recentResponse.ok) {
       const recentPayload = (await recentResponse.json()) as { items?: RecentlyPlayedItem[] };
       recentTracks = (recentPayload.items ?? [])

@@ -11,7 +11,7 @@ export function IPodContainer({
   const isPaused = status === "paused";
 
   return (
-    <div className="relative grow rounded-lg">
+    <div className="relative h-full grow rounded-lg">
       <div className="relative h-full w-auto overflow-hidden rounded-xl border border-gray-400 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-500 shadow-2xl md:h-72">
         <div className="absolute left-4 right-4 top-0 h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
@@ -19,7 +19,7 @@ export function IPodContainer({
           <div className="relative h-full w-full">{children}</div>
         </div>
 
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 scale-[0.8] transform">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 scale-[0.9] transform md:bottom-0 md:scale-[0.8]">
           <div className="relative h-36 w-36 rounded-full border border-gray-300 bg-gradient-to-b from-white via-gray-50 to-gray-200 shadow-lg">
             <div className="absolute inset-1 rounded-full border border-gray-300 bg-gradient-to-b from-gray-50 to-gray-100">
               <div className="absolute left-1/2 top-3 -translate-x-1/2 transform text-[10px] font-medium tracking-wide text-gray-600">

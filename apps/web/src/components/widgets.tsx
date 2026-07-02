@@ -328,23 +328,25 @@ export function MusicWidgetCard() {
     <div className="flex w-full flex-col gap-1">
       <SectionHeader title={headerTitle} />
       <div className="flex min-h-[32rem] w-full flex-col gap-2 rounded-xl bg-white p-2 shadow-sm sm:min-h-0">
-        <IPodContainer status={playbackStatus}>
-          <IpodScreen
-            track={
-              songData ?? {
-                title: "",
-                artist: "",
-                album: "",
-                albumImageUrl: "",
-                songUrl: "#"
+        <div className="h-[29rem] min-h-0 md:h-72">
+          <IPodContainer status={playbackStatus}>
+            <IpodScreen
+              track={
+                songData ?? {
+                  title: "",
+                  artist: "",
+                  album: "",
+                  albumImageUrl: "",
+                  songUrl: "#"
+                }
               }
-            }
-            isPlaying={Boolean(songData?.isPlaying)}
-            relativePlayed={relativePlayed}
-            recentlyPlayed={songData?.recentlyPlayed}
-            recentRelative={recentRelative}
-          />
-        </IPodContainer>
+              isPlaying={Boolean(songData?.isPlaying)}
+              relativePlayed={relativePlayed}
+              recentlyPlayed={songData?.recentlyPlayed}
+              recentRelative={recentRelative}
+            />
+          </IPodContainer>
+        </div>
 
         <div className="flex items-center justify-between text-sm text-neutral-800">
           <p className="max-w-[180px] truncate lowercase">{displayTitle}</p>

@@ -37,7 +37,7 @@ function IpodScreenComponent({
   recentRelative?: string[];
 }) {
   const headerLabel = isPlaying ? "Now Playing" : "Songs";
-  const playlist = (recentlyPlayed ?? []).slice(0, 5);
+  const playlist = (recentlyPlayed ?? []).slice(0, 10);
   const baseProgress = track.progressMs ?? 0;
   const durationMs = track.durationMs ?? 0;
   const [progress, setProgress] = useState(baseProgress);
