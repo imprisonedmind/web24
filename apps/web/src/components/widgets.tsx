@@ -115,11 +115,17 @@ export function HomeWidgetGrid() {
       element: <GamingWidgetCard />,
     },
   ];
-  const visible = new Set(candidates.filter(item => item.available).sort((left, right) => right.timestamp - left.timestamp).slice(0, 3).map(item => item.key));
+  const visible = candidates
+    .filter(item => item.available)
+    .sort((left, right) => right.timestamp - left.timestamp);
 
   return (
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {candidates.filter(item => visible.has(item.key)).map(item => <div key={item.key}>{item.element}</div>)}
+    <section className="flex gap-4 overflow-x-scroll pb-4">
+      {visible.map(item => (
+        <div key={item.key} className="w-[min(85vw,26rem)] flex-none sm:w-[22rem] lg:w-[calc((100%-2rem)/3)]">
+          {item.element}
+        </div>
+      ))}
     </section>
   );
 }
