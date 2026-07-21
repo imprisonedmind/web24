@@ -30,12 +30,12 @@ export const appItems: AppItem[] = [
     year: "2026",
   },
   {
-    title: "finchy",
-    link: "https://finchy.lukestephens.co.za/",
+    title: "mooola",
+    link: "https://mooola.co.za/",
     tag: "mobile",
-    image: "/images/apps/logos/finchy.jpg",
+    image: "/images/apps/logos/mooola-logo.jpg",
     previewImage: "/images/apps/previews/finchy.jpg",
-    alt: "mobile app for spend management",
+    alt: "mooola spend management app logo",
     year: "2025",
   },
   {

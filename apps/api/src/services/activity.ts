@@ -14,7 +14,7 @@ type ActivityDay = {
   categories?: {
     name: string;
     total: number;
-    kind?: "exercise" | "sleep";
+    kind?: "exercise" | "sleep" | "gaming";
     distanceMeters?: number;
     steps?: number;
     caloriesKcal?: number;
@@ -77,6 +77,16 @@ function mergeDays(...dayGroups: ActivityDay[][]) {
   return Object.values(map).sort((a, b) => a.date.localeCompare(b.date));
 }
 
+function markGamingCategories(days: ActivityDay[]) {
+  return days.map(day => ({
+    ...day,
+    categories: day.categories?.map(category => ({
+      ...category,
+      kind: "gaming" as const,
+    })),
+  }));
+}
+
 export async function getCodingActivityDays(startDate?: string, endDate?: string) {
   return listSyncedCodingDailyActivity({ startDate, endDate });
 }
@@ -98,7 +108,13 @@ export async function getHomeActivityDays(
   const exerciseDays = buildHealthSectionDays(healthRows, "exercise");
   const readingDays = buildReadingSectionDays(readingActivity.dailyActivity);
 
-  return mergeDays(codingDays, watchDays, exerciseDays, readingDays, gamingDays);
+  return mergeDays(
+    codingDays,
+    watchDays,
+    exerciseDays,
+    readingDays,
+    markGamingCategories(gamingDays),
+  );
 }
 
 export async function getHomeHeroHealthStats() {
@@ -304,7 +320,9 @@ export async function getGamingActivitySections(gamingVersion?: string) {
   const sinceDate = new Date(Date.now() - 364 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const endDate = new Date().toISOString().slice(0, 10);
   const days = fillActivityDateRange(
-    await listSyncedGamingDailyActivity({ startDate: sinceDate, endDate, cacheVersion: gamingVersion }),
+    markGamingCategories(
+      await listSyncedGamingDailyActivity({ startDate: sinceDate, endDate, cacheVersion: gamingVersion })
+    ),
     sinceDate,
     endDate
   );

@@ -326,6 +326,7 @@ function Chunk({
     Sleep: "#2563eb",
     Nap: "#60a5fa",
     Reading: "#db2777",
+    Gaming: "#111827",
   };
   const today = new Date().toISOString().split("T")[0];
   const defaultColor = ACTIVITY_DEFAULT_COLOR;
@@ -335,6 +336,7 @@ function Chunk({
     category?: NonNullable<WatchDay["categories"]>[number],
   ) => {
     if (!category) return defaultColor;
+    if (category.kind === "gaming") return categoryColors.Gaming;
     if (categoryColors[category.name]) return categoryColors[category.name];
     if (category.kind === "exercise") return categoryColors.Exercise;
     if (category.kind === "sleep") return categoryColors.Sleep;
