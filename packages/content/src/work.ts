@@ -149,7 +149,7 @@ export const personalWorkItems: WorkItem[] = [
     title: "mooola",
     link: "https://mooola.co.za/",
     tag: "mobile",
-    image: "/images/apps/previews/finchy.jpg",
+    image: "https://mooola.co.za/assets/jpeg/mLarge.jpg",
     alt: "mooola mobile app for spend management",
     description: "local on device finance companion for capitec",
     year: "2025",
