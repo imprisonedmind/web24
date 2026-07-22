@@ -19,6 +19,7 @@ const REQUIRED_SCOPES = [
 
 const DEFAULT_PORT = 8721;
 const DEFAULT_CALLBACK_PATH = "/spotify/callback";
+const DEFAULT_REDIRECT_HOST = "127.0.0.1";
 
 function formatError(message: string): never {
   console.error(`\n❌ ${message}\n`);
@@ -154,7 +155,7 @@ async function login() {
   const redirectUri =
     env.SPOTIFY_REDIRECT_URI ??
     env.spotify_redirect_uri ??
-    `http://localhost:${DEFAULT_PORT}${DEFAULT_CALLBACK_PATH}`;
+    `http://${DEFAULT_REDIRECT_HOST}:${DEFAULT_PORT}${DEFAULT_CALLBACK_PATH}`;
 
   const state = randomBytes(16).toString("hex");
   const scopes = REQUIRED_SCOPES.join(" ");
