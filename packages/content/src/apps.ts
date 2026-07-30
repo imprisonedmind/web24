@@ -33,7 +33,7 @@ export const appItems: AppItem[] = [
     title: "mooola",
     link: "https://mooola.co.za/",
     tag: "mobile",
-    image: "/images/apps/logos/mooola-logo.jpg",
+    image: "/images/apps/logos/app-logo-512.png",
     previewImage: "https://mooola.co.za/assets/jpeg/mLarge.jpg",
     alt: "mooola spend management app logo",
     year: "2025",
