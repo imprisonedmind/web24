@@ -33,7 +33,7 @@ function HomeAppLogo({ item }: { item: AppItem }) {
         href={item.link}
         target={item.internal ? "_self" : "_blank"}
         rel={item.internal ? undefined : "noreferrer"}
-        className="flex h-[82px] w-[82px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-white text-inherit no-underline shadow-sm transition duration-150 ease-in-out hover:shadow-md"
+        className="flex h-[82px] w-[82px] items-center justify-center overflow-hidden rounded-[22px] border-4 border-white bg-white text-inherit no-underline shadow-sm transition duration-150 ease-in-out hover:shadow-md"
         aria-label={item.title}
       >
         <CFImage

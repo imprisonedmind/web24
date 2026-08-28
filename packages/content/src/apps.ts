@@ -12,6 +12,24 @@ export interface AppItem {
 
 export const appItems: AppItem[] = [
   {
+    title: "mooola",
+    link: "https://mooola.co.za/",
+    tag: "mobile",
+    image: "/images/apps/logos/app-logo-512.png",
+    previewImage: "https://mooola.co.za/assets/jpeg/mLarge.jpg",
+    alt: "mooola spend management app logo",
+    year: "2025",
+  },
+  {
+    title: "Tomeio",
+    link: "https://tomeio.app/",
+    tag: "mobile app",
+    image: "https://tomeio.app/logo.png",
+    previewImage: "https://tomeio.app/assets/social/tomeio-large.jpg",
+    alt: "Tomeio book discovery app logo",
+    year: "2026",
+  },
+  {
     title: "Paymatey",
     link: "https://paymatey.net/",
     tag: "mobile app",
@@ -28,25 +46,6 @@ export const appItems: AppItem[] = [
     previewImage: "/images/apps/previews/yapboard.jpg",
     alt: "yapboard app logo",
     year: "2026",
-  },
-  {
-    title: "mooola",
-    link: "https://mooola.co.za/",
-    tag: "mobile",
-    image: "/images/apps/logos/app-logo-512.png",
-    previewImage: "https://mooola.co.za/assets/jpeg/mLarge.jpg",
-    alt: "mooola spend management app logo",
-    year: "2025",
-  },
-  {
-    title: "ootify",
-    link: "https://ootify.me/",
-    tag: "web addon",
-    image: "/images/apps/logos/ootify-logo-wordmark.svg",
-    previewImage: "/images/work/ootify.jpg",
-    alt: "ootify app logo",
-    logoFit: "contain",
-    year: "2025",
   },
   {
     title: "Notepond",
