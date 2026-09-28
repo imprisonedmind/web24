@@ -22,9 +22,9 @@ export function HeroImage({ src, alt }: HeroImageProps) {
 
   return (
     <div className="relative overflow-clip rounded-2xl">
-      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-neutral-950/90 via-neutral-950/0 to-neutral-950/0" />
+      <div className="absolute left-0 top-0 z-10 h-full w-full bg-gradient-to-t from-neutral-950/75 via-neutral-950/0 to-neutral-950/0" />
 
-      <div className="absolute bottom-0 left-0 w-full px-3 pb-2">
+      <div className="absolute bottom-0 left-0 z-20 w-full px-3 pb-2">
         <div className="flex w-full items-center justify-between">
           <IconText
             icon={<ActivityIcon size={16} className="text-white" />}
@@ -38,7 +38,7 @@ export function HeroImage({ src, alt }: HeroImageProps) {
       </div>
 
       <CFImage
-        className="mx-auto hidden max-h-[400px] max-w-[300px]  object-cover md:flex"
+        className="mx-auto hidden max-h-[400px] max-w-[300px] object-cover md:flex"
         src={src}
         alt={alt}
         preset="heroPortrait"
