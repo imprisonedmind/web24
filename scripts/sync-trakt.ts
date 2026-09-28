@@ -394,11 +394,16 @@ async function normalizeHistoryItem(item: TraktHistoryItem, tmdbKey?: string) {
   return null;
 }
 
-async function syncHistoryPages(
+export async function syncHistoryPages(
   convex: ConvexHttpClient,
   accessToken: string,
   clientId: string,
   tmdbKey?: string,
+  options: {
+    endpoint?: "sync/history" | "users/me/history";
+    startAtIso?: string;
+    maxPages?: number;
+  } = {},
 ) {
   let totalEntries = 0;
   let totalInserted = 0;
@@ -406,16 +411,23 @@ async function syncHistoryPages(
   let totalSkipped = 0;
   let totalDeduped = 0;
 
-  for (let page = 1; page <= 100; page++) {
+  const endpoint = options.endpoint ?? "sync/history";
+  const maxPages = options.maxPages ?? 100;
+
+  for (let page = 1; page <= maxPages; page++) {
     logStep(`Fetching Trakt history page ${page}`);
-    const response = await fetch(
-      `https://api.trakt.tv/sync/history?type=all&page=${page}&limit=100&extended=full,images`,
-      { headers: traktHeaders(accessToken, clientId) },
-    );
+    const url = new URL(`https://api.trakt.tv/${endpoint}`);
+    url.searchParams.set("page", String(page));
+    url.searchParams.set("limit", "100");
+    url.searchParams.set("extended", "full,images");
+    if (endpoint === "sync/history") url.searchParams.set("type", "all");
+    if (options.startAtIso) url.searchParams.set("start_at", options.startAtIso);
+
+    const response = await fetch(url, { headers: traktHeaders(accessToken, clientId) });
 
     if (!response.ok) {
       const text = await response.text();
-      formatError(`Failed fetching Trakt history page ${page}: ${response.status} ${text}`);
+      throw new Error(`Failed fetching Trakt history page ${page}: ${response.status} ${text}`);
     }
 
     const batch = (await response.json()) as TraktHistoryItem[];
@@ -453,7 +465,7 @@ async function syncHistoryPages(
   };
 }
 
-async function fetchCurrentlyWatching(
+export async function fetchCurrentlyWatching(
   accessToken: string,
   clientId: string,
   tmdbKey?: string,
@@ -469,7 +481,7 @@ async function fetchCurrentlyWatching(
   }
   if (!response.ok) {
     const text = await response.text();
-    formatError(`Failed fetching currently watching: ${response.status} ${text}`);
+    throw new Error(`Failed fetching currently watching: ${response.status} ${text}`);
   }
 
   const item = (await response.json()) as any;
@@ -586,8 +598,10 @@ async function main() {
   console.log(`Currently watching: ${syncResult.currentWatching ?? "none"}`);
 }
 
-void main().catch((error) => {
-  console.error("\n❌ Unexpected error during Trakt sync\n");
-  console.error(error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  void main().catch((error) => {
+    console.error("\n❌ Unexpected error during Trakt sync\n");
+    console.error(error);
+    process.exit(1);
+  });
+}
