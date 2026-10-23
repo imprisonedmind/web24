@@ -30,15 +30,6 @@ export const appItems: AppItem[] = [
     year: "2026",
   },
   {
-    title: "Paymatey",
-    link: "https://paymatey.net/",
-    tag: "mobile app",
-    image: "/images/apps/logos/logo_prod.jpeg",
-    previewImage: "/images/apps/previews/paymatey2.png",
-    alt: "Paymatey app logo",
-    year: "2026",
-  },
-  {
     title: "yapboard",
     link: "https://yapboard.app/",
     tag: "mobile app",
