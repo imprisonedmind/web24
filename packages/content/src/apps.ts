@@ -47,4 +47,12 @@ export const appItems: AppItem[] = [
     alt: "Notepond app logo",
     year: "2026",
   },
+  {
+    title: "send-thing",
+    link: "https://send-thing.lukestephens.co.za/",
+    tag: "web app",
+    image: "/images/apps/logos/send-thing.png",
+    previewImage: "https://send-thing.lukestephens.co.za/social/send-thing-og.jpg",
+    alt: "send-thing app logo",
+  },
 ];
